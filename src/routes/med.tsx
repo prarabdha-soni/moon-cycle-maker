@@ -10,6 +10,9 @@ import {
   Sunset,
   Moon,
   Bell,
+  GlassWater,
+  Droplet,
+  Minus,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 
