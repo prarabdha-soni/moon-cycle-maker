@@ -103,7 +103,68 @@ function MedScreen() {
             <Streak label="Streak" value="12 d" tone="period" />
             <Streak label="This week" value="86%" tone="fertile" />
             <Streak label="Refills" value="2" tone="pms" />
+        </div>
+
+        {/* Water intake card */}
+        <div className="mt-4 rounded-3xl border border-border bg-card p-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-[12px] uppercase tracking-wider text-muted-foreground">
+                Water intake
+              </p>
+              <p className="mt-1 font-display text-2xl font-medium text-foreground">
+                {water} <span className="text-base text-muted-foreground">/ {waterGoal} glasses</span>
+              </p>
+              <p className={`mt-1 text-[12px] ${water >= waterMin ? "text-fertile" : "text-pms"}`}>
+                {water >= waterMin
+                  ? `Daily minimum of ${waterMin} reached`
+                  : `${waterMin - water} more to reach the daily minimum`}
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setWater((w) => Math.max(0, w - 1))}
+                aria-label="Remove a glass"
+                className="grid size-9 place-items-center rounded-full border border-border bg-background text-muted-foreground"
+              >
+                <Minus className="size-4" />
+              </button>
+              <button
+                onClick={() => setWater((w) => Math.min(waterGoal + 4, w + 1))}
+                aria-label="Add a glass"
+                className="grid size-11 place-items-center rounded-full bg-fertile text-primary-foreground shadow-md shadow-fertile/30"
+              >
+                <GlassWater className="size-5" />
+              </button>
+            </div>
           </div>
+          <div className="mt-4 flex items-center gap-1.5">
+            {Array.from({ length: waterGoal }).map((_, i) => {
+              const filled = i < water;
+              const isMin = i < waterMin;
+              return (
+                <button
+                  key={i}
+                  onClick={() => setWater(i + 1)}
+                  aria-label={`Set ${i + 1} glasses`}
+                  className={`grid h-10 flex-1 place-items-center rounded-xl border transition-all ${
+                    filled
+                      ? "border-transparent bg-fertile/15 text-fertile"
+                      : isMin
+                        ? "border-pms/40 bg-pms/5 text-pms/70"
+                        : "border-border bg-background text-muted-foreground/50"
+                  }`}
+                >
+                  <Droplet
+                    className="size-4"
+                    strokeWidth={2}
+                    fill={filled ? "currentColor" : "none"}
+                  />
+                </button>
+              );
+            })}
+          </div>
+        </div>
         </div>
 
         {/* Search */}
