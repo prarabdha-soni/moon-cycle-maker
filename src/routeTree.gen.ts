@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TrackRouteImport } from './routes/track'
+import { Route as MedRouteImport } from './routes/med'
 import { Route as ContentRouteImport } from './routes/content'
 import { Route as CalendarRouteImport } from './routes/calendar'
 import { Route as AnalysisRouteImport } from './routes/analysis'
@@ -18,6 +19,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const TrackRoute = TrackRouteImport.update({
   id: '/track',
   path: '/track',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MedRoute = MedRouteImport.update({
+  id: '/med',
+  path: '/med',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContentRoute = ContentRouteImport.update({
@@ -46,6 +52,7 @@ export interface FileRoutesByFullPath {
   '/analysis': typeof AnalysisRoute
   '/calendar': typeof CalendarRoute
   '/content': typeof ContentRoute
+  '/med': typeof MedRoute
   '/track': typeof TrackRoute
 }
 export interface FileRoutesByTo {
@@ -53,6 +60,7 @@ export interface FileRoutesByTo {
   '/analysis': typeof AnalysisRoute
   '/calendar': typeof CalendarRoute
   '/content': typeof ContentRoute
+  '/med': typeof MedRoute
   '/track': typeof TrackRoute
 }
 export interface FileRoutesById {
@@ -61,14 +69,22 @@ export interface FileRoutesById {
   '/analysis': typeof AnalysisRoute
   '/calendar': typeof CalendarRoute
   '/content': typeof ContentRoute
+  '/med': typeof MedRoute
   '/track': typeof TrackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/analysis' | '/calendar' | '/content' | '/track'
+  fullPaths: '/' | '/analysis' | '/calendar' | '/content' | '/med' | '/track'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/analysis' | '/calendar' | '/content' | '/track'
-  id: '__root__' | '/' | '/analysis' | '/calendar' | '/content' | '/track'
+  to: '/' | '/analysis' | '/calendar' | '/content' | '/med' | '/track'
+  id:
+    | '__root__'
+    | '/'
+    | '/analysis'
+    | '/calendar'
+    | '/content'
+    | '/med'
+    | '/track'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -76,6 +92,7 @@ export interface RootRouteChildren {
   AnalysisRoute: typeof AnalysisRoute
   CalendarRoute: typeof CalendarRoute
   ContentRoute: typeof ContentRoute
+  MedRoute: typeof MedRoute
   TrackRoute: typeof TrackRoute
 }
 
@@ -86,6 +103,13 @@ declare module '@tanstack/react-router' {
       path: '/track'
       fullPath: '/track'
       preLoaderRoute: typeof TrackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/med': {
+      id: '/med'
+      path: '/med'
+      fullPath: '/med'
+      preLoaderRoute: typeof MedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/content': {
@@ -124,8 +148,19 @@ const rootRouteChildren: RootRouteChildren = {
   AnalysisRoute: AnalysisRoute,
   CalendarRoute: CalendarRoute,
   ContentRoute: ContentRoute,
+  MedRoute: MedRoute,
   TrackRoute: TrackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
