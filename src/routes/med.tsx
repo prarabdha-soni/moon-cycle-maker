@@ -52,6 +52,9 @@ const seedToday: MedItem[] = [
 function MedScreen() {
   const [taken, setTaken] = useState<Record<string, boolean>>({ "2": true });
   const [activePeriod, setActivePeriod] = useState<Period | "all">("all");
+  const [water, setWater] = useState(2);
+  const waterGoal = 8;
+  const waterMin = 3;
 
   const items = useMemo(
     () => (activePeriod === "all" ? seedToday : seedToday.filter((m) => m.period === activePeriod)),
