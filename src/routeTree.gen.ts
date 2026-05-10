@@ -9,6 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WelcomeSupplementsRouteImport } from './routes/welcome-supplements'
+import { Route as WelcomeRouteImport } from './routes/welcome'
 import { Route as TrackRouteImport } from './routes/track'
 import { Route as MedRouteImport } from './routes/med'
 import { Route as ContentRouteImport } from './routes/content'
@@ -16,6 +18,16 @@ import { Route as CalendarRouteImport } from './routes/calendar'
 import { Route as AnalysisRouteImport } from './routes/analysis'
 import { Route as IndexRouteImport } from './routes/index'
 
+const WelcomeSupplementsRoute = WelcomeSupplementsRouteImport.update({
+  id: '/welcome-supplements',
+  path: '/welcome-supplements',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WelcomeRoute = WelcomeRouteImport.update({
+  id: '/welcome',
+  path: '/welcome',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TrackRoute = TrackRouteImport.update({
   id: '/track',
   path: '/track',
@@ -54,6 +66,8 @@ export interface FileRoutesByFullPath {
   '/content': typeof ContentRoute
   '/med': typeof MedRoute
   '/track': typeof TrackRoute
+  '/welcome': typeof WelcomeRoute
+  '/welcome-supplements': typeof WelcomeSupplementsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +76,8 @@ export interface FileRoutesByTo {
   '/content': typeof ContentRoute
   '/med': typeof MedRoute
   '/track': typeof TrackRoute
+  '/welcome': typeof WelcomeRoute
+  '/welcome-supplements': typeof WelcomeSupplementsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,12 +87,30 @@ export interface FileRoutesById {
   '/content': typeof ContentRoute
   '/med': typeof MedRoute
   '/track': typeof TrackRoute
+  '/welcome': typeof WelcomeRoute
+  '/welcome-supplements': typeof WelcomeSupplementsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/analysis' | '/calendar' | '/content' | '/med' | '/track'
+  fullPaths:
+    | '/'
+    | '/analysis'
+    | '/calendar'
+    | '/content'
+    | '/med'
+    | '/track'
+    | '/welcome'
+    | '/welcome-supplements'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/analysis' | '/calendar' | '/content' | '/med' | '/track'
+  to:
+    | '/'
+    | '/analysis'
+    | '/calendar'
+    | '/content'
+    | '/med'
+    | '/track'
+    | '/welcome'
+    | '/welcome-supplements'
   id:
     | '__root__'
     | '/'
@@ -85,6 +119,8 @@ export interface FileRouteTypes {
     | '/content'
     | '/med'
     | '/track'
+    | '/welcome'
+    | '/welcome-supplements'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -94,10 +130,26 @@ export interface RootRouteChildren {
   ContentRoute: typeof ContentRoute
   MedRoute: typeof MedRoute
   TrackRoute: typeof TrackRoute
+  WelcomeRoute: typeof WelcomeRoute
+  WelcomeSupplementsRoute: typeof WelcomeSupplementsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/welcome-supplements': {
+      id: '/welcome-supplements'
+      path: '/welcome-supplements'
+      fullPath: '/welcome-supplements'
+      preLoaderRoute: typeof WelcomeSupplementsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/welcome': {
+      id: '/welcome'
+      path: '/welcome'
+      fullPath: '/welcome'
+      preLoaderRoute: typeof WelcomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/track': {
       id: '/track'
       path: '/track'
@@ -150,6 +202,8 @@ const rootRouteChildren: RootRouteChildren = {
   ContentRoute: ContentRoute,
   MedRoute: MedRoute,
   TrackRoute: TrackRoute,
+  WelcomeRoute: WelcomeRoute,
+  WelcomeSupplementsRoute: WelcomeSupplementsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
