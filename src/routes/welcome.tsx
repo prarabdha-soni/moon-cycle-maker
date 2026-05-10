@@ -14,27 +14,27 @@ export const Route = createFileRoute("/welcome")({
 
 type Profile = "regular" | "pcod" | "pregnant";
 
-const options: { id: Profile; title: string; desc: string; icon: typeof Flower2; tone: string }[] = [
+const options: { id: Profile; title: string; desc: string; icon: typeof Flower2; iconClass: string }[] = [
   {
     id: "regular",
     title: "Regular cycle",
     desc: "My periods come on a predictable schedule.",
     icon: Flower2,
-    tone: "fertile",
+    iconClass: "bg-fertile/15 text-fertile",
   },
   {
     id: "pcod",
     title: "PCOD / PCOS",
     desc: "I have irregular cycles or a diagnosis.",
     icon: HeartPulse,
-    tone: "period",
+    iconClass: "bg-period/15 text-period",
   },
   {
     id: "pregnant",
     title: "Pregnant",
     desc: "I'm tracking through pregnancy.",
     icon: Baby,
-    tone: "ovulation",
+    iconClass: "bg-ovulation/15 text-ovulation",
   },
 ];
 
@@ -73,7 +73,7 @@ function WelcomeScreen() {
 
       {/* Options */}
       <div className="mt-8 space-y-3">
-        {options.map(({ id, title, desc, icon: Icon, tone }) => {
+        {options.map(({ id, title, desc, icon: Icon, iconClass }) => {
           const active = selected === id;
           return (
             <button
@@ -87,7 +87,7 @@ function WelcomeScreen() {
               }`}
             >
               <span
-                className={`grid size-12 shrink-0 place-items-center rounded-xl bg-${tone}/15 text-${tone}`}
+                className={`grid size-12 shrink-0 place-items-center rounded-xl ${iconClass}`}
               >
                 <Icon className="size-6" strokeWidth={2} />
               </span>

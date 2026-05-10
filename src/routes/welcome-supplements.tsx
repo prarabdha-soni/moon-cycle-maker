@@ -13,14 +13,14 @@ export const Route = createFileRoute("/welcome-supplements")({
 });
 
 const supplements = [
-  { id: "iron", label: "Iron", icon: FlaskConical, tone: "period" },
-  { id: "folate", label: "Folate", icon: Leaf, tone: "ovulation" },
-  { id: "vitd", label: "Vitamin D", icon: Sun, tone: "pms" },
-  { id: "omega", label: "Omega-3", icon: Droplets, tone: "fertile" },
-  { id: "magnesium", label: "Magnesium", icon: Sparkles, tone: "fertile" },
-  { id: "b12", label: "Vitamin B12", icon: Pill, tone: "ovulation" },
-  { id: "calcium", label: "Calcium", icon: FlaskConical, tone: "pms" },
-  { id: "zinc", label: "Zinc", icon: Sparkles, tone: "period" },
+  { id: "iron", label: "Iron", icon: FlaskConical, iconClass: "bg-period/15 text-period" },
+  { id: "folate", label: "Folate", icon: Leaf, iconClass: "bg-ovulation/15 text-ovulation" },
+  { id: "vitd", label: "Vitamin D", icon: Sun, iconClass: "bg-pms/15 text-pms" },
+  { id: "omega", label: "Omega-3", icon: Droplets, iconClass: "bg-fertile/15 text-fertile" },
+  { id: "magnesium", label: "Magnesium", icon: Sparkles, iconClass: "bg-fertile/15 text-fertile" },
+  { id: "b12", label: "Vitamin B12", icon: Pill, iconClass: "bg-ovulation/15 text-ovulation" },
+  { id: "calcium", label: "Calcium", icon: FlaskConical, iconClass: "bg-pms/15 text-pms" },
+  { id: "zinc", label: "Zinc", icon: Sparkles, iconClass: "bg-period/15 text-period" },
 ] as const;
 
 function SupplementsScreen() {
@@ -60,7 +60,7 @@ function SupplementsScreen() {
       </div>
 
       <div className="mt-8 grid grid-cols-2 gap-3">
-        {supplements.map(({ id, label, icon: Icon, tone }) => {
+        {supplements.map(({ id, label, icon: Icon, iconClass }) => {
           const active = picked[id];
           return (
             <button
@@ -74,7 +74,7 @@ function SupplementsScreen() {
               }`}
             >
               <span
-                className={`grid size-10 shrink-0 place-items-center rounded-xl bg-${tone}/15 text-${tone}`}
+                className={`grid size-10 shrink-0 place-items-center rounded-xl ${iconClass}`}
               >
                 <Icon className="size-5" strokeWidth={2} />
               </span>
