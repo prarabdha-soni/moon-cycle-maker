@@ -1,4 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { ChevronDown, ChevronRight, Smile } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { CycleRing } from "@/components/CycleRing";
@@ -22,6 +23,27 @@ export const Route = createFileRoute("/")({
 });
 
 function CycleScreen() {
+  const navigate = useNavigate();
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const onboarded = window.localStorage.getItem("petal:onboarded");
+    if (!onboarded) {
+      navigate({ to: "/welcome", replace: true });
+    } else {
+      setReady(true);
+    }
+  }, [navigate]);
+
+  if (!ready) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-background">
+        <div className="size-8 animate-pulse rounded-full bg-fertile/30" />
+      </div>
+    );
+  }
+
   return (
     <AppShell title="Your current cycle">
       <div className="px-5">

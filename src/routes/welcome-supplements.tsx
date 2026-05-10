@@ -39,12 +39,17 @@ function SupplementsScreen() {
           <span className="h-1.5 w-8 rounded-full bg-fertile" />
           <span className="h-1.5 w-8 rounded-full bg-fertile" />
         </div>
-        <Link
-          to="/"
+        <button
+          onClick={() => {
+            if (typeof window !== "undefined") {
+              window.localStorage.setItem("petal:onboarded", "1");
+            }
+            navigate({ to: "/", replace: true });
+          }}
           className="text-[13px] font-medium text-muted-foreground transition-colors hover:text-foreground"
         >
           Skip
-        </Link>
+        </button>
       </div>
 
       <div className="mt-10">
@@ -97,7 +102,12 @@ function SupplementsScreen() {
 
       <div className="mt-auto pt-8">
         <button
-          onClick={() => navigate({ to: "/" })}
+          onClick={() => {
+            if (typeof window !== "undefined") {
+              window.localStorage.setItem("petal:onboarded", "1");
+            }
+            navigate({ to: "/", replace: true });
+          }}
           className="w-full rounded-full bg-fertile py-4 text-[15px] font-semibold text-primary-foreground shadow-lg shadow-fertile/30 transition-all active:scale-[0.98]"
         >
           {count === 0 ? "Maybe later" : "Finish setup"}
