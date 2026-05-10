@@ -24,25 +24,17 @@ export const Route = createFileRoute("/")({
 
 function CycleScreen() {
   const navigate = useNavigate();
-  const [ready, setReady] = useState(false);
+  // Read synchronously to avoid an extra render + loading flash.
+  const [onboarded] = useState(() => {
+    if (typeof window === "undefined") return true;
+    return window.localStorage.getItem("petal:onboarded") !== null;
+  });
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const onboarded = window.localStorage.getItem("petal:onboarded");
-    if (!onboarded) {
-      navigate({ to: "/welcome", replace: true });
-    } else {
-      setReady(true);
-    }
-  }, [navigate]);
+    if (!onboarded) navigate({ to: "/welcome", replace: true });
+  }, [onboarded, navigate]);
 
-  if (!ready) {
-    return (
-      <div className="grid min-h-screen place-items-center bg-background">
-        <div className="size-8 animate-pulse rounded-full bg-fertile/30" />
-      </div>
-    );
-  }
+  if (!onboarded) return null;
 
   return (
     <AppShell title="Your current cycle">
