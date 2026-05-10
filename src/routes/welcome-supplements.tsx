@@ -39,12 +39,17 @@ function SupplementsScreen() {
           <span className="h-1.5 w-8 rounded-full bg-fertile" />
           <span className="h-1.5 w-8 rounded-full bg-fertile" />
         </div>
-        <Link
-          to="/"
+        <button
+          onClick={() => {
+            if (typeof window !== "undefined") {
+              window.localStorage.setItem("petal:onboarded", "1");
+            }
+            navigate({ to: "/", replace: true });
+          }}
           className="text-[13px] font-medium text-muted-foreground transition-colors hover:text-foreground"
         >
           Skip
-        </Link>
+        </button>
       </div>
 
       <div className="mt-10">
