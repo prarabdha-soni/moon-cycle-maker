@@ -25,16 +25,23 @@ export const Route = createFileRoute("/")({
 function CycleScreen() {
   const navigate = useNavigate();
   // Read synchronously to avoid an extra render + loading flash.
-  const [onboarded] = useState(() => {
-    if (typeof window === "undefined") return true;
-    return window.localStorage.getItem("petal:onboarded") !== null;
+  const [{ onboarded, mode }] = useState(() => {
+    if (typeof window === "undefined") return { onboarded: true, mode: "regular" };
+    return {
+      onboarded: window.localStorage.getItem("petal:onboarded") !== null,
+      mode: window.localStorage.getItem("petal:mode") ?? "regular",
+    };
   });
 
   useEffect(() => {
-    if (!onboarded) navigate({ to: "/welcome", replace: true });
-  }, [onboarded, navigate]);
+    if (!onboarded) {
+      navigate({ to: "/welcome-mode", replace: true });
+    } else if (mode === "conceive") {
+      navigate({ to: "/conceive", replace: true });
+    }
+  }, [onboarded, mode, navigate]);
 
-  if (!onboarded) return null;
+  if (!onboarded || mode === "conceive") return null;
 
   return (
     <AppShell title="Your current cycle">
