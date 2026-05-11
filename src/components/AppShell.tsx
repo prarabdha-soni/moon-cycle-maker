@@ -1,18 +1,32 @@
-import { Menu } from "lucide-react";
+import { ArrowLeft, Menu } from "lucide-react";
 import type { ReactNode } from "react";
+import { useRouter } from "@tanstack/react-router";
 import { BottomNav } from "./BottomNav";
 
 interface AppShellProps {
   title?: string;
   children: ReactNode;
   rightSlot?: ReactNode;
+  leftSlot?: ReactNode;
+  showBack?: boolean;
 }
 
-export function AppShell({ title = "Your current cycle", children, rightSlot }: AppShellProps) {
+export function AppShell({ title = "Your current cycle", children, rightSlot, leftSlot, showBack }: AppShellProps) {
+  const router = useRouter();
   return (
     <div className="mx-auto flex min-h-screen max-w-md flex-col bg-background">
       <header className="flex items-center justify-between px-5 pt-6 pb-2">
-        <span className="size-6" aria-hidden />
+        {leftSlot ?? (showBack ? (
+          <button
+            aria-label="Back"
+            onClick={() => router.history.back()}
+            className="text-fertile transition-opacity hover:opacity-70"
+          >
+            <ArrowLeft className="size-6" strokeWidth={2.25} />
+          </button>
+        ) : (
+          <span className="size-6" aria-hidden />
+        ))}
         <h1 className="font-display text-[17px] font-medium tracking-tight text-foreground">
           {title}
         </h1>
