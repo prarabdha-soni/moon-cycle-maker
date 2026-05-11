@@ -10,10 +10,12 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WelcomeSupplementsRouteImport } from './routes/welcome-supplements'
+import { Route as WelcomeModeRouteImport } from './routes/welcome-mode'
 import { Route as WelcomeRouteImport } from './routes/welcome'
 import { Route as TrackRouteImport } from './routes/track'
 import { Route as MedRouteImport } from './routes/med'
 import { Route as ContentRouteImport } from './routes/content'
+import { Route as ConceiveRouteImport } from './routes/conceive'
 import { Route as CalendarRouteImport } from './routes/calendar'
 import { Route as AnalysisRouteImport } from './routes/analysis'
 import { Route as IndexRouteImport } from './routes/index'
@@ -21,6 +23,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const WelcomeSupplementsRoute = WelcomeSupplementsRouteImport.update({
   id: '/welcome-supplements',
   path: '/welcome-supplements',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WelcomeModeRoute = WelcomeModeRouteImport.update({
+  id: '/welcome-mode',
+  path: '/welcome-mode',
   getParentRoute: () => rootRouteImport,
 } as any)
 const WelcomeRoute = WelcomeRouteImport.update({
@@ -43,6 +50,11 @@ const ContentRoute = ContentRouteImport.update({
   path: '/content',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConceiveRoute = ConceiveRouteImport.update({
+  id: '/conceive',
+  path: '/conceive',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CalendarRoute = CalendarRouteImport.update({
   id: '/calendar',
   path: '/calendar',
@@ -63,20 +75,24 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/analysis': typeof AnalysisRoute
   '/calendar': typeof CalendarRoute
+  '/conceive': typeof ConceiveRoute
   '/content': typeof ContentRoute
   '/med': typeof MedRoute
   '/track': typeof TrackRoute
   '/welcome': typeof WelcomeRoute
+  '/welcome-mode': typeof WelcomeModeRoute
   '/welcome-supplements': typeof WelcomeSupplementsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/analysis': typeof AnalysisRoute
   '/calendar': typeof CalendarRoute
+  '/conceive': typeof ConceiveRoute
   '/content': typeof ContentRoute
   '/med': typeof MedRoute
   '/track': typeof TrackRoute
   '/welcome': typeof WelcomeRoute
+  '/welcome-mode': typeof WelcomeModeRoute
   '/welcome-supplements': typeof WelcomeSupplementsRoute
 }
 export interface FileRoutesById {
@@ -84,10 +100,12 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/analysis': typeof AnalysisRoute
   '/calendar': typeof CalendarRoute
+  '/conceive': typeof ConceiveRoute
   '/content': typeof ContentRoute
   '/med': typeof MedRoute
   '/track': typeof TrackRoute
   '/welcome': typeof WelcomeRoute
+  '/welcome-mode': typeof WelcomeModeRoute
   '/welcome-supplements': typeof WelcomeSupplementsRoute
 }
 export interface FileRouteTypes {
@@ -96,30 +114,36 @@ export interface FileRouteTypes {
     | '/'
     | '/analysis'
     | '/calendar'
+    | '/conceive'
     | '/content'
     | '/med'
     | '/track'
     | '/welcome'
+    | '/welcome-mode'
     | '/welcome-supplements'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/analysis'
     | '/calendar'
+    | '/conceive'
     | '/content'
     | '/med'
     | '/track'
     | '/welcome'
+    | '/welcome-mode'
     | '/welcome-supplements'
   id:
     | '__root__'
     | '/'
     | '/analysis'
     | '/calendar'
+    | '/conceive'
     | '/content'
     | '/med'
     | '/track'
     | '/welcome'
+    | '/welcome-mode'
     | '/welcome-supplements'
   fileRoutesById: FileRoutesById
 }
@@ -127,10 +151,12 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AnalysisRoute: typeof AnalysisRoute
   CalendarRoute: typeof CalendarRoute
+  ConceiveRoute: typeof ConceiveRoute
   ContentRoute: typeof ContentRoute
   MedRoute: typeof MedRoute
   TrackRoute: typeof TrackRoute
   WelcomeRoute: typeof WelcomeRoute
+  WelcomeModeRoute: typeof WelcomeModeRoute
   WelcomeSupplementsRoute: typeof WelcomeSupplementsRoute
 }
 
@@ -141,6 +167,13 @@ declare module '@tanstack/react-router' {
       path: '/welcome-supplements'
       fullPath: '/welcome-supplements'
       preLoaderRoute: typeof WelcomeSupplementsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/welcome-mode': {
+      id: '/welcome-mode'
+      path: '/welcome-mode'
+      fullPath: '/welcome-mode'
+      preLoaderRoute: typeof WelcomeModeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/welcome': {
@@ -171,6 +204,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContentRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/conceive': {
+      id: '/conceive'
+      path: '/conceive'
+      fullPath: '/conceive'
+      preLoaderRoute: typeof ConceiveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/calendar': {
       id: '/calendar'
       path: '/calendar'
@@ -199,10 +239,12 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AnalysisRoute: AnalysisRoute,
   CalendarRoute: CalendarRoute,
+  ConceiveRoute: ConceiveRoute,
   ContentRoute: ContentRoute,
   MedRoute: MedRoute,
   TrackRoute: TrackRoute,
   WelcomeRoute: WelcomeRoute,
+  WelcomeModeRoute: WelcomeModeRoute,
   WelcomeSupplementsRoute: WelcomeSupplementsRoute,
 }
 export const routeTree = rootRouteImport
