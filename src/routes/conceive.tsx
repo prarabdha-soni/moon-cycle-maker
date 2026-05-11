@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   Thermometer,
@@ -10,6 +10,8 @@ import {
   Plus,
   Calendar as CalendarIcon,
   TrendingUp,
+  ChevronDown,
+  Check,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 
@@ -30,12 +32,62 @@ export const Route = createFileRoute("/conceive")({
 const bbt = [97.2, 97.1, 97.3, 97.2, 97.4, 97.3, 97.5, 97.4, 97.6, 98.1, 98.2, 98.3, 98.2, 98.3];
 
 function ConceiveScreen() {
+  const navigate = useNavigate();
   const [mucus, setMucus] = useState<string | null>(null);
   const [test, setTest] = useState<"positive" | "negative" | null>(null);
+  const [showModeMenu, setShowModeMenu] = useState(false);
+  
+  // Read current mode from localStorage
+  const currentMode = typeof window !== "undefined" 
+    ? (window.localStorage.getItem("petal:mode") ?? "conceive")
+    : "conceive";
+
+  const handleModeSwitch = (newMode: "regular" | "conceive") => {
+    window.localStorage.setItem("petal:mode", newMode);
+    setShowModeMenu(false);
+    if (newMode === "regular") {
+      navigate({ to: "/", replace: true });
+    }
+  };
 
   return (
     <AppShell title="Conceive">
       <div className="px-5 pb-6">
+        {/* Mode selector */}
+        <div className="mx-auto mt-2 flex w-fit items-center gap-2 rounded-full bg-ovulation/20 px-4 py-1.5 text-[13px] text-ovulation relative">
+          <button 
+            onClick={() => setShowModeMenu(!showModeMenu)}
+            className="flex items-center gap-1 font-semibold"
+          >
+            <span className="text-muted-foreground">Mode:</span>
+            <span>Conceive Mode</span>
+            <ChevronDown className="size-3.5" strokeWidth={2.5} />
+          </button>
+          
+          {showModeMenu && (
+            <div className="absolute top-full left-0 mt-2 w-48 rounded-xl border border-border bg-card shadow-lg overflow-hidden z-50">
+              <button
+                onClick={() => handleModeSwitch("regular")}
+                className={`w-full flex items-center justify-between px-4 py-3 text-sm transition-colors hover:bg-accent ${
+                  currentMode === "regular" ? "bg-accent" : ""
+                }`}
+              >
+                <span>Regular Tracking</span>
+                {currentMode === "regular" && <Check className="size-4 text-fertile" />}
+              </button>
+              <button
+                onClick={() => handleModeSwitch("conceive")}
+                className={`w-full flex items-center justify-between px-4 py-3 text-sm transition-colors hover:bg-accent ${
+                  currentMode === "conceive" ? "bg-accent" : ""
+                }`}
+              >
+                <span>Conceive Mode</span>
+                {currentMode === "conceive" && <Check className="size-4 text-ovulation" />}
+              </button>
+            </div>
+          )}
+        </div>
+
         {/* Hero — fertility score */}
         <section className="mt-2 overflow-hidden rounded-3xl bg-gradient-to-br from-ovulation/15 via-fertile/10 to-pms/15 p-5">
           <div className="flex items-center justify-between">

@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ChevronDown, ChevronRight, Smile } from "lucide-react";
+import { ChevronDown, ChevronRight, Smile, Check } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { CycleRing } from "@/components/CycleRing";
 
@@ -25,31 +25,68 @@ export const Route = createFileRoute("/")({
 function CycleScreen() {
   const navigate = useNavigate();
   // Read synchronously to avoid an extra render + loading flash.
-  const [{ onboarded, mode }] = useState(() => {
+  const [{ onboarded, mode }, setModeState] = useState(() => {
     if (typeof window === "undefined") return { onboarded: true, mode: "regular" };
     return {
       onboarded: window.localStorage.getItem("petal:onboarded") !== null,
       mode: window.localStorage.getItem("petal:mode") ?? "regular",
     };
   });
+  
+  const [showModeMenu, setShowModeMenu] = useState(false);
 
   useEffect(() => {
     if (!onboarded) {
       navigate({ to: "/welcome-mode", replace: true });
-    } else if (mode === "conceive") {
+    }
+  }, [onboarded, navigate]);
+
+  const handleModeSwitch = (newMode: "regular" | "conceive") => {
+    window.localStorage.setItem("petal:mode", newMode);
+    setModeState(prev => ({ ...prev, mode: newMode }));
+    setShowModeMenu(false);
+    if (newMode === "conceive") {
       navigate({ to: "/conceive", replace: true });
     }
-  }, [onboarded, mode, navigate]);
+  };
 
-  if (!onboarded || mode === "conceive") return null;
+  if (!onboarded) return null;
 
   return (
     <AppShell title="Your current cycle">
       <div className="px-5">
-        <div className="mx-auto mt-2 flex w-fit items-center gap-2 rounded-full bg-fertile-light/30 px-4 py-1.5 text-[13px] text-fertile">
-          <span className="text-muted-foreground">Mode:</span>
-          <span className="font-semibold">Petal Period Tracking</span>
-          <ChevronDown className="size-3.5" strokeWidth={2.5} />
+        <div className="mx-auto mt-2 flex w-fit items-center gap-2 rounded-full bg-fertile-light/30 px-4 py-1.5 text-[13px] text-fertile relative">
+          <button 
+            onClick={() => setShowModeMenu(!showModeMenu)}
+            className="flex items-center gap-1 font-semibold"
+          >
+            <span className="text-muted-foreground">Mode:</span>
+            <span>Petal Period Tracking</span>
+            <ChevronDown className="size-3.5" strokeWidth={2.5} />
+          </button>
+          
+          {showModeMenu && (
+            <div className="absolute top-full left-0 mt-2 w-48 rounded-xl border border-border bg-card shadow-lg overflow-hidden z-50">
+              <button
+                onClick={() => handleModeSwitch("regular")}
+                className={`w-full flex items-center justify-between px-4 py-3 text-sm transition-colors hover:bg-accent ${
+                  mode === "regular" ? "bg-accent" : ""
+                }`}
+              >
+                <span>Regular Tracking</span>
+                {mode === "regular" && <Check className="size-4 text-fertile" />}
+              </button>
+              <button
+                onClick={() => handleModeSwitch("conceive")}
+                className={`w-full flex items-center justify-between px-4 py-3 text-sm transition-colors hover:bg-accent ${
+                  mode === "conceive" ? "bg-accent" : ""
+                }`}
+              >
+                <span>Conceive Mode</span>
+                {mode === "conceive" && <Check className="size-4 text-ovulation" />}
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="mt-6">
