@@ -26,7 +26,7 @@ function AnalysisScreen() {
   const min = Math.min(...cycleHistory.map((c) => c.length));
 
   return (
-    <AppShell title="Analysis">
+    <AppShell title="Analysis" showBack>
       <div className="space-y-6 px-5 pt-2">
         <div className="grid grid-cols-3 gap-3">
           <Stat icon={TrendingUp} value="29" label="Avg cycle" tone="fertile" />
