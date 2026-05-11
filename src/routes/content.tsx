@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, ShoppingBag, Check } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import shetrivesCup from "@/assets/shetrives-cup.png";
 
 export const Route = createFileRoute("/content")({
   head: () => ({
@@ -57,6 +58,57 @@ function ContentScreen() {
               <p className="mt-2 text-sm text-muted-foreground">
                 A clear, no-nonsense guide to what your body is doing every day.
               </p>
+            </div>
+          </article>
+        </section>
+
+        <section>
+          <div className="mb-3 flex items-end justify-between">
+            <h2 className="font-display text-lg font-medium">Shop</h2>
+            <span className="text-[11px] uppercase tracking-wider text-fertile">
+              Petal picks
+            </span>
+          </div>
+          <article className="overflow-hidden rounded-3xl border border-border bg-card">
+            <div className="relative grid place-items-center bg-gradient-to-br from-fertile-light/40 via-period-light/30 to-pms/30 px-4 pt-5">
+              <span className="absolute left-4 top-4 rounded-full bg-background/80 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-fertile backdrop-blur">
+                New
+              </span>
+              <img
+                src={shetrivesCup}
+                alt="SheTrives soft menstrual cup, size regular in desert blush"
+                className="h-48 w-auto object-contain drop-shadow-md"
+                loading="lazy"
+              />
+            </div>
+            <div className="p-4">
+              <p className="text-[11px] uppercase tracking-wider text-fertile">
+                Period care
+              </p>
+              <h3 className="mt-1 font-display text-xl font-medium leading-tight">
+                SheTrives Soft Menstrual Cup
+              </h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Size Regular · Desert Blush · Wear up to 12 hours
+              </p>
+              <ul className="mt-3 space-y-1.5">
+                {["Medical-grade soft silicone","Reusable for up to 5 years","Made in India"].map((f) => (
+                  <li key={f} className="flex items-center gap-2 text-[13px] text-foreground">
+                    <Check className="size-3.5 text-fertile" strokeWidth={3} />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-4 flex items-center justify-between">
+                <div>
+                  <p className="font-display text-2xl font-medium text-foreground">₹499</p>
+                  <p className="text-[11px] text-muted-foreground line-through">₹799</p>
+                </div>
+                <button className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90">
+                  <ShoppingBag className="size-4" />
+                  Add to bag
+                </button>
+              </div>
             </div>
           </article>
         </section>
