@@ -6,8 +6,8 @@ import shetrivesCup from "@/assets/shetrives-cup.png";
 export const Route = createFileRoute("/content")({
   head: () => ({
     meta: [
-      { title: "Content — Petal" },
-      { name: "description", content: "Read science-backed articles about your cycle, hormones and health." },
+      { title: "Product — Petal" },
+      { name: "description", content: "Shop curated period care products handpicked for your cycle." },
     ],
   }),
   component: ContentScreen,
