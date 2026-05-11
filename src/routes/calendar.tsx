@@ -24,7 +24,7 @@ function CalendarScreen() {
   const ovulationDay = 15;
 
   return (
-    <AppShell title="Calendar">
+    <AppShell title="Calendar" showBack>
       <div className="px-5">
         <div className="flex items-center justify-between py-2">
           <button aria-label="Previous month" className="p-2 text-muted-foreground">
