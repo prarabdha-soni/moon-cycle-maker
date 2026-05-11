@@ -1,8 +1,25 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { getRouter } from "./router";
+import { RouterProvider, createRouter } from "@tanstack/react-router";
+import { routeTree } from "./routeTree.gen";
+import { QueryClient } from "@tanstack/react-query";
 
-const router = getRouter();
+const queryClient = new QueryClient();
+
+const router = createRouter({
+  routeTree,
+  context: { queryClient },
+  scrollRestoration: true,
+  defaultPreload: "intent",
+  defaultPreloadStaleTime: 0,
+});
+
+// Register the router instance for type safety
+declare module "@tanstack/react-router" {
+  interface Register {
+    router: typeof router;
+  }
+}
 
 // Render the app
 const rootElement = document.getElementById("root");
@@ -10,13 +27,7 @@ if (rootElement && !rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <React.StrictMode>
-      {router.getMatch(router.state.resolvedPathname)?.routeId ? (
-        router.getComponent()
-      ) : (
-        <router.RouterContext.Provider value={router}>
-          <router.MatchRouter />
-        </router.RouterContext.Provider>
-      )}
+      <RouterProvider router={router} />
     </React.StrictMode>
   );
 }
