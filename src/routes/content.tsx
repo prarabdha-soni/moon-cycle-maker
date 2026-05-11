@@ -6,8 +6,8 @@ import shetrivesCup from "@/assets/shetrives-cup.png";
 export const Route = createFileRoute("/content")({
   head: () => ({
     meta: [
-      { title: "Content — Petal" },
-      { name: "description", content: "Read science-backed articles about your cycle, hormones and health." },
+      { title: "Product — Petal" },
+      { name: "description", content: "Shop curated period care products handpicked for your cycle." },
     ],
   }),
   component: ContentScreen,
@@ -42,7 +42,7 @@ const articles = [
 
 function ContentScreen() {
   return (
-    <AppShell title="Content">
+    <AppShell title="Product">
       <div className="space-y-6 px-5 pt-2">
         <section>
           <h2 className="mb-3 font-display text-lg font-medium">Featured</h2>
