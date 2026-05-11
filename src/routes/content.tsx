@@ -42,7 +42,7 @@ const articles = [
 
 function ContentScreen() {
   return (
-    <AppShell title="Content">
+    <AppShell title="Product">
       <div className="space-y-6 px-5 pt-2">
         <section>
           <h2 className="mb-3 font-display text-lg font-medium">Featured</h2>
