@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, ShoppingBag, Check } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import shetrivesCup from "@/assets/shetrives-cup.png";
 
 export const Route = createFileRoute("/content")({
   head: () => ({
