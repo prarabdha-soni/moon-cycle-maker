@@ -42,11 +42,13 @@ function ConceiveScreen() {
     ? (window.localStorage.getItem("petal:mode") ?? "conceive")
     : "conceive";
 
-  const handleModeSwitch = (newMode: "regular" | "conceive") => {
+  const handleModeSwitch = (newMode: "regular" | "conceive" | "pregnant") => {
     window.localStorage.setItem("petal:mode", newMode);
     setShowModeMenu(false);
     if (newMode === "regular") {
       navigate({ to: "/", replace: true });
+    } else if (newMode === "pregnant") {
+      navigate({ to: "/pregnant", replace: true });
     }
   };
 
@@ -83,6 +85,15 @@ function ConceiveScreen() {
               >
                 <span>Conceive Mode</span>
                 {currentMode === "conceive" && <Check className="size-4 text-ovulation" />}
+              </button>
+              <button
+                onClick={() => handleModeSwitch("pregnant")}
+                className={`w-full flex items-center justify-between px-4 py-3 text-sm transition-colors hover:bg-accent ${
+                  currentMode === "pregnant" ? "bg-accent" : ""
+                }`}
+              >
+                <span>Pregnant Mode</span>
+                {currentMode === "pregnant" && <Check className="size-4 text-pms" />}
               </button>
             </div>
           )}
