@@ -4,6 +4,7 @@ import { ChevronDown, ChevronRight, Smile, Check } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { CycleRing } from "@/components/CycleRing";
 import { ModeSwitcherPill } from "@/components/ModeSwitcherPill";
+import type { UserProfile } from "@/components/ProfileIcon";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -25,6 +26,8 @@ export const Route = createFileRoute("/")({
 
 function CycleScreen() {
   const navigate = useNavigate();
+  const [refreshKey, setRefreshKey] = useState(0);
+  
   // Read synchronously to avoid an extra render + loading flash.
   const [{ onboarded, mode }, setModeState] = useState(() => {
     if (typeof window === "undefined") return { onboarded: true, mode: "regular" };
@@ -50,12 +53,16 @@ function CycleScreen() {
       const lastPeriod = typeof window !== "undefined" ? window.localStorage.getItem("petal:lastPeriod") : null;
       navigate({ to: lastPeriod ? "/pregnant" : "/welcome-last-period", replace: true });
     }
-  }, [mode, onboarded, navigate]);
+  }, [mode, onboarded, navigate, refreshKey]);
+
+  const handleProfileUpdate = () => {
+    setRefreshKey(prev => prev + 1);
+  };
 
   if (!onboarded) return null;
 
   return (
-    <AppShell title="Your current cycle">
+    <AppShell title="Your current cycle" rightSlot={<div className="pointer-events-auto" />}>
       <div className="px-5">
         <ModeSwitcherPill />
 
