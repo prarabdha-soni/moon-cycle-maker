@@ -1,10 +1,30 @@
 ```
+# Build artifacts
+dist/
+build/
+*.js
+*.css
+
 # Dependencies
 node_modules/
+
 # Environment
 .env
 .env.local
-.env.*
+*.env.*
+
 # Editors
 .vscode/
+.idea/
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+
+# Compiled files
+*.pyc
+__pycache__/
+*.o
+*.obj
 ```
