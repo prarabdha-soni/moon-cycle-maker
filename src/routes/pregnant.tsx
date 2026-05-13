@@ -12,6 +12,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { ModeSwitcherPill } from "@/components/ModeSwitcherPill";
 
 export const Route = createFileRoute("/pregnant")({
   head: () => ({
@@ -208,6 +209,7 @@ function PregnantScreen() {
   return (
     <AppShell title="Pregnancy">
       <div className="px-5 pb-6">
+        <ModeSwitcherPill />
         {/* Hero - Pregnancy Progress */}
         <section className="mt-2 overflow-hidden rounded-3xl bg-gradient-to-br from-pms/20 via-fertile/10 to-ovulation/15 p-5">
           <div className="flex items-center justify-between">

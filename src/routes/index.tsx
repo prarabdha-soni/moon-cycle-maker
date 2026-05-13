@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { ChevronDown, ChevronRight, Smile, Check } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { CycleRing } from "@/components/CycleRing";
+import { ModeSwitcherPill } from "@/components/ModeSwitcherPill";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -33,61 +34,30 @@ function CycleScreen() {
     };
   });
   
-  const [showModeMenu, setShowModeMenu] = useState(false);
-
   useEffect(() => {
     if (!onboarded) {
       navigate({ to: "/welcome-mode", replace: true });
     }
   }, [onboarded, navigate]);
 
-  const handleModeSwitch = (newMode: "regular" | "conceive") => {
-    window.localStorage.setItem("petal:mode", newMode);
-    setModeState(prev => ({ ...prev, mode: newMode }));
-    setShowModeMenu(false);
-    if (newMode === "conceive") {
+  useEffect(() => {
+    if (!onboarded) return;
+    if (mode === "conceive") {
       navigate({ to: "/conceive", replace: true });
+      return;
     }
-  };
+    if (mode === "pregnant") {
+      const lastPeriod = typeof window !== "undefined" ? window.localStorage.getItem("petal:lastPeriod") : null;
+      navigate({ to: lastPeriod ? "/pregnant" : "/welcome-last-period", replace: true });
+    }
+  }, [mode, onboarded, navigate]);
 
   if (!onboarded) return null;
 
   return (
     <AppShell title="Your current cycle">
       <div className="px-5">
-        <div className="mx-auto mt-2 flex w-fit items-center gap-2 rounded-full bg-fertile-light/30 px-4 py-1.5 text-[13px] text-fertile relative">
-          <button 
-            onClick={() => setShowModeMenu(!showModeMenu)}
-            className="flex items-center gap-1 font-semibold"
-          >
-            <span className="text-muted-foreground">Mode:</span>
-            <span>Petal Period Tracking</span>
-            <ChevronDown className="size-3.5" strokeWidth={2.5} />
-          </button>
-          
-          {showModeMenu && (
-            <div className="absolute top-full left-0 mt-2 w-48 rounded-xl border border-border bg-card shadow-lg overflow-hidden z-50">
-              <button
-                onClick={() => handleModeSwitch("regular")}
-                className={`w-full flex items-center justify-between px-4 py-3 text-sm transition-colors hover:bg-accent ${
-                  mode === "regular" ? "bg-accent" : ""
-                }`}
-              >
-                <span>Regular Tracking</span>
-                {mode === "regular" && <Check className="size-4 text-fertile" />}
-              </button>
-              <button
-                onClick={() => handleModeSwitch("conceive")}
-                className={`w-full flex items-center justify-between px-4 py-3 text-sm transition-colors hover:bg-accent ${
-                  mode === "conceive" ? "bg-accent" : ""
-                }`}
-              >
-                <span>Conceive Mode</span>
-                {mode === "conceive" && <Check className="size-4 text-ovulation" />}
-              </button>
-            </div>
-          )}
-        </div>
+        <ModeSwitcherPill />
 
         <div className="mt-6">
           <CycleRing

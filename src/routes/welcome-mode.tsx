@@ -71,7 +71,7 @@ function WelcomeMode() {
       // Pregnant users go to last period screen
       navigate({ to: "/welcome-last-period", replace: true });
     } else {
-      navigate({ to: "/welcome", replace: true });
+      navigate({ to: "/welcome-supplements", replace: true });
     }
   };
 

@@ -18,6 +18,8 @@ import { Route as ContentRouteImport } from './routes/content'
 import { Route as ConceiveRouteImport } from './routes/conceive'
 import { Route as CalendarRouteImport } from './routes/calendar'
 import { Route as AnalysisRouteImport } from './routes/analysis'
+import { Route as PregnantRouteImport } from './routes/pregnant'
+import { Route as WelcomeLastPeriodRouteImport } from './routes/welcome-last-period'
 import { Route as IndexRouteImport } from './routes/index'
 
 const WelcomeSupplementsRoute = WelcomeSupplementsRouteImport.update({
@@ -65,6 +67,16 @@ const AnalysisRoute = AnalysisRouteImport.update({
   path: '/analysis',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PregnantRoute = PregnantRouteImport.update({
+  id: '/pregnant',
+  path: '/pregnant',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WelcomeLastPeriodRoute = WelcomeLastPeriodRouteImport.update({
+  id: '/welcome-last-period',
+  path: '/welcome-last-period',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -78,8 +90,10 @@ export interface FileRoutesByFullPath {
   '/conceive': typeof ConceiveRoute
   '/content': typeof ContentRoute
   '/med': typeof MedRoute
+  '/pregnant': typeof PregnantRoute
   '/track': typeof TrackRoute
   '/welcome': typeof WelcomeRoute
+  '/welcome-last-period': typeof WelcomeLastPeriodRoute
   '/welcome-mode': typeof WelcomeModeRoute
   '/welcome-supplements': typeof WelcomeSupplementsRoute
 }
@@ -90,8 +104,10 @@ export interface FileRoutesByTo {
   '/conceive': typeof ConceiveRoute
   '/content': typeof ContentRoute
   '/med': typeof MedRoute
+  '/pregnant': typeof PregnantRoute
   '/track': typeof TrackRoute
   '/welcome': typeof WelcomeRoute
+  '/welcome-last-period': typeof WelcomeLastPeriodRoute
   '/welcome-mode': typeof WelcomeModeRoute
   '/welcome-supplements': typeof WelcomeSupplementsRoute
 }
@@ -103,8 +119,10 @@ export interface FileRoutesById {
   '/conceive': typeof ConceiveRoute
   '/content': typeof ContentRoute
   '/med': typeof MedRoute
+  '/pregnant': typeof PregnantRoute
   '/track': typeof TrackRoute
   '/welcome': typeof WelcomeRoute
+  '/welcome-last-period': typeof WelcomeLastPeriodRoute
   '/welcome-mode': typeof WelcomeModeRoute
   '/welcome-supplements': typeof WelcomeSupplementsRoute
 }
@@ -117,8 +135,10 @@ export interface FileRouteTypes {
     | '/conceive'
     | '/content'
     | '/med'
+    | '/pregnant'
     | '/track'
     | '/welcome'
+    | '/welcome-last-period'
     | '/welcome-mode'
     | '/welcome-supplements'
   fileRoutesByTo: FileRoutesByTo
@@ -129,8 +149,10 @@ export interface FileRouteTypes {
     | '/conceive'
     | '/content'
     | '/med'
+    | '/pregnant'
     | '/track'
     | '/welcome'
+    | '/welcome-last-period'
     | '/welcome-mode'
     | '/welcome-supplements'
   id:
@@ -141,8 +163,10 @@ export interface FileRouteTypes {
     | '/conceive'
     | '/content'
     | '/med'
+    | '/pregnant'
     | '/track'
     | '/welcome'
+    | '/welcome-last-period'
     | '/welcome-mode'
     | '/welcome-supplements'
   fileRoutesById: FileRoutesById
@@ -154,8 +178,10 @@ export interface RootRouteChildren {
   ConceiveRoute: typeof ConceiveRoute
   ContentRoute: typeof ContentRoute
   MedRoute: typeof MedRoute
+  PregnantRoute: typeof PregnantRoute
   TrackRoute: typeof TrackRoute
   WelcomeRoute: typeof WelcomeRoute
+  WelcomeLastPeriodRoute: typeof WelcomeLastPeriodRoute
   WelcomeModeRoute: typeof WelcomeModeRoute
   WelcomeSupplementsRoute: typeof WelcomeSupplementsRoute
 }
@@ -225,6 +251,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AnalysisRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pregnant': {
+      id: '/pregnant'
+      path: '/pregnant'
+      fullPath: '/pregnant'
+      preLoaderRoute: typeof PregnantRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/welcome-last-period': {
+      id: '/welcome-last-period'
+      path: '/welcome-last-period'
+      fullPath: '/welcome-last-period'
+      preLoaderRoute: typeof WelcomeLastPeriodRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -242,8 +282,10 @@ const rootRouteChildren: RootRouteChildren = {
   ConceiveRoute: ConceiveRoute,
   ContentRoute: ContentRoute,
   MedRoute: MedRoute,
+  PregnantRoute: PregnantRoute,
   TrackRoute: TrackRoute,
   WelcomeRoute: WelcomeRoute,
+  WelcomeLastPeriodRoute: WelcomeLastPeriodRoute,
   WelcomeModeRoute: WelcomeModeRoute,
   WelcomeSupplementsRoute: WelcomeSupplementsRoute,
 }
