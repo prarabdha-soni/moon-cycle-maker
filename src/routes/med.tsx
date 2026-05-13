@@ -53,6 +53,7 @@ function MedScreen() {
   const [taken, setTaken] = useState<Record<string, boolean>>({ "2": true });
   const [activePeriod, setActivePeriod] = useState<Period | "all">("all");
   const [water, setWater] = useState(2);
+  const [currentDate, setCurrentDate] = useState(new Date());
   const waterGoal = 8;
   const waterMin = 3;
 
@@ -65,19 +66,58 @@ function MedScreen() {
   const done = seedToday.filter((m) => taken[m.id]).length;
   const pct = Math.round((done / total) * 100);
 
+  const goToPreviousDay = () => {
+    const newDate = new Date(currentDate);
+    newDate.setDate(newDate.getDate() - 1);
+    setCurrentDate(newDate);
+  };
+
+  const goToNextDay = () => {
+    const newDate = new Date(currentDate);
+    newDate.setDate(newDate.getDate() + 1);
+    setCurrentDate(newDate);
+  };
+
+  const isToday = currentDate.toDateString() === new Date().toDateString();
+  
+  const formatDate = (date: Date) => {
+    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return `${dayNames[date.getDay()]}, ${date.getDate()} ${monthNames[date.getMonth()]}`;
+  };
+
+  const getDisplayLabel = () => {
+    if (isToday) return "Today";
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    if (currentDate.toDateString() === yesterday.toDateString()) return "Yesterday";
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    if (currentDate.toDateString() === tomorrow.toDateString()) return "Tomorrow";
+    return formatDate(currentDate);
+  };
+
   return (
     <AppShell title="Med">
       <div className="px-5">
         {/* Date strip */}
         <div className="flex items-center justify-between py-2">
-          <button aria-label="Previous day" className="p-2 text-muted-foreground">
+          <button 
+            onClick={goToPreviousDay}
+            aria-label="Previous day" 
+            className="p-2 text-muted-foreground hover:text-foreground transition-colors"
+          >
             <ChevronLeft className="size-5" />
           </button>
           <div className="text-center">
-            <p className="font-display text-lg font-medium leading-tight">Today</p>
-            <p className="text-[12px] text-muted-foreground">Sat, 16 August</p>
+            <p className="font-display text-lg font-medium leading-tight">{getDisplayLabel()}</p>
+            <p className="text-[12px] text-muted-foreground">{formatDate(currentDate)}</p>
           </div>
-          <button aria-label="Next day" className="p-2 text-muted-foreground">
+          <button 
+            onClick={goToNextDay}
+            aria-label="Next day" 
+            className="p-2 text-muted-foreground hover:text-foreground transition-colors"
+          >
             <ChevronRight className="size-5" />
           </button>
         </div>

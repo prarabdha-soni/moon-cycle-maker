@@ -1,18 +1,18 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Flower2, Sparkles, Check, ArrowRight } from "lucide-react";
+import { Flower2, Sparkles, Baby, Check, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/welcome-mode")({
   head: () => ({
     meta: [
       { title: "Welcome — Petal" },
-      { name: "description", content: "Choose your Petal experience: Regular tracking or Conceive." },
+      { name: "description", content: "Choose your Petal experience: Regular tracking, Conceive, or Pregnant." },
     ],
   }),
   component: WelcomeMode,
 });
 
-type Mode = "regular" | "conceive";
+type Mode = "regular" | "conceive" | "pregnant";
 
 const modes: {
   id: Mode;
@@ -41,6 +41,15 @@ const modes: {
     iconClass: "bg-ovulation/15 text-ovulation",
     ringClass: "border-ovulation",
   },
+  {
+    id: "pregnant",
+    title: "Pregnant",
+    tag: "Expecting a baby",
+    desc: "Track your pregnancy journey with day-by-day baby development insights.",
+    icon: Baby,
+    iconClass: "bg-pms/15 text-pms",
+    ringClass: "border-pms",
+  },
 ];
 
 function WelcomeMode() {
@@ -58,6 +67,9 @@ function WelcomeMode() {
         window.localStorage.setItem("petal:onboarded", "1");
       }
       navigate({ to: "/conceive", replace: true });
+    } else if (selected === "pregnant") {
+      // Pregnant users go to last period screen
+      navigate({ to: "/welcome-last-period", replace: true });
     } else {
       navigate({ to: "/welcome", replace: true });
     }

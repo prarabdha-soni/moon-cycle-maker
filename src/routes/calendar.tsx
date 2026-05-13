@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { useState, useMemo } from "react";
 
 export const Route = createFileRoute("/calendar")({
   head: () => ({
@@ -14,24 +15,62 @@ export const Route = createFileRoute("/calendar")({
 
 const weekdays = ["M", "T", "W", "T", "F", "S", "S"];
 
+function getDaysInMonth(year: number, month: number): number {
+  return new Date(year, month + 1, 0).getDate();
+}
+
+function getFirstDayOfMonth(year: number, month: number): number {
+  const day = new Date(year, month, 1).getDay();
+  return day === 0 ? 6 : day - 1; // Convert to Monday-based
+}
+
 function CalendarScreen() {
-  // August 2025 — starts on Friday (offset 4)
-  const offset = 4;
-  const days = Array.from({ length: 31 }, (_, i) => i + 1);
-  const today = 16;
+  const today = new Date();
+  const [currentDate, setCurrentDate] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
+  
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+  
+  const offset = getFirstDayOfMonth(year, month);
+  const daysInMonth = getDaysInMonth(year, month);
+  const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+  
+  const todayDate = today.getDate();
+  const isCurrentMonth = today.getMonth() === month && today.getFullYear() === year;
+  
+  // Mock cycle data based on a 28-day cycle starting from the 1st of the month
   const periodDays = [1, 2, 3, 4, 5];
-  const fertileDays = [12, 13, 14, 15, 16, 17];
-  const ovulationDay = 15;
+  const ovulationDay = 14;
+  const fertileDays = [ovulationDay - 2, ovulationDay - 1, ovulationDay, ovulationDay + 1, ovulationDay + 2, ovulationDay + 3];
+  
+  const goToPreviousMonth = () => {
+    setCurrentDate(new Date(year, month - 1, 1));
+  };
+  
+  const goToNextMonth = () => {
+    setCurrentDate(new Date(year, month + 1, 1));
+  };
+  
+  const monthNames = ["January", "February", "March", "April", "May", "June", 
+                      "July", "August", "September", "October", "November", "December"];
 
   return (
     <AppShell title="Calendar" showBack>
       <div className="px-5">
         <div className="flex items-center justify-between py-2">
-          <button aria-label="Previous month" className="p-2 text-muted-foreground">
+          <button 
+            onClick={goToPreviousMonth}
+            aria-label="Previous month" 
+            className="p-2 text-muted-foreground hover:text-foreground transition-colors"
+          >
             <ChevronLeft className="size-5" />
           </button>
-          <p className="font-display text-lg font-medium">August 2025</p>
-          <button aria-label="Next month" className="p-2 text-muted-foreground">
+          <p className="font-display text-lg font-medium">{monthNames[month]} {year}</p>
+          <button 
+            onClick={goToNextMonth}
+            aria-label="Next month" 
+            className="p-2 text-muted-foreground hover:text-foreground transition-colors"
+          >
             <ChevronRight className="size-5" />
           </button>
         </div>
