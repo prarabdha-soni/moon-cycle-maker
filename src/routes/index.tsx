@@ -62,7 +62,7 @@ function CycleScreen() {
   if (!onboarded) return null;
 
   return (
-    <AppShell title="Your current cycle" rightSlot={<div className="pointer-events-auto" />}>
+    <AppShell title="Your current cycle">
       <div className="px-5">
         <ModeSwitcherPill />
 
