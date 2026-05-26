@@ -1,162 +1,38 @@
-import { useState, useEffect } from "react";
-import { User, Calendar, Settings } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useNavigate } from "@tanstack/react-router";
 
 export interface UserProfile {
   name: string;
   lastPeriod: string;
   cycleLength: number;
-  mode: "conceive" | "pregnant";
+  mode: "regular" | "conceive" | "pregnant";
 }
 
 interface ProfileIconProps {
+  /** Force a light appearance when rendered over a dark/coloured hero (e.g. pregnant screen). */
+  variant?: "default" | "light";
   onProfileUpdate?: (profile: Partial<UserProfile>) => void;
 }
 
-export function ProfileIcon({ onProfileUpdate }: ProfileIconProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [profile, setProfile] = useState<UserProfile>({
-    name: "",
-    lastPeriod: "",
-    cycleLength: 28,
-    mode: "conceive",
-  });
+/** Custom event dispatched after a profile save so same-tab screens can refresh. */
+export const PROFILE_UPDATE_EVENT = "petal:profileUpdate";
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedName = window.localStorage.getItem("petal:name") || "User";
-      const storedLastPeriod = window.localStorage.getItem("petal:lastPeriod") || "";
-      const storedCycleLength = window.localStorage.getItem("petal:cycleLength") || "28";
-      const storedMode = (window.localStorage.getItem("petal:mode") as "conceive" | "pregnant") || "conceive";
-      
-      setProfile({
-        name: storedName,
-        lastPeriod: storedLastPeriod,
-        cycleLength: parseInt(storedCycleLength, 10),
-        mode: storedMode,
-      });
-    }
-  }, []);
+export function ProfileIcon({ variant = "default" }: ProfileIconProps) {
+  const navigate = useNavigate();
 
-  const handleSave = () => {
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem("petal:name", profile.name);
-      window.localStorage.setItem("petal:lastPeriod", profile.lastPeriod);
-      window.localStorage.setItem("petal:cycleLength", profile.cycleLength.toString());
-      window.localStorage.setItem("petal:mode", profile.mode);
-      
-      if (onProfileUpdate) {
-        onProfileUpdate(profile);
-      }
-    }
-    setIsOpen(false);
-  };
+  const name = typeof window !== "undefined" ? (window.localStorage.getItem("petal:name") || "") : "";
+  const initial = name.charAt(0).toUpperCase() || "P";
 
-  const getInitial = () => profile.name.charAt(0).toUpperCase() || "U";
+  const btnClass = variant === "light"
+    ? "grid size-9 place-items-center rounded-full bg-white/25 text-white transition-colors hover:bg-white/35"
+    : "grid size-9 place-items-center rounded-full bg-pms/15 text-pms transition-colors hover:bg-pms/25";
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <button
-          className="grid size-9 place-items-center rounded-full bg-pms/20 text-pms transition-colors hover:bg-pms/30"
-          aria-label="Open profile settings"
-        >
-          <span className="text-[14px] font-semibold">{getInitial()}</span>
-        </button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Profile Settings</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-5 py-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Your Name</Label>
-            <div className="relative">
-              <User className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-              <Input
-                id="name"
-                type="text"
-                value={profile.name}
-                onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-                placeholder="Enter your name"
-                className="pl-9"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="lastPeriod">Last Period Date (LMP)</Label>
-            <div className="relative">
-              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-              <Input
-                id="lastPeriod"
-                type="date"
-                value={profile.lastPeriod}
-                onChange={(e) => setProfile({ ...profile, lastPeriod: e.target.value })}
-                className="pl-9"
-              />
-            </div>
-            <p className="text-[11px] text-muted-foreground">
-              First day of your last menstrual period
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="cycleLength">Average Cycle Length (days)</Label>
-            <div className="relative">
-              <Settings className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-              <Input
-                id="cycleLength"
-                type="number"
-                min="21"
-                max="35"
-                value={profile.cycleLength}
-                onChange={(e) => setProfile({ ...profile, cycleLength: parseInt(e.target.value, 10) || 28 })}
-                className="pl-9"
-              />
-            </div>
-            <p className="text-[11px] text-muted-foreground">
-              Typically between 21-35 days
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Tracking Mode</Label>
-            <div className="grid grid-cols-2 gap-3">
-              <Button
-                type="button"
-                variant={profile.mode === "conceive" ? "default" : "outline"}
-                onClick={() => setProfile({ ...profile, mode: "conceive" })}
-                className={profile.mode === "conceive" ? "bg-pms text-primary-foreground hover:bg-pms/90" : ""}
-              >
-                Conceive
-              </Button>
-              <Button
-                type="button"
-                variant={profile.mode === "pregnant" ? "default" : "outline"}
-                onClick={() => setProfile({ ...profile, mode: "pregnant" })}
-                className={profile.mode === "pregnant" ? "bg-pms text-primary-foreground hover:bg-pms/90" : ""}
-              >
-                Pregnant
-              </Button>
-            </div>
-          </div>
-
-          <Button
-            onClick={handleSave}
-            className="w-full bg-pms text-primary-foreground hover:bg-pms/90"
-          >
-            Save Changes
-          </Button>
-
-          <p className="text-[11px] text-center text-muted-foreground">
-            Changes will be saved to your device and applied immediately.
-          </p>
-        </div>
-      </DialogContent>
-    </Dialog>
+    <button
+      className={btnClass}
+      aria-label="Open profile settings"
+      onClick={() => navigate({ to: "/profile" })}
+    >
+      <span className="text-[14px] font-semibold">{initial}</span>
+    </button>
   );
 }

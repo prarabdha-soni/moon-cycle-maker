@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   Thermometer,
   Droplet,
@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { ModeSwitcherPill } from "@/components/ModeSwitcherPill";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/conceive")({
   head: () => ({
@@ -39,6 +40,9 @@ function ConceiveScreen() {
       <div className="px-5 pb-6">
         {/* Mode selector */}
         <ModeSwitcherPill />
+
+        {/* Horizontal cycle strip */}
+        <CycleStrip />
 
         {/* Hero — fertility score */}
         <section className="mt-2 overflow-hidden rounded-3xl bg-gradient-to-br from-ovulation/15 via-fertile/10 to-pms/15 p-5">
@@ -223,6 +227,85 @@ function ConceiveScreen() {
         </section>
       </div>
     </AppShell>
+  );
+}
+
+function CycleStrip() {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const cycleLength = parseInt(
+    typeof window !== "undefined" ? (window.localStorage.getItem("petal:cycleLength") || "28") : "28",
+    10,
+  );
+  const lastPeriodStr = typeof window !== "undefined" ? window.localStorage.getItem("petal:lastPeriod") : null;
+
+  let currentDay = 14;
+  if (lastPeriodStr) {
+    const diff = Math.floor((Date.now() - new Date(lastPeriodStr).getTime()) / 86400000);
+    currentDay = Math.max(1, Math.min(cycleLength, (diff % cycleLength) + 1));
+  }
+
+  const ovDay = cycleLength - 14;
+  const fertileStart = ovDay - 5;
+  const fertileEnd = ovDay + 1;
+  const periodEnd = 5;
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const todayEl = el.querySelector("[data-today]") as HTMLElement | null;
+    if (todayEl) {
+      const left = todayEl.offsetLeft - el.clientWidth / 2 + todayEl.clientWidth / 2;
+      el.scrollTo({ left, behavior: "instant" });
+    }
+  }, []);
+
+  return (
+    <div className="mt-4 -mx-5">
+      <div ref={scrollRef} className="flex gap-1.5 overflow-x-auto px-5 pb-2 scrollbar-none">
+        {Array.from({ length: cycleLength }, (_, i) => i + 1).map((d) => {
+          const isToday = d === currentDay;
+          const isPeriod = d <= periodEnd;
+          const isOv = d === ovDay;
+          const isFertile = d >= fertileStart && d <= fertileEnd && !isOv;
+
+          const barColor = isOv
+            ? "bg-ovulation"
+            : isFertile
+              ? "bg-fertile/70"
+              : isPeriod
+                ? "bg-period"
+                : "bg-track";
+
+          const barH = isOv ? "h-4" : isFertile ? "h-3" : isPeriod ? "h-3" : "h-1.5";
+
+          return (
+            <div
+              key={d}
+              data-today={isToday ? "" : undefined}
+              className="flex shrink-0 flex-col items-center gap-1.5"
+              style={{ width: 28 }}
+            >
+              <div className={cn("w-full rounded-full", barColor, barH)} />
+              <div
+                className={cn(
+                  "flex size-6 items-center justify-center rounded-full text-[11px] font-semibold",
+                  isToday
+                    ? "bg-foreground text-background"
+                    : "text-muted-foreground",
+                )}
+              >
+                {d}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div className="mt-1 flex items-center gap-4 px-5 text-[10px] text-muted-foreground">
+        <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-period inline-block" /> Period</span>
+        <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-fertile/70 inline-block" /> Fertile</span>
+        <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-ovulation inline-block" /> Ovulation</span>
+      </div>
+    </div>
   );
 }
 

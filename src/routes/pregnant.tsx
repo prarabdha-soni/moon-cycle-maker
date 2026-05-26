@@ -1,7 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useRef } from "react";
-import { X, Info, Plus, ChevronLeft, ChevronRight } from "lucide-react";
+import { useState, useRef, useId, useEffect } from "react";
+import { X, Info, Plus, ChevronLeft, ChevronRight, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { BottomNav } from "@/components/BottomNav";
+import { ModeSwitcherPill } from "@/components/ModeSwitcherPill";
+import { ProfileIcon } from "@/components/ProfileIcon";
 
 export const Route = createFileRoute("/pregnant")({
   head: () => ({
@@ -471,179 +474,318 @@ for (let w = 1; w <= 40; w++) {
   }
 }
 
-// ─── Fetus SVG illustration (stage-based) ─────────────────────────────────────
+// ─── Fetus SVG illustration (sonography-inspired, stage-based) ─────────────────
 
 function FetusSvg({ week, size = 220 }: { week: number; size?: number }) {
-  // Stage determines the fetus shape / complexity
+  const rawId = useId();
+  const uid = rawId.replace(/:/g, "i");
+
   const stage =
-    week <= 6 ? 1 :
-    week <= 9 ? 2 :
-    week <= 13 ? 3 :
+    week <= 4  ? 1 :
+    week <= 8  ? 2 :
+    week <= 12 ? 3 :
     week <= 20 ? 4 :
     week <= 28 ? 5 :
     week <= 34 ? 6 : 7;
 
-  const scale = size / 220;
+  // Unique gradient/filter IDs
+  const am = `am${uid}`;  // amniotic ambient
+  const bd = `bd${uid}`;  // body gradient
+  const hg = `hg${uid}`;  // head gradient
+  const sh = `sh${uid}`;  // shadow depth overlay
+  const gl = `gl${uid}`;  // embryo glow
+  const sf = `sf${uid}`;  // soft blur filter
+
+  const ks = "0.45 0 0.55 1; 0.45 0 0.55 1";
+  // Growth: week 1 ≈ 22% → week 40 ≈ 82%.
+  // Capped at 0.82 so stage-7 paths (which extend to ~y=234) stay within the 220px viewBox.
+  // Power 0.65 gives a slightly more gradual S-curve than before — consecutive weeks
+  // look clearly different (≈ +1–3% per week) without clipping at either end.
+  const s = 0.22 + 0.60 * Math.pow(Math.max(0, week - 1) / 39, 0.65);
+  const st = `translate(${+(110 * (1 - s)).toFixed(2)},${+(115 * (1 - s)).toFixed(2)}) scale(${+s.toFixed(4)})`;
 
   return (
-    <svg width={size} height={size} viewBox="0 0 220 220" fill="none">
+    <svg width={size} height={size} viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id={sf} x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur stdDeviation="7" result="blur" />
+          <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+        </filter>
+        <radialGradient id={am} cx="50%" cy="44%" r="54%">
+          <stop offset="0%"   stopColor="#FFF2EC" stopOpacity="0.82" />
+          <stop offset="60%"  stopColor="#FFD8C0" stopOpacity="0.14" />
+          <stop offset="100%" stopColor="#FFD8C0" stopOpacity="0" />
+        </radialGradient>
+        <radialGradient id={bd} cx="26%" cy="20%" r="80%" gradientUnits="objectBoundingBox">
+          <stop offset="0%"   stopColor="#F5C0A0" />
+          <stop offset="18%"  stopColor="#E8986A" />
+          <stop offset="50%"  stopColor="#CC6840" />
+          <stop offset="78%"  stopColor="#A84828" />
+          <stop offset="100%" stopColor="#882810" />
+        </radialGradient>
+        <radialGradient id={hg} cx="36%" cy="22%" r="74%" gradientUnits="objectBoundingBox">
+          <stop offset="0%"   stopColor="#FACCAA" />
+          <stop offset="16%"  stopColor="#ECA080" />
+          <stop offset="48%"  stopColor="#D06848" />
+          <stop offset="78%"  stopColor="#A84430" />
+          <stop offset="100%" stopColor="#882810" />
+        </radialGradient>
+        <radialGradient id={sh} cx="68%" cy="74%" r="58%" gradientUnits="objectBoundingBox">
+          <stop offset="0%"   stopColor="#5A1808" stopOpacity="0.48" />
+          <stop offset="100%" stopColor="#5A1808" stopOpacity="0" />
+        </radialGradient>
+        <radialGradient id={gl} cx="50%" cy="50%" r="50%">
+          <stop offset="0%"   stopColor="#FFE0C0" stopOpacity="0.95" />
+          <stop offset="45%"  stopColor="#FFB880" stopOpacity="0.5" />
+          <stop offset="100%" stopColor="#FF9050" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+
+      {/* Warm amniotic ambient */}
+      <ellipse cx="110" cy="112" rx="92" ry="88" fill={`url(#${am})`} />
+
+      {/* ── Stage 1: weeks 1–4 — glowing blastocyst ── */}
       {stage === 1 && (
-        // Tiny blastocyst / cluster of cells
-        <g transform="translate(110,110)">
-          <circle r="18" fill="#E8A07A" opacity={0.9} />
-          <circle cx="10" cy="-8" r="7" fill="#D4806A" opacity={0.7} />
-          <circle cx="-10" cy="6" r="5" fill="#D4806A" opacity={0.6} />
-          <circle cx="5" cy="14" r="6" fill="#C87060" opacity={0.5} />
+        <g transform={st}>
+          <animateTransform attributeName="transform" type="translate"
+            values="0,0; 0,-8; 0,0" dur="3.5s" repeatCount="indefinite"
+            calcMode="spline" keySplines={ks} additive="sum" />
+          <circle cx="110" cy="115" r="54" fill={`url(#${gl})`} filter={`url(#${sf})`}>
+            <animate attributeName="r" values="48;60;48" dur="2.4s" repeatCount="indefinite"
+              calcMode="spline" keySplines={ks} />
+            <animate attributeName="opacity" values="0.65;1;0.65" dur="2.4s" repeatCount="indefinite"
+              calcMode="spline" keySplines={ks} />
+          </circle>
+          <circle cx="110" cy="115" r="26" fill={`url(#${bd})`} />
+          <circle cx="110" cy="115" r="26" fill={`url(#${sh})`} />
+          <circle cx="124" cy="104" r="14" fill="#D07848" opacity="0.82" />
+          <circle cx="96"  cy="124" r="10" fill="#C86840" opacity="0.72" />
+          <circle cx="120" cy="128" r="9"  fill="#BE6038" opacity="0.62" />
+          <ellipse cx="103" cy="108" rx="8" ry="7" fill="#FAD0B0" opacity="0.38" />
+          <circle cx="110" cy="115" r="4" fill="#E03828" opacity="0.9">
+            <animate attributeName="r" values="3;7;3" dur="1.1s" repeatCount="indefinite"
+              calcMode="spline" keySplines="0.4 0 0.6 1; 0.4 0 0.6 1" />
+            <animate attributeName="opacity" values="0.9;0.25;0.9" dur="1.1s" repeatCount="indefinite"
+              calcMode="spline" keySplines="0.4 0 0.6 1; 0.4 0 0.6 1" />
+          </circle>
         </g>
       )}
+
+      {/* ── Stage 2: weeks 5–8 — early C-shaped embryo (like 7-week scan) ── */}
       {stage === 2 && (
-        // Early embryo C-shape
-        <g transform={`translate(${110 * scale},${105 * scale}) scale(${scale})`}>
-          {/* Amniotic sac */}
-          <ellipse cx="0" cy="0" rx="45" ry="55" fill="#F5C4A8" opacity={0.35} />
-          {/* Body */}
-          <path d="M0,-30 C22,-22 28,0 20,22 C12,38 -5,42 -15,30 C-25,18 -22,-10 0,-30Z"
-            fill="#E08060" opacity={0.9} />
-          {/* Head */}
-          <circle cx="2" cy="-34" r="18" fill="#D87050" opacity={0.95} />
-          {/* Eye */}
-          <circle cx="7" cy="-36" r="3" fill="#333" opacity={0.6} />
-          {/* Limb buds */}
-          <ellipse cx="22" cy="-8" rx="9" ry="5" fill="#C86848" opacity={0.7} transform="rotate(30,22,-8)" />
-          <ellipse cx="18" cy="18" rx="8" ry="4" fill="#C86848" opacity={0.7} transform="rotate(-20,18,18)" />
+        <g transform={st}>
+          <animateTransform attributeName="transform" type="translate"
+            values="0,0; 0,-7; 0,0" dur="3.5s" repeatCount="indefinite"
+            calcMode="spline" keySplines={ks} additive="sum" />
+          {/* Head — large oval, embryo proportions */}
+          <ellipse cx="107" cy="70" rx="33" ry="40" fill={`url(#${hg})`} />
+          <ellipse cx="107" cy="70" rx="33" ry="40" fill={`url(#${sh})`} />
+          <ellipse cx="97" cy="57" rx="11" ry="13" fill="#FAD0B0" opacity="0.24" />
+          {/* Body torso */}
+          <path d="M108,106 C124,102 140,116 136,138 C132,158 118,168 104,160 C90,152 82,136 86,116 C90,102 100,108 108,106Z"
+            fill={`url(#${bd})`} />
+          <path d="M108,106 C124,102 140,116 136,138 C132,158 118,168 104,160 C90,152 82,136 86,116 C90,102 100,108 108,106Z"
+            fill={`url(#${sh})`} />
+          {/* Arm bud */}
+          <ellipse cx="142" cy="114" rx="14" ry="8" fill="#C07848" opacity="0.9"
+            transform="rotate(28 142 114)" />
+          <ellipse cx="142" cy="114" rx="14" ry="8" fill={`url(#${sh})`}
+            transform="rotate(28 142 114)" />
+          {/* Leg bud */}
+          <ellipse cx="128" cy="152" rx="13" ry="7.5" fill="#B87040" opacity="0.84"
+            transform="rotate(-22 128 152)" />
+          {/* Embryonic tail */}
+          <path d="M90,154 C78,166 78,180 86,184" stroke="#B06038" strokeWidth="6"
+            strokeLinecap="round" fill="none" opacity="0.52" />
+          {/* Pulsing heart */}
+          <circle cx="118" cy="118" r="5" fill="#E03828" opacity="0.82">
+            <animate attributeName="r" values="4;8;4" dur="1.2s" repeatCount="indefinite"
+              calcMode="spline" keySplines="0.4 0 0.6 1; 0.4 0 0.6 1" />
+            <animate attributeName="opacity" values="0.82;0.22;0.82" dur="1.2s" repeatCount="indefinite"
+              calcMode="spline" keySplines="0.4 0 0.6 1; 0.4 0 0.6 1" />
+          </circle>
         </g>
       )}
+
+      {/* ── Stage 3: weeks 9–12 — recognizable curled fetus ── */}
       {stage === 3 && (
-        // Recognisable fetus, curled
-        <g transform="translate(110,108)">
-          {/* Sac */}
-          <ellipse cx="0" cy="0" rx="60" ry="68" fill="#F5C4A8" opacity={0.3} />
-          {/* Torso */}
-          <path d="M0,-22 C28,-14 34,10 24,34 C16,52 -8,56 -20,40 C-32,24 -28,-6 0,-22Z"
-            fill="#E08060" opacity={0.92} />
-          {/* Head */}
-          <circle cx="4" cy="-40" r="24" fill="#D07050" opacity={0.97} />
-          {/* Face */}
-          <circle cx="10" cy="-44" r="4" fill="#222" opacity={0.5} />
-          <path d="M0,-32 Q8,-28 14,-32" stroke="#222" strokeWidth="1.5" strokeLinecap="round" opacity={0.4} fill="none" />
-          {/* Arm */}
-          <path d="M26,-10 C38,-4 42,8 36,16" stroke="#C87050" strokeWidth="7" strokeLinecap="round" fill="none" />
-          {/* Hand */}
-          <circle cx="36" cy="16" r="5" fill="#C87050" opacity={0.8} />
-          {/* Leg */}
-          <path d="M20,32 C30,44 28,58 18,62" stroke="#C87050" strokeWidth="7" strokeLinecap="round" fill="none" />
-          {/* Foot */}
-          <ellipse cx="18" cy="62" rx="7" ry="4" fill="#C87050" opacity={0.8} transform="rotate(-20,18,62)" />
-          {/* Umbilical cord */}
-          <path d="M-4,20 C-20,35 -10,50 -5,58" stroke="#D4805A" strokeWidth="3" strokeLinecap="round" fill="none" opacity={0.5} />
+        <g transform={st}>
+          <animateTransform attributeName="transform" type="translate"
+            values="0,0; 0,-7; 0,0" dur="3.5s" repeatCount="indefinite"
+            calcMode="spline" keySplines={ks} additive="sum" />
+          <path d="M106,102 C130,94 150,116 146,150 C142,180 118,192 98,176 C78,160 70,130 76,108 C82,90 96,108 106,102Z"
+            fill={`url(#${bd})`} />
+          <path d="M106,102 C130,94 150,116 146,150 C142,180 118,192 98,176 C78,160 70,130 76,108 C82,90 96,108 106,102Z"
+            fill={`url(#${sh})`} />
+          <circle cx="106" cy="70" r="34" fill={`url(#${hg})`} />
+          <circle cx="106" cy="70" r="34" fill={`url(#${sh})`} />
+          <ellipse cx="96" cy="57" rx="12" ry="13" fill="#FAD0B0" opacity="0.22" />
+          {/* Eye areas — subtle dark patches only */}
+          <ellipse cx="96"  cy="66" rx="5.5" ry="4" fill="#4A1808" opacity="0.25" />
+          <ellipse cx="116" cy="66" rx="5.5" ry="4" fill="#4A1808" opacity="0.25" />
+          <path d="M134,122 C154,116 162,134 150,148" stroke="#C07040" strokeWidth="11"
+            strokeLinecap="round" fill="none" />
+          <circle cx="150" cy="149" r="8" fill="#B86830" />
+          <path d="M118,162 C132,176 128,194 108,196" stroke="#C07040" strokeWidth="11"
+            strokeLinecap="round" fill="none" />
+          <ellipse cx="104" cy="197" rx="10" ry="6" fill="#B06830" transform="rotate(-8 104 197)" />
+          <path d="M90,166 C74,180 72,194 84,198" stroke="#A85828" strokeWidth="10"
+            strokeLinecap="round" fill="none" opacity="0.58" />
+          <path d="M94,140 C72,156 76,174 88,184" stroke="#C87848" strokeWidth="3.5"
+            strokeLinecap="round" fill="none" opacity="0.36" />
         </g>
       )}
+
+      {/* ── Stage 4: weeks 13–20 ── */}
       {stage === 4 && (
-        // Floating fetus, more defined
-        <g transform="translate(110,112)">
-          {/* Body */}
-          <path d="M0,-30 C32,-20 40,8 30,38 C20,62 -10,68 -26,50 C-40,32 -36,-4 0,-30Z"
-            fill="#E08060" opacity={0.93} />
-          {/* Head */}
-          <circle cx="5" cy="-55" r="30" fill="#D07050" />
-          {/* Face features */}
-          <circle cx="14" cy="-60" r="5" fill="#222" opacity={0.45} />
-          <circle cx="-2" cy="-60" r="5" fill="#222" opacity={0.45} />
-          <path d="M2,-46 Q8,-42 14,-46" stroke="#222" strokeWidth="1.5" strokeLinecap="round" opacity={0.35} fill="none" />
-          {/* Ear */}
-          <path d="M-24,-55 C-30,-50 -30,-44 -24,-40" stroke="#C87050" strokeWidth="4" strokeLinecap="round" fill="none" />
-          {/* Arm */}
-          <path d="M32,-8 C48,0 52,18 44,28" stroke="#D07050" strokeWidth="9" strokeLinecap="round" fill="none" />
-          <ellipse cx="46" cy="30" rx="9" ry="6" fill="#C87050" transform="rotate(-20,46,30)" />
-          {/* Fingers */}
-          {[-1,1,3].map((d,i) => <line key={i} x1={46+d*2} y1={28} x2={46+d*2} y2={38} stroke="#B86040" strokeWidth="2" strokeLinecap="round" />)}
-          {/* Leg */}
-          <path d="M24,44 C34,62 30,76 18,82" stroke="#D07050" strokeWidth="9" strokeLinecap="round" fill="none" />
-          <ellipse cx="17" cy="84" rx="10" ry="5" fill="#C87050" transform="rotate(-10,17,84)" />
-          {/* Other leg (behind) */}
-          <path d="M-12,48 C-22,62 -24,76 -16,84" stroke="#C06848" strokeWidth="8" strokeLinecap="round" fill="none" opacity={0.6} />
-          {/* Cord */}
-          <path d="M-4,10 C-24,30 -18,56 -10,68" stroke="#D4805A" strokeWidth="3.5" strokeLinecap="round" fill="none" opacity={0.5} />
+        <g transform={st}>
+          <animateTransform attributeName="transform" type="translate"
+            values="0,0; 0,-7; 0,0" dur="3.5s" repeatCount="indefinite"
+            calcMode="spline" keySplines={ks} additive="sum" />
+          <path d="M104,90 C134,82 156,110 152,150 C148,188 114,200 88,180 C62,160 54,128 60,104 C66,84 88,96 104,90Z"
+            fill={`url(#${bd})`} />
+          <path d="M104,90 C134,82 156,110 152,150 C148,188 114,200 88,180 C62,160 54,128 60,104 C66,84 88,96 104,90Z"
+            fill={`url(#${sh})`} />
+          <circle cx="108" cy="56" r="38" fill={`url(#${hg})`} />
+          <circle cx="108" cy="56" r="38" fill={`url(#${sh})`} />
+          <ellipse cx="96" cy="42" rx="13" ry="14" fill="#FAD0B0" opacity="0.2" />
+          {/* Eye patches */}
+          <ellipse cx="96"  cy="52" rx="6" ry="4" fill="#4A1808" opacity="0.28" />
+          <ellipse cx="118" cy="52" rx="6" ry="4" fill="#4A1808" opacity="0.28" />
+          <ellipse cx="108" cy="64" rx="4" ry="2.5" fill="#904020" opacity="0.2" />
+          {/* Arm up */}
+          <path d="M146,108 C166,100 172,80 156,62" stroke="#C07040" strokeWidth="12"
+            strokeLinecap="round" fill="none" />
+          <circle cx="154" cy="60" r="10" fill="#B86830" />
+          {[-3, 2, 7].map((d, i) => (
+            <line key={i} x1={154+d} y1={57} x2={153+d} y2={48}
+              stroke="#A05828" strokeWidth="2.5" strokeLinecap="round" />
+          ))}
+          <path d="M120,164 C136,178 132,198 110,202" stroke="#C07040" strokeWidth="13"
+            strokeLinecap="round" fill="none" />
+          <ellipse cx="106" cy="203" rx="12" ry="7" fill="#B06830" transform="rotate(-6 106 203)" />
+          <path d="M82,170 C60,186 58,206 72,210" stroke="#A05028" strokeWidth="12"
+            strokeLinecap="round" fill="none" opacity="0.6" />
+          <path d="M86,132 C62,152 66,180 78,196" stroke="#C87848" strokeWidth="4"
+            strokeLinecap="round" fill="none" opacity="0.3" />
         </g>
       )}
+
+      {/* ── Stage 5: weeks 21–28 ── */}
       {stage === 5 && (
-        // Weeks 21-28: larger fetus, more defined
-        <g transform="translate(110,114)">
-          {/* Body */}
-          <path d="M0,-28 C38,-16 46,14 34,48 C22,76 -14,82 -32,62 C-50,40 -44,-8 0,-28Z"
-            fill="#E08060" opacity={0.94} />
-          {/* Head */}
-          <circle cx="6" cy="-60" r="36" fill="#D07050" />
-          {/* Face */}
-          <circle cx="18" cy="-66" r="6" fill="#111" opacity={0.4} />
-          <circle cx="0" cy="-66" r="6" fill="#111" opacity={0.4} />
-          <path d="M4,-50 Q10,-44 18,-50" stroke="#111" strokeWidth="2" strokeLinecap="round" opacity={0.3} fill="none" />
-          {/* Ear */}
-          <path d="M-29,-62 C-38,-56 -38,-48 -29,-44" stroke="#C87050" strokeWidth="5" strokeLinecap="round" fill="none" />
-          {/* Arm */}
-          <path d="M38,-5 C56,6 60,28 50,40" stroke="#D07050" strokeWidth="11" strokeLinecap="round" fill="none" />
-          <ellipse cx="52" cy="42" rx="11" ry="7" fill="#C87050" transform="rotate(-15,52,42)" />
-          {[0,2,4].map((d,i)=><line key={i} x1={52+d*2} y1={40} x2={52+d*2} y2={52} stroke="#B86040" strokeWidth="2.5" strokeLinecap="round" />)}
-          {/* Legs */}
-          <path d="M26,54 C38,72 36,90 24,96" stroke="#D07050" strokeWidth="11" strokeLinecap="round" fill="none" />
-          <ellipse cx="22" cy="98" rx="12" ry="6" fill="#C87050" transform="rotate(-8,22,98)" />
-          <path d="M-10,60 C-26,76 -28,92 -18,100" stroke="#C06848" strokeWidth="10" strokeLinecap="round" fill="none" opacity={0.65} />
-          {/* Cord */}
-          <path d="M-2,14 C-28,40 -22,70 -12,84" stroke="#D4805A" strokeWidth="4" strokeLinecap="round" fill="none" opacity={0.45} />
+        <g transform={st}>
+          <animateTransform attributeName="transform" type="translate"
+            values="0,0; 0,-7; 0,0" dur="3.5s" repeatCount="indefinite"
+            calcMode="spline" keySplines={ks} additive="sum" />
+          <path d="M100,86 C138,76 162,108 156,154 C150,196 112,208 84,184 C56,160 48,122 56,96 C64,74 82,94 100,86Z"
+            fill={`url(#${bd})`} />
+          <path d="M100,86 C138,76 162,108 156,154 C150,196 112,208 84,184 C56,160 48,122 56,96 C64,74 82,94 100,86Z"
+            fill={`url(#${sh})`} />
+          <circle cx="110" cy="50" r="42" fill={`url(#${hg})`} />
+          <circle cx="110" cy="50" r="42" fill={`url(#${sh})`} />
+          <ellipse cx="97" cy="36" rx="14" ry="15" fill="#FAD0B0" opacity="0.18" />
+          {/* Closed eyelids — medical style */}
+          <path d="M94,46 Q103,40 112,46" stroke="#6A2010" strokeWidth="2.5"
+            strokeLinecap="round" fill="none" opacity="0.5" />
+          <path d="M114,46 Q123,40 132,46" stroke="#6A2010" strokeWidth="2.5"
+            strokeLinecap="round" fill="none" opacity="0.5" />
+          <ellipse cx="112" cy="60" rx="4" ry="3" fill="#904020" opacity="0.2" />
+          <path d="M150,110 C170,102 178,78 158,60" stroke="#C07040" strokeWidth="13"
+            strokeLinecap="round" fill="none" />
+          <circle cx="156" cy="58" r="11" fill="#B06830" />
+          {[-4, 1, 6].map((d, i) => (
+            <line key={i} x1={156+d} y1={54} x2={155+d} y2={44}
+              stroke="#986028" strokeWidth="2.8" strokeLinecap="round" />
+          ))}
+          <path d="M118,168 C136,184 132,204 108,208" stroke="#C07040" strokeWidth="14"
+            strokeLinecap="round" fill="none" />
+          <ellipse cx="104" cy="209" rx="13" ry="7.5" fill="#B06830" />
+          <path d="M76,176 C52,194 50,214 66,218" stroke="#A05028" strokeWidth="13"
+            strokeLinecap="round" fill="none" opacity="0.58" />
+          <path d="M80,126 C54,152 58,186 70,204" stroke="#C87848" strokeWidth="4.5"
+            strokeLinecap="round" fill="none" opacity="0.26" />
         </g>
       )}
+
+      {/* ── Stage 6: weeks 29–34, plump with hair ── */}
       {stage === 6 && (
-        // Weeks 29-34: plump fetus
-        <g transform="translate(108,118)">
-          {/* Plump body */}
-          <path d="M2,-22 C46,-8 54,24 40,58 C26,88 -16,94 -38,72 C-58,48 -52,-10 2,-22Z"
-            fill="#E08060" opacity={0.95} />
-          {/* Head */}
-          <circle cx="8" cy="-58" r="40" fill="#D07050" />
-          {/* Face */}
-          <circle cx="22" cy="-65" r="7" fill="#111" opacity={0.38} />
-          <circle cx="2" cy="-65" r="7" fill="#111" opacity={0.38} />
-          <ellipse cx="10" cy="-50" rx="8" ry="3" fill="#C06040" opacity={0.5} />
-          <path d="M6,-48 Q12,-42 20,-48" stroke="#111" strokeWidth="1.8" strokeLinecap="round" opacity={0.25} fill="none" />
-          {/* Ear */}
-          <path d="M-31,-60 C-42,-52 -42,-42 -31,-36" stroke="#C87050" strokeWidth="6" strokeLinecap="round" fill="none" />
-          {/* Arms */}
-          <path d="M44,-2 C64,10 68,36 56,50" stroke="#D07050" strokeWidth="13" strokeLinecap="round" fill="none" />
-          <ellipse cx="57" cy="52" rx="13" ry="8" fill="#C87050" transform="rotate(-12,57,52)" />
-          {/* Legs */}
-          <path d="M28,62 C42,82 40,100 26,108" stroke="#D07050" strokeWidth="13" strokeLinecap="round" fill="none" />
-          <ellipse cx="24" cy="110" rx="14" ry="7" fill="#C87050" />
-          <path d="M-14,68 C-32,86 -34,104 -22,112" stroke="#C06848" strokeWidth="12" strokeLinecap="round" fill="none" opacity={0.6} />
+        <g transform={st}>
+          <animateTransform attributeName="transform" type="translate"
+            values="0,0; 0,-7; 0,0" dur="3.5s" repeatCount="indefinite"
+            calcMode="spline" keySplines={ks} additive="sum" />
+          <path d="M96,82 C144,70 170,106 162,156 C154,202 106,214 78,188 C50,162 42,122 52,94 C62,68 76,92 96,82Z"
+            fill={`url(#${bd})`} />
+          <path d="M96,82 C144,70 170,106 162,156 C154,202 106,214 78,188 C50,162 42,122 52,94 C62,68 76,92 96,82Z"
+            fill={`url(#${sh})`} />
+          <circle cx="112" cy="44" r="46" fill={`url(#${hg})`} />
+          <circle cx="112" cy="44" r="46" fill={`url(#${sh})`} />
+          <ellipse cx="97" cy="30" rx="16" ry="16" fill="#FAD0B0" opacity="0.16" />
+          {[-16,-9,-2,5,12,19].map((x, i) => (
+            <path key={i} d={`M${112+x},4 Q${113+x},-6 ${111+x},-10`}
+              stroke="#8A3818" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.36" />
+          ))}
+          <path d="M92,40 Q103,33 114,40" stroke="#6A2010" strokeWidth="3"
+            strokeLinecap="round" fill="none" opacity="0.55" />
+          <path d="M116,40 Q127,33 138,40" stroke="#6A2010" strokeWidth="3"
+            strokeLinecap="round" fill="none" opacity="0.55" />
+          <ellipse cx="114" cy="53" rx="4.5" ry="3.5" fill="#904020" opacity="0.2" />
+          <path d="M106,65 Q114,72 122,65" stroke="#904020" strokeWidth="2"
+            strokeLinecap="round" fill="none" opacity="0.26" />
+          <path d="M154,112 C176,104 182,78 164,60" stroke="#C07040" strokeWidth="14"
+            strokeLinecap="round" fill="none" />
+          <circle cx="162" cy="58" r="12" fill="#B06830" />
+          {[-5, 0, 6].map((d, i) => (
+            <line key={i} x1={162+d} y1={54} x2={162+d} y2={43}
+              stroke="#986028" strokeWidth="3" strokeLinecap="round" />
+          ))}
+          <path d="M112,172 C134,190 130,210 106,214" stroke="#C07040" strokeWidth="14"
+            strokeLinecap="round" fill="none" />
+          <ellipse cx="102" cy="215" rx="14" ry="8" fill="#B06830" />
+          <path d="M70,180 C44,200 42,220 60,224" stroke="#A05028" strokeWidth="13"
+            strokeLinecap="round" fill="none" opacity="0.58" />
+          <path d="M76,128 C46,160 50,196 62,214" stroke="#C87848" strokeWidth="5"
+            strokeLinecap="round" fill="none" opacity="0.24" />
         </g>
       )}
+
+      {/* ── Stage 7: weeks 35–40, full-term ── */}
       {stage === 7 && (
-        // Weeks 35-40: full-term baby
-        <g transform="translate(110,116)">
-          {/* Full, round body */}
-          <path d="M4,-16 C52,-0 62,32 46,66 C30,96 -18,102 -42,78 C-66,52 -60,-8 4,-16Z"
-            fill="#E08060" opacity={0.96} />
-          {/* Head */}
-          <circle cx="10" cy="-54" r="44" fill="#D07050" />
-          {/* Face details */}
-          <circle cx="26" cy="-62" r="7" fill="#111" opacity={0.35} />
-          <circle cx="4" cy="-62" r="7" fill="#111" opacity={0.35} />
-          <ellipse cx="14" cy="-46" rx="9" ry="3.5" fill="#C06040" opacity={0.45} />
-          <path d="M8,-43 Q15,-36 24,-43" stroke="#333" strokeWidth="2" strokeLinecap="round" opacity={0.22} fill="none" />
-          <ellipse cx="15" cy="-54" rx="1" ry="2.5" fill="#C06040" opacity={0.5} />
-          {/* Ear */}
-          <path d="M-33,-57 C-46,-47 -46,-35 -33,-28" stroke="#C87050" strokeWidth="7" strokeLinecap="round" fill="none" />
-          {/* Hair suggestion */}
-          {[-2,4,10,16,22].map((x,i) => <path key={i} d={`M${x},-96 Q${x+3},-104 ${x+1},-108`} stroke="#8B4040" strokeWidth="2" strokeLinecap="round" fill="none" opacity={0.35} />)}
-          {/* Arms */}
-          <path d="M48,4 C70,18 74,46 60,62" stroke="#D07050" strokeWidth="14" strokeLinecap="round" fill="none" />
-          <ellipse cx="61" cy="64" rx="14" ry="9" fill="#C87050" transform="rotate(-10,61,64)" />
-          {[0,3,6].map((d,i)=><line key={i} x1={61+d*2} y1={62} x2={62+d*2} y2={74} stroke="#B86040" strokeWidth="2.5" strokeLinecap="round" />)}
-          {/* Legs */}
-          <path d="M30,70 C46,92 44,112 30,120" stroke="#D07050" strokeWidth="14" strokeLinecap="round" fill="none" />
-          <ellipse cx="28" cy="122" rx="16" ry="8" fill="#C87050" />
-          <path d="M-16,76 C-36,96 -38,116 -26,124" stroke="#C06848" strokeWidth="13" strokeLinecap="round" fill="none" opacity={0.62} />
-          {/* Cord */}
-          <path d="M0,18 C-30,48 -26,80 -14,96" stroke="#D4805A" strokeWidth="4.5" strokeLinecap="round" fill="none" opacity={0.42} />
+        <g transform={st}>
+          <animateTransform attributeName="transform" type="translate"
+            values="0,0; 0,-6; 0,0" dur="4s" repeatCount="indefinite"
+            calcMode="spline" keySplines={ks} additive="sum" />
+          <path d="M90,78 C148,64 178,104 166,160 C154,212 100,226 70,196 C40,166 32,124 44,92 C56,62 72,88 90,78Z"
+            fill={`url(#${bd})`} />
+          <path d="M90,78 C148,64 178,104 166,160 C154,212 100,226 70,196 C40,166 32,124 44,92 C56,62 72,88 90,78Z"
+            fill={`url(#${sh})`} />
+          <circle cx="114" cy="40" r="50" fill={`url(#${hg})`} />
+          <circle cx="114" cy="40" r="50" fill={`url(#${sh})`} />
+          <ellipse cx="98" cy="24" rx="18" ry="18" fill="#FAD0B0" opacity="0.14" />
+          {[-20,-13,-6,1,8,15,22].map((x, i) => (
+            <path key={i} d={`M${114+x},-2 Q${115+x},-14 ${113+x},-18`}
+              stroke="#8A3818" strokeWidth="3" strokeLinecap="round" fill="none" opacity="0.4" />
+          ))}
+          <path d="M90,34 Q103,26 116,34" stroke="#6A2010" strokeWidth="3.5"
+            strokeLinecap="round" fill="none" opacity="0.6" />
+          <path d="M120,34 Q133,26 146,34" stroke="#6A2010" strokeWidth="3.5"
+            strokeLinecap="round" fill="none" opacity="0.6" />
+          <ellipse cx="116" cy="49" rx="5" ry="4" fill="#904020" opacity="0.2" />
+          <path d="M106,62 Q116,70 126,62" stroke="#904020" strokeWidth="2.5"
+            strokeLinecap="round" fill="none" opacity="0.28" />
+          <path d="M158,114 C182,104 188,76 168,56" stroke="#C07040" strokeWidth="15"
+            strokeLinecap="round" fill="none" />
+          <circle cx="166" cy="54" r="13" fill="#B06830" />
+          {[-5, 0, 6].map((d, i) => (
+            <line key={i} x1={166+d} y1={49} x2={165+d} y2={37}
+              stroke="#986028" strokeWidth="3.2" strokeLinecap="round" />
+          ))}
+          <path d="M114,182 C138,202 134,222 108,226" stroke="#C07040" strokeWidth="15"
+            strokeLinecap="round" fill="none" />
+          <ellipse cx="104" cy="227" rx="15" ry="9" fill="#B06830" />
+          <path d="M62,192 C36,214 34,230 54,234" stroke="#A05028" strokeWidth="14"
+            strokeLinecap="round" fill="none" opacity="0.58" />
+          <path d="M70,132 C38,168 42,208 56,226" stroke="#C87848" strokeWidth="5"
+            strokeLinecap="round" fill="none" opacity="0.22" />
         </g>
       )}
     </svg>
@@ -722,19 +864,45 @@ function DetailsSheet({
   const weeks = Array.from({ length: 40 }, (_, i) => i + 1);
   const data = WEEK_DATA[selectedWeek] || WEEK_DATA[7];
 
+  // Auto-scroll week pills to the selected week on open
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const activeBtn = el.querySelector("[data-active-week]") as HTMLElement | null;
+    if (activeBtn) {
+      const left = activeBtn.offsetLeft - el.clientWidth / 2 + activeBtn.clientWidth / 2;
+      el.scrollTo({ left, behavior: "instant" });
+    }
+  }, []);
+
+  // Intercept browser/swipe back to close the sheet instead of leaving the route
+  useEffect(() => {
+    const handlePopState = (e: PopStateEvent) => {
+      e.preventDefault();
+      onClose();
+      window.history.pushState(null, "", window.location.href);
+    };
+    window.history.pushState(null, "", window.location.href);
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [onClose]);
+
   return (
     <div className="fixed inset-0 z-50 flex flex-col" style={{ background: "linear-gradient(160deg, #f4c09a 0%, #e8956d 55%, #f0b080 100%)" }}>
-      {/* Close */}
-      <button
-        onClick={onClose}
-        className="absolute left-4 top-10 z-10 flex size-9 items-center justify-center rounded-full bg-white/20"
-        aria-label="Close"
-      >
-        <X className="size-5 text-white" strokeWidth={2.5} />
-      </button>
+      {/* Back / Close — prominent pill button */}
+      <div className="flex items-center px-4 pt-12 pb-2">
+        <button
+          onClick={onClose}
+          aria-label="Close"
+          className="flex items-center gap-2 rounded-full bg-white/30 px-4 py-2 text-white backdrop-blur-sm transition-colors hover:bg-white/40"
+        >
+          <ArrowLeft className="size-4" strokeWidth={2.5} />
+          <span className="text-[13px] font-semibold">Back</span>
+        </button>
+      </div>
 
       {/* Fetus illustration */}
-      <div className="flex flex-1 items-center justify-center pt-16">
+      <div className="flex flex-1 items-center justify-center">
         <FetusSvg week={selectedWeek} size={240} />
       </div>
 
@@ -744,6 +912,7 @@ function DetailsSheet({
           {weeks.map((w) => (
             <button
               key={w}
+              data-active-week={w === selectedWeek ? "" : undefined}
               onClick={() => setSelectedWeek(w)}
               className={cn(
                 "shrink-0 rounded-full px-4 py-2 text-[13px] font-semibold transition-all",
@@ -945,19 +1114,20 @@ function PregnantScreen() {
             minHeight: "62vh",
           }}
         >
-          {/* Top bar */}
+          {/* Top bar — ProfileIcon left, date centre, spacer right */}
           <div className="flex items-center justify-between px-5 pt-12">
-            <div className="grid size-9 place-items-center rounded-full bg-white/25">
-              <span className="text-[17px]">🐱</span>
-            </div>
+            <ProfileIcon variant="light" />
             <p className="text-[16px] font-semibold text-white">{monthLabel}</p>
-            <button className="grid size-9 place-items-center rounded-full bg-white/25">
-              <span className="text-[17px]">📅</span>
-            </button>
+            <span className="size-9" aria-hidden />
+          </div>
+
+          {/* Mode switcher — sits just below the top bar */}
+          <div className="mt-2 flex justify-center">
+            <ModeSwitcherPill />
           </div>
 
           {/* Week strip */}
-          <div className="mt-3">
+          <div className="mt-2">
             <WeekStrip today={today} />
           </div>
 
@@ -999,7 +1169,7 @@ function PregnantScreen() {
               <p className="text-[11px] uppercase tracking-wider text-muted-foreground">Due date</p>
               <p className="text-[14px] font-semibold text-foreground">{fmtDate(dueDate)}</p>
             </div>
-            <div className="text-right">=
+            <div className="text-right">
               <p className="text-[11px] uppercase tracking-wider text-muted-foreground">Days left</p>
               <p className="text-[14px] font-semibold text-foreground">{daysLeft} days</p>
             </div>
@@ -1075,6 +1245,9 @@ function PregnantScreen() {
             <ChevronRight className="size-4 text-muted-foreground" />
           </div>
         </div>
+
+        {/* ── Bottom navigation (same as every other screen) ── */}
+        <BottomNav />
       </div>
     </>
   );
