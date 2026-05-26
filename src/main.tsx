@@ -1,8 +1,39 @@
 import React from "react";
+import type { ErrorInfo, ReactNode } from "react";
 import ReactDOM from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
 import { QueryClient } from "@tanstack/react-query";
+
+/** Catches unhandled render errors so a broken page doesn't crash the whole app */
+class AppErrorBoundary extends React.Component<
+  { children: ReactNode },
+  { error: Error | null }
+> {
+  state = { error: null };
+  static getDerivedStateFromError(error: Error) { return { error }; }
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    console.error("Petal error boundary caught:", error, info);
+  }
+  render() {
+    if (this.state.error) {
+      return (
+        <div className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center gap-4 bg-background px-8 text-center">
+          <p className="text-4xl">🌸</p>
+          <h1 className="font-display text-[22px] font-semibold text-foreground">Something went wrong</h1>
+          <p className="text-[14px] text-muted-foreground">Petal hit an unexpected error. Tap below to reload.</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="rounded-2xl bg-period px-6 py-3 text-[14px] font-semibold text-white"
+          >
+            Reload app
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 const queryClient = new QueryClient();
 
@@ -27,7 +58,9 @@ if (rootElement && !rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <React.StrictMode>
-      <RouterProvider router={router} />
+      <AppErrorBoundary>
+        <RouterProvider router={router} />
+      </AppErrorBoundary>
     </React.StrictMode>
   );
 }

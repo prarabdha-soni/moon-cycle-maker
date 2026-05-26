@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useRef, useId, useEffect } from "react";
+import { useState, useRef, useId, useEffect, useCallback } from "react";
 import { X, Info, Plus, ChevronLeft, ChevronRight, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BottomNav } from "@/components/BottomNav";
@@ -875,16 +875,24 @@ function DetailsSheet({
     }
   }, []);
 
-  // Intercept browser/swipe back to close the sheet instead of leaving the route
+  // Intercept hardware/swipe back to close the sheet instead of leaving the route.
+  // We push one sentinel entry when the sheet opens so the back gesture has
+  // something to pop. The popstate handler intercepts that pop and closes the sheet.
+  // onClose is wrapped in useCallback in the parent so this effect only runs once.
   useEffect(() => {
-    const handlePopState = (e: PopStateEvent) => {
-      e.preventDefault();
+    window.history.pushState({ detailsSheet: true }, "");
+    const handlePopState = () => {
       onClose();
-      window.history.pushState(null, "", window.location.href);
     };
-    window.history.pushState(null, "", window.location.href);
     window.addEventListener("popstate", handlePopState);
-    return () => window.removeEventListener("popstate", handlePopState);
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+      // If the sheet is closed programmatically (not via back), clean up the
+      // sentinel history entry so we don't leave extra entries behind.
+      if (window.history.state?.detailsSheet) {
+        window.history.back();
+      }
+    };
   }, [onClose]);
 
   return (
@@ -1091,6 +1099,8 @@ function InsightCards({ week, data, onOpenDetails }: {
 
 function PregnantScreen() {
   const [showDetails, setShowDetails] = useState(false);
+  // Stable reference so DetailsSheet's useEffect doesn't re-run on every render
+  const handleCloseDetails = useCallback(() => setShowDetails(false), []);
   const today = new Date();
 
   const lmpStr = typeof window !== "undefined" ? window.localStorage.getItem("petal:lastPeriod") : null;
@@ -1102,7 +1112,7 @@ function PregnantScreen() {
   return (
     <>
       {showDetails && (
-        <DetailsSheet initialWeek={weeks} onClose={() => setShowDetails(false)} />
+        <DetailsSheet initialWeek={weeks} onClose={handleCloseDetails} />
       )}
 
       <div className="mx-auto flex min-h-screen max-w-md flex-col bg-background">

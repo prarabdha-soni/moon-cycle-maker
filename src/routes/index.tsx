@@ -108,9 +108,14 @@ const GOAL_TIPS: Record<string, Record<string, { title: string; body: string; ic
 };
 
 function GoalTips({ phase }: { phase: string }) {
-  const goals: string[] = typeof window !== "undefined"
-    ? JSON.parse(window.localStorage.getItem("petal:goals") || "[]")
-    : [];
+  let goals: string[] = [];
+  try {
+    goals = typeof window !== "undefined"
+      ? JSON.parse(window.localStorage.getItem("petal:goals") || "[]")
+      : [];
+  } catch {
+    goals = [];
+  }
   if (goals.length === 0) return null;
   const tips = goals.map((g) => GOAL_TIPS[g]?.[phase]).filter(Boolean);
   if (tips.length === 0) return null;
@@ -166,7 +171,9 @@ function CycleScreen() {
       const lp = typeof window !== "undefined" ? window.localStorage.getItem("petal:lastPeriod") : null;
       navigate({ to: lp ? "/pregnant" : "/welcome-last-period", replace: true });
     }
-  }, [mode, onboarded, navigate, refreshKey]);
+  // refreshKey intentionally excluded: it tracks cycle data refresh, not mode changes.
+  // Including it caused navigate() to fire on every profile save.
+  }, [mode, onboarded, navigate]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const cycle = useMemo(() => computeCycleData(refreshKey), [refreshKey]);
 
