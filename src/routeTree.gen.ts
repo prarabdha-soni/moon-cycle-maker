@@ -13,12 +13,18 @@ import { Route as WelcomeSupplementsRouteImport } from './routes/welcome-supplem
 import { Route as WelcomeModeRouteImport } from './routes/welcome-mode'
 import { Route as WelcomeRouteImport } from './routes/welcome'
 import { Route as TrackRouteImport } from './routes/track'
+import { Route as ShopRouteImport } from './routes/shop'
 import { Route as MedRouteImport } from './routes/med'
+import { Route as LearnRouteImport } from './routes/learn'
+import { Route as HealthRouteImport } from './routes/health'
 import { Route as ContentRouteImport } from './routes/content'
+import { Route as CoachRouteImport } from './routes/coach'
 import { Route as ConceiveRouteImport } from './routes/conceive'
 import { Route as CalendarRouteImport } from './routes/calendar'
 import { Route as AnalysisRouteImport } from './routes/analysis'
 import { Route as PregnantRouteImport } from './routes/pregnant'
+import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as WelcomeGoalsRouteImport } from './routes/welcome-goals'
 import { Route as WelcomeLastPeriodRouteImport } from './routes/welcome-last-period'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -42,14 +48,34 @@ const TrackRoute = TrackRouteImport.update({
   path: '/track',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShopRoute = ShopRouteImport.update({
+  id: '/shop',
+  path: '/shop',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MedRoute = MedRouteImport.update({
   id: '/med',
   path: '/med',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LearnRoute = LearnRouteImport.update({
+  id: '/learn',
+  path: '/learn',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HealthRoute = HealthRouteImport.update({
+  id: '/health',
+  path: '/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContentRoute = ContentRouteImport.update({
   id: '/content',
   path: '/content',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CoachRoute = CoachRouteImport.update({
+  id: '/coach',
+  path: '/coach',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConceiveRoute = ConceiveRouteImport.update({
@@ -72,6 +98,16 @@ const PregnantRoute = PregnantRouteImport.update({
   path: '/pregnant',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WelcomeGoalsRoute = WelcomeGoalsRouteImport.update({
+  id: '/welcome-goals',
+  path: '/welcome-goals',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WelcomeLastPeriodRoute = WelcomeLastPeriodRouteImport.update({
   id: '/welcome-last-period',
   path: '/welcome-last-period',
@@ -87,12 +123,18 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/analysis': typeof AnalysisRoute
   '/calendar': typeof CalendarRoute
+  '/coach': typeof CoachRoute
   '/conceive': typeof ConceiveRoute
   '/content': typeof ContentRoute
+  '/health': typeof HealthRoute
+  '/learn': typeof LearnRoute
   '/med': typeof MedRoute
   '/pregnant': typeof PregnantRoute
+  '/profile': typeof ProfileRoute
+  '/shop': typeof ShopRoute
   '/track': typeof TrackRoute
   '/welcome': typeof WelcomeRoute
+  '/welcome-goals': typeof WelcomeGoalsRoute
   '/welcome-last-period': typeof WelcomeLastPeriodRoute
   '/welcome-mode': typeof WelcomeModeRoute
   '/welcome-supplements': typeof WelcomeSupplementsRoute
@@ -101,12 +143,18 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/analysis': typeof AnalysisRoute
   '/calendar': typeof CalendarRoute
+  '/coach': typeof CoachRoute
   '/conceive': typeof ConceiveRoute
   '/content': typeof ContentRoute
+  '/health': typeof HealthRoute
+  '/learn': typeof LearnRoute
   '/med': typeof MedRoute
   '/pregnant': typeof PregnantRoute
+  '/profile': typeof ProfileRoute
+  '/shop': typeof ShopRoute
   '/track': typeof TrackRoute
   '/welcome': typeof WelcomeRoute
+  '/welcome-goals': typeof WelcomeGoalsRoute
   '/welcome-last-period': typeof WelcomeLastPeriodRoute
   '/welcome-mode': typeof WelcomeModeRoute
   '/welcome-supplements': typeof WelcomeSupplementsRoute
@@ -116,12 +164,18 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/analysis': typeof AnalysisRoute
   '/calendar': typeof CalendarRoute
+  '/coach': typeof CoachRoute
   '/conceive': typeof ConceiveRoute
   '/content': typeof ContentRoute
+  '/health': typeof HealthRoute
+  '/learn': typeof LearnRoute
   '/med': typeof MedRoute
   '/pregnant': typeof PregnantRoute
+  '/profile': typeof ProfileRoute
+  '/shop': typeof ShopRoute
   '/track': typeof TrackRoute
   '/welcome': typeof WelcomeRoute
+  '/welcome-goals': typeof WelcomeGoalsRoute
   '/welcome-last-period': typeof WelcomeLastPeriodRoute
   '/welcome-mode': typeof WelcomeModeRoute
   '/welcome-supplements': typeof WelcomeSupplementsRoute
@@ -132,12 +186,18 @@ export interface FileRouteTypes {
     | '/'
     | '/analysis'
     | '/calendar'
+    | '/coach'
     | '/conceive'
     | '/content'
+    | '/health'
+    | '/learn'
     | '/med'
     | '/pregnant'
+    | '/profile'
+    | '/shop'
     | '/track'
     | '/welcome'
+    | '/welcome-goals'
     | '/welcome-last-period'
     | '/welcome-mode'
     | '/welcome-supplements'
@@ -146,12 +206,18 @@ export interface FileRouteTypes {
     | '/'
     | '/analysis'
     | '/calendar'
+    | '/coach'
     | '/conceive'
     | '/content'
+    | '/health'
+    | '/learn'
     | '/med'
     | '/pregnant'
+    | '/profile'
+    | '/shop'
     | '/track'
     | '/welcome'
+    | '/welcome-goals'
     | '/welcome-last-period'
     | '/welcome-mode'
     | '/welcome-supplements'
@@ -160,12 +226,18 @@ export interface FileRouteTypes {
     | '/'
     | '/analysis'
     | '/calendar'
+    | '/coach'
     | '/conceive'
     | '/content'
+    | '/health'
+    | '/learn'
     | '/med'
     | '/pregnant'
+    | '/profile'
+    | '/shop'
     | '/track'
     | '/welcome'
+    | '/welcome-goals'
     | '/welcome-last-period'
     | '/welcome-mode'
     | '/welcome-supplements'
@@ -175,12 +247,18 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AnalysisRoute: typeof AnalysisRoute
   CalendarRoute: typeof CalendarRoute
+  CoachRoute: typeof CoachRoute
   ConceiveRoute: typeof ConceiveRoute
   ContentRoute: typeof ContentRoute
+  HealthRoute: typeof HealthRoute
+  LearnRoute: typeof LearnRoute
   MedRoute: typeof MedRoute
   PregnantRoute: typeof PregnantRoute
+  ProfileRoute: typeof ProfileRoute
+  ShopRoute: typeof ShopRoute
   TrackRoute: typeof TrackRoute
   WelcomeRoute: typeof WelcomeRoute
+  WelcomeGoalsRoute: typeof WelcomeGoalsRoute
   WelcomeLastPeriodRoute: typeof WelcomeLastPeriodRoute
   WelcomeModeRoute: typeof WelcomeModeRoute
   WelcomeSupplementsRoute: typeof WelcomeSupplementsRoute
@@ -216,6 +294,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TrackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/shop': {
+      id: '/shop'
+      path: '/shop'
+      fullPath: '/shop'
+      preLoaderRoute: typeof ShopRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/med': {
       id: '/med'
       path: '/med'
@@ -223,11 +308,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MedRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/health': {
+      id: '/health'
+      path: '/health'
+      fullPath: '/health'
+      preLoaderRoute: typeof HealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/learn': {
+      id: '/learn'
+      path: '/learn'
+      fullPath: '/learn'
+      preLoaderRoute: typeof LearnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/content': {
       id: '/content'
       path: '/content'
       fullPath: '/content'
       preLoaderRoute: typeof ContentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/coach': {
+      id: '/coach'
+      path: '/coach'
+      fullPath: '/coach'
+      preLoaderRoute: typeof CoachRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/conceive': {
@@ -258,6 +364,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PregnantRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/welcome-goals': {
+      id: '/welcome-goals'
+      path: '/welcome-goals'
+      fullPath: '/welcome-goals'
+      preLoaderRoute: typeof WelcomeGoalsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/welcome-last-period': {
       id: '/welcome-last-period'
       path: '/welcome-last-period'
@@ -279,12 +399,18 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AnalysisRoute: AnalysisRoute,
   CalendarRoute: CalendarRoute,
+  CoachRoute: CoachRoute,
   ConceiveRoute: ConceiveRoute,
   ContentRoute: ContentRoute,
+  HealthRoute: HealthRoute,
+  LearnRoute: LearnRoute,
   MedRoute: MedRoute,
   PregnantRoute: PregnantRoute,
+  ProfileRoute: ProfileRoute,
+  ShopRoute: ShopRoute,
   TrackRoute: TrackRoute,
   WelcomeRoute: WelcomeRoute,
+  WelcomeGoalsRoute: WelcomeGoalsRoute,
   WelcomeLastPeriodRoute: WelcomeLastPeriodRoute,
   WelcomeModeRoute: WelcomeModeRoute,
   WelcomeSupplementsRoute: WelcomeSupplementsRoute,
