@@ -30,16 +30,38 @@ const SUGGESTIONS = [
   "How does stress affect my cycle?",
 ];
 
+// Offline fallback (shown when /api/chat is unreachable, e.g. local dev)
 const BOT_REPLIES: Record<string, string> = {
   "Why do I feel tired before my period?":
     "During the luteal phase, progesterone rises sharply which has a sedating effect on the brain. Combined with a dip in serotonin, this can leave you feeling drained 3–7 days before your period. 💤 Try iron-rich foods, gentle movement, and prioritising sleep in this window.",
   "What foods help with cramps?":
-    "Anti-inflammatory foods are your best friend! 🥦 Omega-3s (salmon, flaxseed), magnesium (dark chocolate, leafy greens), and ginger tea can all reduce prostaglandins — the compounds that cause cramping. Reducing caffeine and refined sugar also helps.",
+    "Anti-inflammatory foods are your best friend! 🥦 Omega-3s (salmon, flaxseed), magnesium (dark chocolate, leafy greens), and ginger tea can all reduce prostaglandins — the compounds that cause cramping.",
   "When is my fertile window?":
-    "Your fertile window is roughly 5 days before ovulation plus ovulation day itself. For a 28-day cycle that's usually days 10–15. Sperm can live up to 5 days, so timing intercourse in this range gives you the best chance of conceiving. 🌿",
+    "Your fertile window is roughly 5 days before ovulation plus ovulation day itself. For a 28-day cycle that's usually days 10–15. 🌿 Sperm can live up to 5 days, so timing in this range gives you the best chance.",
   "How does stress affect my cycle?":
-    "Chronic stress raises cortisol, which disrupts the hypothalamic-pituitary-ovarian axis — basically the control centre for your cycle. This can delay ovulation, shorten your luteal phase, or even cause a missed period. Managing stress with breathwork, sleep, and gentle exercise makes a real difference. 🧘",
+    "Chronic stress raises cortisol, which disrupts the hypothalamic-pituitary-ovarian axis — the control centre for your cycle. This can delay ovulation, shorten your luteal phase, or even cause a missed period. 🧘 Breathwork and sleep make a real difference.",
 };
+
+/** Convert internal Msg[] → OpenAI-format messages (skip the initial bot greeting) */
+function toAPIMessages(msgs: Msg[]) {
+  return msgs
+    .slice(1) // drop the welcome message
+    .map((m) => ({
+      role: m.role === "bot" ? "assistant" : "user",
+      content: m.text,
+    }));
+}
+
+async function fetchAIReply(history: Msg[]): Promise<string> {
+  const res = await fetch("/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ messages: toAPIMessages(history) }),
+  });
+  if (!res.ok) throw new Error(`API ${res.status}`);
+  const { reply } = await res.json();
+  return reply as string;
+}
 
 function CoachScreen() {
   const [messages, setMessages] = useState<Msg[]>(INITIAL_MESSAGES);
@@ -51,19 +73,28 @@ function CoachScreen() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, typing]);
 
-  const send = (text: string) => {
-    if (!text.trim()) return;
+  const send = async (text: string) => {
+    if (!text.trim() || typing) return;
+
     const userMsg: Msg = { role: "user", text };
-    setMessages((m) => [...m, userMsg]);
+    const updatedHistory = [...messages, userMsg];
+    setMessages(updatedHistory);
     setInput("");
     setTyping(true);
-    setTimeout(() => {
-      const reply =
-        BOT_REPLIES[text] ??
-        "That's a great question! Cycle health is deeply personal. I'd recommend tracking your symptoms for a few cycles — patterns will reveal a lot. Feel free to ask me anything specific! 🌸";
+
+    try {
+      // Try real AI first
+      const reply = await fetchAIReply(updatedHistory);
       setMessages((m) => [...m, { role: "bot", text: reply }]);
+    } catch {
+      // Fallback: canned reply → generic message
+      const fallback =
+        BOT_REPLIES[text] ??
+        "That's a great question! Cycle health is deeply personal. Track your symptoms for a few cycles — patterns reveal a lot. Feel free to ask me anything specific! 🌸";
+      setMessages((m) => [...m, { role: "bot", text: fallback }]);
+    } finally {
       setTyping(false);
-    }, 1200);
+    }
   };
 
   const showSuggestions = messages.length === 1;
@@ -79,7 +110,7 @@ function CoachScreen() {
           </div>
           <div>
             <p className="text-[13px] font-semibold text-foreground">Petal AI Coach</p>
-            <p className="text-[11px] text-muted-foreground">Powered by cycle science · Always private</p>
+            <p className="text-[11px] text-muted-foreground">Powered by DeepSeek · Always private</p>
           </div>
         </div>
 
@@ -152,7 +183,7 @@ function CoachScreen() {
             />
             <button
               onClick={() => send(input)}
-              disabled={!input.trim()}
+              disabled={!input.trim() || typing}
               className="grid size-8 place-items-center rounded-full bg-period text-white disabled:opacity-30 transition-opacity"
             >
               <Send className="size-3.5" strokeWidth={2.5} />
