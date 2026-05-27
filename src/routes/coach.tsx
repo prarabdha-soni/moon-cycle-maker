@@ -51,31 +51,37 @@ function toAPIMessages(msgs: Msg[]) {
     .map((m) => ({ role: m.role === "bot" ? "assistant" : "user", content: m.text }));
 }
 
-/** 8-second timeout via Promise.race — works even when AbortController is ignored by the browser */
 async function callAPI(history: Msg[]): Promise<string> {
   const controller = new AbortController();
 
-  const timer = new Promise<never>((_, reject) =>
-    setTimeout(() => {
+  return new Promise<string>((resolve, reject) => {
+    const timerId = setTimeout(() => {
       controller.abort();
       reject(new Error("timeout"));
-    }, 8000),
-  );
+    }, 8000);
 
-  const req = fetch("/api/chat", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ messages: toAPIMessages(history) }),
-    signal: controller.signal,
-  }).then(async (res) => {
-    if (!res.ok) throw new Error(`http_${res.status}`);
-    const text = await res.text();
-    const data = JSON.parse(text) as { reply?: unknown };
-    if (typeof data.reply !== "string" || !data.reply) throw new Error("bad_reply");
-    return data.reply;
+    fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages: toAPIMessages(history) }),
+      signal: controller.signal,
+    })
+      .then(async (res) => {
+        clearTimeout(timerId);
+        if (!res.ok) throw new Error(`http_${res.status}`);
+        const text = await res.text();
+        const data = JSON.parse(text) as { reply?: unknown };
+        if (typeof data.reply !== "string" || !data.reply) throw new Error("bad_reply");
+        return data.reply;
+      })
+      .then(resolve)
+      .catch((err: unknown) => {
+        clearTimeout(timerId);
+        // AbortError fires when the timer aborted the fetch — let the "timeout" rejection win
+        if (err instanceof Error && err.name === "AbortError") return;
+        reject(err);
+      });
   });
-
-  return Promise.race([req, timer]);
 }
 
 function CoachScreen() {
@@ -120,7 +126,7 @@ function CoachScreen() {
 
   return (
     <div
-      className="mx-auto flex max-w-md flex-col bg-background"
+      className="mx-auto flex max-w-md flex-col bg-background h-screen"
       style={{ height: "100dvh" } as React.CSSProperties}
     >
       {/* Header */}
