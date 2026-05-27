@@ -12,23 +12,30 @@ interface AppShellProps {
   showBack?: boolean;
 }
 
-export function AppShell({ title = "Your current cycle", children, rightSlot, leftSlot, showBack }: AppShellProps) {
+export function AppShell({
+  title = "Your current cycle",
+  children,
+  rightSlot,
+  leftSlot,
+  showBack,
+}: AppShellProps) {
   const router = useRouter();
   return (
     <div className="mx-auto flex min-h-screen max-w-md flex-col bg-background">
       <header className="flex items-center justify-between px-5 pt-6 pb-2">
         {/* Left: ProfileIcon by default; back arrow when showBack; custom via leftSlot */}
-        {leftSlot ?? (showBack ? (
-          <button
-            aria-label="Back"
-            onClick={() => router.history.back()}
-            className="text-fertile transition-opacity hover:opacity-70"
-          >
-            <ArrowLeft className="size-6" strokeWidth={2.25} />
-          </button>
-        ) : (
-          <ProfileIcon />
-        ))}
+        {leftSlot ??
+          (showBack ? (
+            <button
+              aria-label="Back"
+              onClick={() => router.history.back()}
+              className="text-fertile transition-opacity hover:opacity-70"
+            >
+              <ArrowLeft className="size-6" strokeWidth={2.25} />
+            </button>
+          ) : (
+            <ProfileIcon />
+          ))}
         <h1 className="font-display text-[17px] font-medium tracking-tight text-foreground">
           {title}
         </h1>

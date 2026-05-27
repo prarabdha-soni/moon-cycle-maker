@@ -7,7 +7,10 @@ export const Route = createFileRoute("/welcome-goals")({
   head: () => ({
     meta: [
       { title: "Your Goals — Petal" },
-      { name: "description", content: "Tell us your health goals so we can personalise your experience." },
+      {
+        name: "description",
+        content: "Tell us your health goals so we can personalise your experience.",
+      },
     ],
   }),
   component: WelcomeGoalsScreen,
@@ -53,7 +56,11 @@ function WelcomeGoalsScreen() {
   const toggle = (id: string) => {
     setSelected((s) => {
       const next = new Set(s);
-      next.has(id) ? next.delete(id) : next.add(id);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
       return next;
     });
   };
@@ -62,7 +69,7 @@ function WelcomeGoalsScreen() {
     if (typeof window !== "undefined") {
       window.localStorage.setItem(
         "petal:goals",
-        JSON.stringify(selected.size > 0 ? Array.from(selected) : ["health"])
+        JSON.stringify(selected.size > 0 ? Array.from(selected) : ["health"]),
       );
       window.localStorage.setItem("petal:onboarded", "1");
     }
@@ -71,7 +78,6 @@ function WelcomeGoalsScreen() {
 
   return (
     <div className="mx-auto flex min-h-screen max-w-md flex-col bg-background px-6 pt-10 pb-8">
-
       {/* Progress */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5">
@@ -113,7 +119,7 @@ function WelcomeGoalsScreen() {
                 "group relative flex w-full items-center gap-4 overflow-hidden rounded-2xl border p-4 text-left transition-all shadow-sm",
                 isActive
                   ? `${activeClass} border-current shadow-md`
-                  : "border-border bg-card hover:bg-accent/40"
+                  : "border-border bg-card hover:bg-accent/40",
               )}
             >
               <span className={cn("grid size-12 shrink-0 place-items-center rounded-xl", iconBg)}>
@@ -130,7 +136,7 @@ function WelcomeGoalsScreen() {
               <span
                 className={cn(
                   "grid size-6 shrink-0 place-items-center rounded-full border-2 transition-all",
-                  isActive ? `${check} border-transparent text-white` : "border-border"
+                  isActive ? `${check} border-transparent text-white` : "border-border",
                 )}
               >
                 {isActive && <Check className="size-3.5" strokeWidth={3} />}

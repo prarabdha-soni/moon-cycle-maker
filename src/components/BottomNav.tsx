@@ -16,10 +16,10 @@ export function BottomNav() {
   const cycleTo = mode === "conceive" ? "/conceive" : mode === "pregnant" ? "/pregnant" : "/";
 
   const items = [
-    { to: cycleTo,   label: "Home",     icon: House },
-    { to: "/coach",  label: "AI Coach", icon: Bot },
-    { to: "/health", label: "Health",   icon: HeartPulse },
-    { to: "/shop",   label: "Shop",     icon: ShoppingBag },
+    { to: cycleTo, label: "Home", icon: House },
+    { to: "/coach", label: "AI Coach", icon: Bot },
+    { to: "/health", label: "Health", icon: HeartPulse },
+    { to: "/shop", label: "Shop", icon: ShoppingBag },
   ] as const;
 
   return (
@@ -29,11 +29,7 @@ export function BottomNav() {
           const active = pathname === to || (label === "Home" && pathname === cycleTo);
           return (
             <li key={label} className="flex-1">
-              <Link
-                to={to}
-                className="flex flex-col items-center gap-1 py-1"
-                aria-label={label}
-              >
+              <Link to={to} className="flex flex-col items-center gap-1 py-1" aria-label={label}>
                 <Icon
                   className={`size-5 ${active ? "text-period" : "text-muted-foreground"}`}
                   strokeWidth={active ? 2.5 : 1.8}

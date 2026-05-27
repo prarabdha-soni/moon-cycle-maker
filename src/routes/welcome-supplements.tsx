@@ -27,8 +27,7 @@ function SupplementsScreen() {
   const navigate = useNavigate();
   const [picked, setPicked] = useState<Record<string, boolean>>({});
 
-  const toggle = (id: string) =>
-    setPicked((p) => ({ ...p, [id]: !p[id] }));
+  const toggle = (id: string) => setPicked((p) => ({ ...p, [id]: !p[id] }));
 
   const count = Object.values(picked).filter(Boolean).length;
 
@@ -78,14 +77,10 @@ function SupplementsScreen() {
                   : "border-border bg-card hover:border-fertile/40"
               }`}
             >
-              <span
-                className={`grid size-10 shrink-0 place-items-center rounded-xl ${iconClass}`}
-              >
+              <span className={`grid size-10 shrink-0 place-items-center rounded-xl ${iconClass}`}>
                 <Icon className="size-5" strokeWidth={2} />
               </span>
-              <span className="font-display text-[15px] font-medium text-foreground">
-                {label}
-              </span>
+              <span className="font-display text-[15px] font-medium text-foreground">{label}</span>
               {active && (
                 <span className="absolute right-3 top-3 grid size-5 place-items-center rounded-full bg-fertile text-primary-foreground">
                   <Check className="size-3" strokeWidth={3} />

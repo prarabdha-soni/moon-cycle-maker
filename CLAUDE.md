@@ -26,11 +26,11 @@ File-based routing via **TanStack Router**. Routes live in `src/routes/`. The fi
 
 The app has three mutually exclusive modes stored in `localStorage` as `petal:mode`:
 
-| Mode | Home route | Description |
-|------|-----------|-------------|
-| `regular` | `/` | Period, mood, symptoms — CycleRing view |
+| Mode       | Home route  | Description                               |
+| ---------- | ----------- | ----------------------------------------- |
+| `regular`  | `/`         | Period, mood, symptoms — CycleRing view   |
 | `conceive` | `/conceive` | Fertility-first: BBT, CM, ovulation tests |
-| `pregnant` | `/pregnant` | Week-by-week pregnancy tracker |
+| `pregnant` | `/pregnant` | Week-by-week pregnancy tracker            |
 
 The root index route (`/`) reads `petal:mode` synchronously on mount and immediately `navigate({ replace: true })` to the correct home for the current mode. The `ModeSwitcherPill` component handles switching modes and redirecting.
 
@@ -59,6 +59,7 @@ All app state uses the `petal:` namespace:
 ### AppShell
 
 Every main screen is wrapped in `<AppShell>` (`src/components/AppShell.tsx`), which renders:
+
 - A fixed header with title, optional back button, optional `rightSlot`/`leftSlot`, and `ProfileIcon`
 - A `<main>` with `pb-32` to clear the bottom nav
 - A fixed `<BottomNav>` with 5 tabs: Cycle (mode-aware route), Med, Calendar, Analysis, Product
@@ -67,13 +68,13 @@ Every main screen is wrapped in `<AppShell>` (`src/components/AppShell.tsx`), wh
 
 Defined in `src/styles.css` using Tailwind v4 `@theme inline`. Key semantic color tokens:
 
-| Token | Color | Usage |
-|-------|-------|-------|
-| `period` / `period-light` | Deep red / coral | Menstruation segments |
-| `fertile` / `fertile-light` | Teal blue | Fertile window, primary interactive color |
-| `ovulation` | Green | Ovulation marker, Conceive mode accent |
-| `pms` | Amber | PMS indicator, Pregnant mode accent |
-| `track` | Neutral gray | CycleRing background track |
+| Token                       | Color            | Usage                                     |
+| --------------------------- | ---------------- | ----------------------------------------- |
+| `period` / `period-light`   | Deep red / coral | Menstruation segments                     |
+| `fertile` / `fertile-light` | Teal blue        | Fertile window, primary interactive color |
+| `ovulation`                 | Green            | Ovulation marker, Conceive mode accent    |
+| `pms`                       | Amber            | PMS indicator, Pregnant mode accent       |
+| `track`                     | Neutral gray     | CycleRing background track                |
 
 Fonts: `font-display` → Fraunces (serif, for headings/titles); `font-sans` → Inter (body text).
 

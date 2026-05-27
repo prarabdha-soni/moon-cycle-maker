@@ -21,7 +21,8 @@ export const Route = createFileRoute("/conceive")({
       { title: "Conceive — Petal" },
       {
         name: "description",
-        content: "Fertility-first tracking: BBT, cervical mucus, ovulation tests and your fertile window.",
+        content:
+          "Fertility-first tracking: BBT, cervical mucus, ovulation tests and your fertile window.",
       },
     ],
   }),
@@ -85,12 +86,8 @@ function ConceiveScreen() {
                   <Thermometer className="size-5" strokeWidth={2.25} />
                 </span>
                 <div>
-                  <p className="text-[14px] font-medium text-foreground">
-                    Basal body temperature
-                  </p>
-                  <p className="text-[12px] text-muted-foreground">
-                    98.3 °F · logged 7:12 am
-                  </p>
+                  <p className="text-[14px] font-medium text-foreground">Basal body temperature</p>
+                  <p className="text-[12px] text-muted-foreground">98.3 °F · logged 7:12 am</p>
                 </div>
               </div>
               <button
@@ -117,9 +114,7 @@ function ConceiveScreen() {
                 <Droplet className="size-5" strokeWidth={2.25} />
               </span>
               <div className="flex-1">
-                <p className="text-[14px] font-medium text-foreground">
-                  Cervical mucus
-                </p>
+                <p className="text-[14px] font-medium text-foreground">Cervical mucus</p>
                 <p className="text-[12px] text-muted-foreground">
                   Egg-white texture is most fertile
                 </p>
@@ -153,12 +148,8 @@ function ConceiveScreen() {
                 <TestTube2 className="size-5" strokeWidth={2.25} />
               </span>
               <div className="flex-1">
-                <p className="text-[14px] font-medium text-foreground">
-                  Ovulation test (LH)
-                </p>
-                <p className="text-[12px] text-muted-foreground">
-                  Log your strip result
-                </p>
+                <p className="text-[14px] font-medium text-foreground">Ovulation test (LH)</p>
+                <p className="text-[12px] text-muted-foreground">Log your strip result</p>
               </div>
             </div>
             <div className="mt-3 grid grid-cols-2 gap-2">
@@ -193,12 +184,8 @@ function ConceiveScreen() {
               <Heart className="size-5" strokeWidth={2.25} />
             </span>
             <div className="flex-1">
-              <p className="text-[14px] font-medium text-foreground">
-                Log intercourse
-              </p>
-              <p className="text-[12px] text-muted-foreground">
-                Today is a high-chance day
-              </p>
+              <p className="text-[14px] font-medium text-foreground">Log intercourse</p>
+              <p className="text-[12px] text-muted-foreground">Today is a high-chance day</p>
             </div>
             <button className="rounded-full bg-pms px-3.5 py-1.5 text-[12px] font-semibold text-primary-foreground shadow-sm shadow-pms/30">
               Log
@@ -233,10 +220,11 @@ function ConceiveScreen() {
 function CycleStrip() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const cycleLength = parseInt(
-    typeof window !== "undefined" ? (window.localStorage.getItem("petal:cycleLength") || "28") : "28",
+    typeof window !== "undefined" ? window.localStorage.getItem("petal:cycleLength") || "28" : "28",
     10,
   );
-  const lastPeriodStr = typeof window !== "undefined" ? window.localStorage.getItem("petal:lastPeriod") : null;
+  const lastPeriodStr =
+    typeof window !== "undefined" ? window.localStorage.getItem("petal:lastPeriod") : null;
 
   let currentDay = 14;
   if (lastPeriodStr) {
@@ -289,9 +277,7 @@ function CycleStrip() {
               <div
                 className={cn(
                   "flex size-6 items-center justify-center rounded-full text-[11px] font-semibold",
-                  isToday
-                    ? "bg-foreground text-background"
-                    : "text-muted-foreground",
+                  isToday ? "bg-foreground text-background" : "text-muted-foreground",
                 )}
               >
                 {d}
@@ -301,9 +287,15 @@ function CycleStrip() {
         })}
       </div>
       <div className="mt-1 flex items-center gap-4 px-5 text-[10px] text-muted-foreground">
-        <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-period inline-block" /> Period</span>
-        <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-fertile/70 inline-block" /> Fertile</span>
-        <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-ovulation inline-block" /> Ovulation</span>
+        <span className="flex items-center gap-1">
+          <span className="size-2 rounded-full bg-period inline-block" /> Period
+        </span>
+        <span className="flex items-center gap-1">
+          <span className="size-2 rounded-full bg-fertile/70 inline-block" /> Fertile
+        </span>
+        <span className="flex items-center gap-1">
+          <span className="size-2 rounded-full bg-ovulation inline-block" /> Ovulation
+        </span>
       </div>
     </div>
   );
@@ -312,12 +304,8 @@ function CycleStrip() {
 function Mini({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-xl bg-card/70 p-3 backdrop-blur">
-      <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
-        {label}
-      </p>
-      <p className="mt-1 font-display text-[15px] font-medium text-foreground">
-        {value}
-      </p>
+      <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</p>
+      <p className="mt-1 font-display text-[15px] font-medium text-foreground">{value}</p>
     </div>
   );
 }
@@ -343,12 +331,8 @@ function FertilityRing({ score }: { score: number }) {
         />
       </svg>
       <div className="text-center">
-        <p className="font-display text-[20px] font-medium leading-none text-foreground">
-          {score}
-        </p>
-        <p className="text-[9px] uppercase tracking-wider text-muted-foreground">
-          score
-        </p>
+        <p className="font-display text-[20px] font-medium leading-none text-foreground">{score}</p>
+        <p className="text-[9px] uppercase tracking-wider text-muted-foreground">score</p>
       </div>
     </div>
   );
@@ -375,11 +359,7 @@ function BbtChart({ data }: { data: number[] }) {
           <stop offset="100%" stopColor="var(--ovulation)" stopOpacity="0" />
         </linearGradient>
       </defs>
-      <polyline
-        points={`0,${h} ${points} ${w},${h}`}
-        fill="url(#bbtFill)"
-        stroke="none"
-      />
+      <polyline points={`0,${h} ${points} ${w},${h}`} fill="url(#bbtFill)" stroke="none" />
       <polyline
         points={points}
         fill="none"
@@ -407,11 +387,7 @@ function FertileTimeline() {
           <div key={d} className="flex flex-1 flex-col items-center gap-1">
             <span
               className={`w-full rounded-full ${
-                isOv
-                  ? "h-9 bg-ovulation"
-                  : isFertile
-                    ? "h-7 bg-fertile/60"
-                    : "h-3 bg-track"
+                isOv ? "h-9 bg-ovulation" : isFertile ? "h-7 bg-fertile/60" : "h-3 bg-track"
               } ${isToday ? "ring-2 ring-foreground/80 ring-offset-2 ring-offset-card" : ""}`}
             />
             <span

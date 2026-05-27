@@ -14,10 +14,38 @@ export const Route = createFileRoute("/profile")({
 
 type Mode = "regular" | "conceive" | "pregnant";
 
-const MODES: { id: Mode; label: string; description: string; color: string; bg: string; dot: string }[] = [
-  { id: "regular",  label: "Regular",  description: "Period & symptom tracking",  color: "text-fertile",   bg: "bg-fertile/10",   dot: "bg-fertile"   },
-  { id: "conceive", label: "Conceive", description: "Fertility & ovulation",       color: "text-ovulation", bg: "bg-ovulation/10", dot: "bg-ovulation" },
-  { id: "pregnant", label: "Pregnant", description: "Week-by-week pregnancy",      color: "text-pms",       bg: "bg-pms/10",       dot: "bg-pms"       },
+const MODES: {
+  id: Mode;
+  label: string;
+  description: string;
+  color: string;
+  bg: string;
+  dot: string;
+}[] = [
+  {
+    id: "regular",
+    label: "Regular",
+    description: "Period & symptom tracking",
+    color: "text-fertile",
+    bg: "bg-fertile/10",
+    dot: "bg-fertile",
+  },
+  {
+    id: "conceive",
+    label: "Conceive",
+    description: "Fertility & ovulation",
+    color: "text-ovulation",
+    bg: "bg-ovulation/10",
+    dot: "bg-ovulation",
+  },
+  {
+    id: "pregnant",
+    label: "Pregnant",
+    description: "Week-by-week pregnancy",
+    color: "text-pms",
+    bg: "bg-pms/10",
+    dot: "bg-pms",
+  },
 ];
 
 function ProfileScreen() {
@@ -34,10 +62,10 @@ function ProfileScreen() {
   useEffect(() => {
     if (typeof window === "undefined") return;
     setProfile({
-      name:        window.localStorage.getItem("petal:name")        || "",
-      lastPeriod:  window.localStorage.getItem("petal:lastPeriod")  || "",
+      name: window.localStorage.getItem("petal:name") || "",
+      lastPeriod: window.localStorage.getItem("petal:lastPeriod") || "",
       cycleLength: parseInt(window.localStorage.getItem("petal:cycleLength") || "28", 10),
-      mode:       (window.localStorage.getItem("petal:mode") as Mode) || "regular",
+      mode: (window.localStorage.getItem("petal:mode") as Mode) || "regular",
     });
   }, []);
 
@@ -46,28 +74,40 @@ function ProfileScreen() {
 
     const prevMode = window.localStorage.getItem("petal:mode") as Mode | null;
 
-    window.localStorage.setItem("petal:name",        profile.name);
-    window.localStorage.setItem("petal:lastPeriod",  profile.lastPeriod);
+    window.localStorage.setItem("petal:name", profile.name);
+    window.localStorage.setItem("petal:lastPeriod", profile.lastPeriod);
     window.localStorage.setItem("petal:cycleLength", profile.cycleLength.toString());
-    window.localStorage.setItem("petal:mode",        profile.mode);
+    window.localStorage.setItem("petal:mode", profile.mode);
     window.dispatchEvent(new Event(PROFILE_UPDATE_EVENT));
 
-    // Navigate to the correct home screen
-    if (profile.mode !== prevMode || true) {
-      if (profile.mode === "regular")  { navigate({ to: "/"         }); return; }
-      if (profile.mode === "conceive") { navigate({ to: "/conceive" }); return; }
-      const lp = window.localStorage.getItem("petal:lastPeriod");
-      navigate({ to: lp ? "/pregnant" : "/welcome-last-period" });
+    // Always navigate to the correct home screen after saving
+    if (profile.mode === "regular") {
+      navigate({ to: "/" });
+      return;
     }
+    if (profile.mode === "conceive") {
+      navigate({ to: "/conceive" });
+      return;
+    }
+    const lp = window.localStorage.getItem("petal:lastPeriod");
+    navigate({ to: lp ? "/pregnant" : "/welcome-last-period" });
   };
 
   const goBack = () => {
     if (window.history.length > 1) {
       window.history.back();
     } else {
-      const mode = (typeof window !== "undefined" ? window.localStorage.getItem("petal:mode") : null) as Mode | null;
-      if (mode === "conceive") { navigate({ to: "/conceive" }); return; }
-      if (mode === "pregnant") { navigate({ to: "/pregnant" }); return; }
+      const mode = (
+        typeof window !== "undefined" ? window.localStorage.getItem("petal:mode") : null
+      ) as Mode | null;
+      if (mode === "conceive") {
+        navigate({ to: "/conceive" });
+        return;
+      }
+      if (mode === "pregnant") {
+        navigate({ to: "/pregnant" });
+        return;
+      }
       navigate({ to: "/" });
     }
   };
@@ -83,15 +123,19 @@ function ProfileScreen() {
         >
           <ArrowLeft className="size-5" strokeWidth={2.25} />
         </button>
-        <h1 className="font-display text-[20px] font-semibold text-foreground">Profile &amp; Settings</h1>
+        <h1 className="font-display text-[20px] font-semibold text-foreground">
+          Profile &amp; Settings
+        </h1>
       </header>
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto px-5 py-6 space-y-6 pb-12">
-
         {/* Name */}
         <div className="space-y-2">
-          <Label htmlFor="pf-name" className="text-[12px] font-semibold uppercase tracking-wider text-muted-foreground">
+          <Label
+            htmlFor="pf-name"
+            className="text-[12px] font-semibold uppercase tracking-wider text-muted-foreground"
+          >
             Your Name
           </Label>
           <div className="relative">
@@ -109,13 +153,18 @@ function ProfileScreen() {
 
         {/* Last Period Date */}
         <div className="space-y-2">
-          <Label htmlFor="pf-lmp" className="text-[12px] font-semibold uppercase tracking-wider text-muted-foreground">
+          <Label
+            htmlFor="pf-lmp"
+            className="text-[12px] font-semibold uppercase tracking-wider text-muted-foreground"
+          >
             Last Period Date
           </Label>
           <div className="flex items-center gap-3 rounded-2xl border-2 border-period/30 bg-period/5 px-4 py-3">
             <Calendar className="size-5 shrink-0 text-period" strokeWidth={2} />
             <div className="flex-1">
-              <p className="text-[11px] text-muted-foreground mb-1">First day of last menstrual period</p>
+              <p className="text-[11px] text-muted-foreground mb-1">
+                First day of last menstrual period
+              </p>
               <Input
                 id="pf-lmp"
                 type="date"
@@ -129,7 +178,10 @@ function ProfileScreen() {
 
         {/* Cycle Length */}
         <div className="space-y-2">
-          <Label htmlFor="pf-cycle" className="text-[12px] font-semibold uppercase tracking-wider text-muted-foreground">
+          <Label
+            htmlFor="pf-cycle"
+            className="text-[12px] font-semibold uppercase tracking-wider text-muted-foreground"
+          >
             Cycle Length
           </Label>
           <div className="flex items-center gap-3 rounded-2xl border border-border bg-muted/30 px-4 py-3">
@@ -142,7 +194,9 @@ function ProfileScreen() {
                 min="21"
                 max="35"
                 value={profile.cycleLength}
-                onChange={(e) => setProfile({ ...profile, cycleLength: parseInt(e.target.value, 10) || 28 })}
+                onChange={(e) =>
+                  setProfile({ ...profile, cycleLength: parseInt(e.target.value, 10) || 28 })
+                }
                 className="h-8 border-0 bg-transparent p-0 text-[15px] font-semibold text-foreground shadow-none focus-visible:ring-0"
               />
             </div>
@@ -167,17 +221,31 @@ function ProfileScreen() {
                     "flex w-full items-center gap-3 rounded-2xl border-2 px-4 py-3 text-left transition-all",
                     active
                       ? `border-current ${m.color} ${m.bg}`
-                      : "border-border bg-background hover:bg-accent"
+                      : "border-border bg-background hover:bg-accent",
                   )}
                 >
-                  <span className={cn("size-2.5 shrink-0 rounded-full", active ? m.dot : "bg-muted-foreground/30")} />
+                  <span
+                    className={cn(
+                      "size-2.5 shrink-0 rounded-full",
+                      active ? m.dot : "bg-muted-foreground/30",
+                    )}
+                  />
                   <div className="flex-1">
-                    <p className={cn("text-[14px] font-semibold", active ? m.color : "text-foreground")}>{m.label}</p>
+                    <p
+                      className={cn(
+                        "text-[14px] font-semibold",
+                        active ? m.color : "text-foreground",
+                      )}
+                    >
+                      {m.label}
+                    </p>
                     <p className="text-[11px] text-muted-foreground">{m.description}</p>
                   </div>
-                  {active
-                    ? <Check className={cn("size-4 shrink-0", m.color)} strokeWidth={2.5} />
-                    : <ChevronRight className="size-4 shrink-0 text-muted-foreground/40" />}
+                  {active ? (
+                    <Check className={cn("size-4 shrink-0", m.color)} strokeWidth={2.5} />
+                  ) : (
+                    <ChevronRight className="size-4 shrink-0 text-muted-foreground/40" />
+                  )}
                 </button>
               );
             })}

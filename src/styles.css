@@ -64,13 +64,13 @@
   --ring: oklch(0.45 0.12 220);
 
   /* Clue-inspired palette */
-  --period: oklch(0.55 0.22 22);          /* deep red */
-  --period-light: oklch(0.72 0.18 25);    /* soft coral */
-  --fertile: oklch(0.55 0.12 220);        /* teal blue */
+  --period: oklch(0.55 0.22 22); /* deep red */
+  --period-light: oklch(0.72 0.18 25); /* soft coral */
+  --fertile: oklch(0.55 0.12 220); /* teal blue */
   --fertile-light: oklch(0.75 0.08 220);
-  --ovulation: oklch(0.55 0.16 165);      /* green */
-  --pms: oklch(0.7 0.14 60);              /* amber */
-  --track: oklch(0.92 0.005 80);          /* ring track */
+  --ovulation: oklch(0.55 0.16 165); /* green */
+  --pms: oklch(0.7 0.14 60); /* amber */
+  --track: oklch(0.92 0.005 80); /* ring track */
   --chart-1: var(--period);
   --chart-2: var(--fertile);
   --chart-3: var(--ovulation);
@@ -115,20 +115,23 @@
     font-style: normal;
     font-weight: 100 900;
     font-display: swap;
-    src: url("https://fonts.gstatic.com/s/inter/v18/UcCo3FwrK3iLTcvneQg7Ca725JhhKnNqk4j1ebLhAm8SrXTczg.woff2") format("woff2");
+    src: url("https://fonts.gstatic.com/s/inter/v18/UcCo3FwrK3iLTcvneQg7Ca725JhhKnNqk4j1ebLhAm8SrXTczg.woff2")
+      format("woff2");
   }
   @font-face {
     font-family: "Fraunces";
     font-style: normal;
     font-weight: 100 900;
     font-display: swap;
-    src: url("https://fonts.gstatic.com/s/fraunces/v37/6NUh8FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk.woff2") format("woff2");
+    src: url("https://fonts.gstatic.com/s/fraunces/v37/6NUh8FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk.woff2")
+      format("woff2");
   }
 
   * {
     border-color: var(--color-border);
   }
-  html, body {
+  html,
+  body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);

@@ -65,12 +65,11 @@ export default async function handler(req: Request): Promise<Response> {
       return json({ error: "Upstream API error" }, 502);
     }
 
-    const data = await upstream.json() as {
+    const data = (await upstream.json()) as {
       choices: { message: { content: string } }[];
     };
     const reply =
-      data.choices?.[0]?.message?.content ??
-      "I'm not sure — could you rephrase your question? 🌸";
+      data.choices?.[0]?.message?.content ?? "I'm not sure — could you rephrase your question? 🌸";
 
     return json({ reply }, 200);
   } catch (err) {

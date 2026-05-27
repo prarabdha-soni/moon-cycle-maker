@@ -43,10 +43,26 @@ interface MedItem {
 }
 
 const seedToday: MedItem[] = [
-  { id: "1", name: "Iron + Vit C", dose: "65 mg", time: "08:00", period: "morning", tone: "period", note: "With breakfast" },
+  {
+    id: "1",
+    name: "Iron + Vit C",
+    dose: "65 mg",
+    time: "08:00",
+    period: "morning",
+    tone: "period",
+    note: "With breakfast",
+  },
   { id: "2", name: "Omega-3", dose: "1000 mg", time: "08:15", period: "morning", tone: "fertile" },
   { id: "3", name: "Vitamin D3", dose: "2000 IU", time: "13:00", period: "afternoon", tone: "pms" },
-  { id: "4", name: "Magnesium", dose: "300 mg", time: "21:30", period: "evening", tone: "ovulation", note: "Before bed" },
+  {
+    id: "4",
+    name: "Magnesium",
+    dose: "300 mg",
+    time: "21:30",
+    period: "evening",
+    tone: "ovulation",
+    note: "Before bed",
+  },
 ];
 
 function MedScreen() {
@@ -79,10 +95,23 @@ function MedScreen() {
   };
 
   const isToday = currentDate.toDateString() === new Date().toDateString();
-  
+
   const formatDate = (date: Date) => {
     const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
     return `${dayNames[date.getDay()]}, ${date.getDate()} ${monthNames[date.getMonth()]}`;
   };
 
@@ -102,9 +131,9 @@ function MedScreen() {
       <div className="px-5">
         {/* Date strip */}
         <div className="flex items-center justify-between py-2">
-          <button 
+          <button
             onClick={goToPreviousDay}
-            aria-label="Previous day" 
+            aria-label="Previous day"
             className="p-2 text-muted-foreground hover:text-foreground transition-colors"
           >
             <ChevronLeft className="size-5" />
@@ -113,9 +142,9 @@ function MedScreen() {
             <p className="font-display text-lg font-medium leading-tight">{getDisplayLabel()}</p>
             <p className="text-[12px] text-muted-foreground">{formatDate(currentDate)}</p>
           </div>
-          <button 
+          <button
             onClick={goToNextDay}
-            aria-label="Next day" 
+            aria-label="Next day"
             className="p-2 text-muted-foreground hover:text-foreground transition-colors"
           >
             <ChevronRight className="size-5" />
@@ -143,68 +172,71 @@ function MedScreen() {
             <Streak label="Streak" value="12 d" tone="period" />
             <Streak label="This week" value="86%" tone="fertile" />
             <Streak label="Refills" value="2" tone="pms" />
-        </div>
+          </div>
 
-        {/* Water intake card */}
-        <div className="mt-4 rounded-3xl border border-border bg-card p-5">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-[12px] uppercase tracking-wider text-muted-foreground">
-                Water intake
-              </p>
-              <p className="mt-1 font-display text-2xl font-medium text-foreground">
-                {water} <span className="text-base text-muted-foreground">/ {waterGoal} glasses</span>
-              </p>
-              <p className={`mt-1 text-[12px] ${water >= waterMin ? "text-fertile" : "text-pms"}`}>
-                {water >= waterMin
-                  ? `Daily minimum of ${waterMin} reached`
-                  : `${waterMin - water} more to reach the daily minimum`}
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setWater((w) => Math.max(0, w - 1))}
-                aria-label="Remove a glass"
-                className="grid size-9 place-items-center rounded-full border border-border bg-background text-muted-foreground"
-              >
-                <Minus className="size-4" />
-              </button>
-              <button
-                onClick={() => setWater((w) => Math.min(waterGoal + 4, w + 1))}
-                aria-label="Add a glass"
-                className="grid size-11 place-items-center rounded-full bg-fertile text-primary-foreground shadow-md shadow-fertile/30"
-              >
-                <GlassWater className="size-5" />
-              </button>
-            </div>
-          </div>
-          <div className="mt-4 flex items-center gap-1.5">
-            {Array.from({ length: waterGoal }).map((_, i) => {
-              const filled = i < water;
-              const isMin = i < waterMin;
-              return (
-                <button
-                  key={i}
-                  onClick={() => setWater(i + 1)}
-                  aria-label={`Set ${i + 1} glasses`}
-                  className={`grid h-10 flex-1 place-items-center rounded-xl border transition-all ${
-                    filled
-                      ? "border-transparent bg-fertile/15 text-fertile"
-                      : isMin
-                        ? "border-pms/40 bg-pms/5 text-pms/70"
-                        : "border-border bg-background text-muted-foreground/50"
-                  }`}
+          {/* Water intake card */}
+          <div className="mt-4 rounded-3xl border border-border bg-card p-5">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[12px] uppercase tracking-wider text-muted-foreground">
+                  Water intake
+                </p>
+                <p className="mt-1 font-display text-2xl font-medium text-foreground">
+                  {water}{" "}
+                  <span className="text-base text-muted-foreground">/ {waterGoal} glasses</span>
+                </p>
+                <p
+                  className={`mt-1 text-[12px] ${water >= waterMin ? "text-fertile" : "text-pms"}`}
                 >
-                  <Droplet
-                    className="size-4"
-                    strokeWidth={2}
-                    fill={filled ? "currentColor" : "none"}
-                  />
+                  {water >= waterMin
+                    ? `Daily minimum of ${waterMin} reached`
+                    : `${waterMin - water} more to reach the daily minimum`}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setWater((w) => Math.max(0, w - 1))}
+                  aria-label="Remove a glass"
+                  className="grid size-9 place-items-center rounded-full border border-border bg-background text-muted-foreground"
+                >
+                  <Minus className="size-4" />
                 </button>
-              );
-            })}
+                <button
+                  onClick={() => setWater((w) => Math.min(waterGoal + 4, w + 1))}
+                  aria-label="Add a glass"
+                  className="grid size-11 place-items-center rounded-full bg-fertile text-primary-foreground shadow-md shadow-fertile/30"
+                >
+                  <GlassWater className="size-5" />
+                </button>
+              </div>
+            </div>
+            <div className="mt-4 flex items-center gap-1.5">
+              {Array.from({ length: waterGoal }).map((_, i) => {
+                const filled = i < water;
+                const isMin = i < waterMin;
+                return (
+                  <button
+                    key={i}
+                    onClick={() => setWater(i + 1)}
+                    aria-label={`Set ${i + 1} glasses`}
+                    className={`grid h-10 flex-1 place-items-center rounded-xl border transition-all ${
+                      filled
+                        ? "border-transparent bg-fertile/15 text-fertile"
+                        : isMin
+                          ? "border-pms/40 bg-pms/5 text-pms/70"
+                          : "border-border bg-background text-muted-foreground/50"
+                    }`}
+                  >
+                    <Droplet
+                      className="size-4"
+                      strokeWidth={2}
+                      fill={filled ? "currentColor" : "none"}
+                    />
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </div>
         </div>
 
         {/* Search */}
@@ -218,12 +250,14 @@ function MedScreen() {
 
         {/* Period filter */}
         <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
-          {([
-            { id: "all", label: "All", icon: null },
-            { id: "morning", label: "Morning", icon: Sun },
-            { id: "afternoon", label: "Afternoon", icon: Sunset },
-            { id: "evening", label: "Evening", icon: Moon },
-          ] as const).map(({ id, label, icon: Icon }) => {
+          {(
+            [
+              { id: "all", label: "All", icon: null },
+              { id: "morning", label: "Morning", icon: Sun },
+              { id: "afternoon", label: "Afternoon", icon: Sunset },
+              { id: "evening", label: "Evening", icon: Moon },
+            ] as const
+          ).map(({ id, label, icon: Icon }) => {
             const active = activePeriod === id;
             return (
               <button
@@ -259,7 +293,9 @@ function MedScreen() {
                 key={m.id}
                 className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3 pr-4"
               >
-                <span className={`grid size-12 shrink-0 place-items-center rounded-2xl ${toneBg}/15`}>
+                <span
+                  className={`grid size-12 shrink-0 place-items-center rounded-2xl ${toneBg}/15`}
+                >
                   <span className={`size-3 rounded-full ${toneBg}`} />
                 </span>
                 <div className="min-w-0 flex-1">
@@ -284,9 +320,7 @@ function MedScreen() {
                 <button
                   aria-label={isTaken ? "Mark as not taken" : "Mark as taken"}
                   aria-pressed={isTaken}
-                  onClick={() =>
-                    setTaken((t) => ({ ...t, [m.id]: !t[m.id] }))
-                  }
+                  onClick={() => setTaken((t) => ({ ...t, [m.id]: !t[m.id] }))}
                   className={`grid size-9 shrink-0 place-items-center rounded-full border transition-all ${
                     isTaken
                       ? "border-transparent bg-fertile text-primary-foreground shadow-md shadow-fertile/30"
@@ -348,15 +382,12 @@ function Streak({
   value: string;
   tone: "period" | "fertile" | "pms";
 }) {
-  const dot =
-    tone === "period" ? "bg-period" : tone === "fertile" ? "bg-fertile" : "bg-pms";
+  const dot = tone === "period" ? "bg-period" : tone === "fertile" ? "bg-fertile" : "bg-pms";
   return (
     <div className="flex-1 rounded-2xl bg-accent/60 px-3 py-2">
       <div className="flex items-center gap-1.5">
         <span className={`size-1.5 rounded-full ${dot}`} />
-        <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-          {label}
-        </span>
+        <span className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</span>
       </div>
       <p className="mt-0.5 font-display text-[15px] font-medium text-foreground">{value}</p>
     </div>

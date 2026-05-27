@@ -19,12 +19,13 @@ export const PROFILE_UPDATE_EVENT = "petal:profileUpdate";
 export function ProfileIcon({ variant = "default" }: ProfileIconProps) {
   const navigate = useNavigate();
 
-  const name = typeof window !== "undefined" ? (window.localStorage.getItem("petal:name") || "") : "";
+  const name = typeof window !== "undefined" ? window.localStorage.getItem("petal:name") || "" : "";
   const initial = name.charAt(0).toUpperCase() || "P";
 
-  const btnClass = variant === "light"
-    ? "grid size-9 place-items-center rounded-full bg-white/25 text-white transition-colors hover:bg-white/35"
-    : "grid size-9 place-items-center rounded-full bg-pms/15 text-pms transition-colors hover:bg-pms/25";
+  const btnClass =
+    variant === "light"
+      ? "grid size-9 place-items-center rounded-full bg-white/25 text-white transition-colors hover:bg-white/35"
+      : "grid size-9 place-items-center rounded-full bg-pms/15 text-pms transition-colors hover:bg-pms/25";
 
   return (
     <button

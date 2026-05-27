@@ -70,16 +70,14 @@ const ARTICLES = [
 function LearnScreen() {
   const [activeCategory, setActiveCategory] = useState("All");
 
-  const filtered = activeCategory === "All"
-    ? ARTICLES
-    : ARTICLES.filter((a) => a.tag === activeCategory);
+  const filtered =
+    activeCategory === "All" ? ARTICLES : ARTICLES.filter((a) => a.tag === activeCategory);
 
   const [featured, ...rest] = filtered;
 
   return (
     <AppShell title="Learn">
       <div className="pb-6">
-
         {/* Category pills */}
         <div className="flex gap-2 overflow-x-auto px-5 pb-1 pt-2 scrollbar-hide">
           {CATEGORIES.map((cat) => (
@@ -90,7 +88,7 @@ function LearnScreen() {
                 "shrink-0 rounded-full px-4 py-1.5 text-[12px] font-semibold transition-colors",
                 activeCategory === cat
                   ? "bg-period text-white"
-                  : "bg-muted text-muted-foreground hover:bg-accent"
+                  : "bg-muted text-muted-foreground hover:bg-accent",
               )}
             >
               {cat}
@@ -99,11 +97,12 @@ function LearnScreen() {
         </div>
 
         <div className="px-5 mt-4 space-y-4">
-
           {/* Featured card */}
           {featured && (
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Featured</p>
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                Featured
+              </p>
               <button className="w-full overflow-hidden rounded-3xl border border-border bg-card text-left transition-all hover:shadow-md active:scale-[0.99]">
                 <div className={cn("h-36 bg-gradient-to-br flex items-end p-4", featured.gradient)}>
                   <span className="rounded-full bg-white/20 backdrop-blur-sm px-3 py-1 text-[11px] font-semibold text-white uppercase tracking-wide">
@@ -114,7 +113,9 @@ function LearnScreen() {
                   <h3 className="font-display text-[18px] font-semibold leading-snug text-foreground">
                     {featured.title}
                   </h3>
-                  <p className="mt-1 text-[13px] text-muted-foreground leading-relaxed">{featured.excerpt}</p>
+                  <p className="mt-1 text-[13px] text-muted-foreground leading-relaxed">
+                    {featured.excerpt}
+                  </p>
                   <div className="mt-3 flex items-center gap-1 text-[12px] text-muted-foreground">
                     <Clock className="size-3.5" strokeWidth={2} />
                     <span>{featured.minutes} min read</span>
@@ -136,7 +137,12 @@ function LearnScreen() {
                   return (
                     <li key={a.title}>
                       <button className="flex w-full items-center gap-4 rounded-2xl border border-border bg-card p-3 text-left transition-colors hover:bg-accent/40 active:scale-[0.99]">
-                        <span className={cn("grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br", a.gradient)}>
+                        <span
+                          className={cn(
+                            "grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br",
+                            a.gradient,
+                          )}
+                        >
                           <Icon className="size-6 text-white" strokeWidth={2} />
                         </span>
                         <span className="flex-1 min-w-0">
@@ -167,7 +173,6 @@ function LearnScreen() {
               <p className="text-[14px] text-muted-foreground">No articles in this category yet.</p>
             </div>
           )}
-
         </div>
       </div>
     </AppShell>

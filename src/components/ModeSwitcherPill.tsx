@@ -61,7 +61,8 @@ export function ModeSwitcherPill({ className }: { className?: string }) {
       return;
     }
 
-    const lastPeriod = typeof window !== "undefined" ? window.localStorage.getItem("petal:lastPeriod") : null;
+    const lastPeriod =
+      typeof window !== "undefined" ? window.localStorage.getItem("petal:lastPeriod") : null;
     if (!lastPeriod) {
       navigate({ to: "/welcome-last-period", replace: true });
       return;
@@ -70,7 +71,9 @@ export function ModeSwitcherPill({ className }: { className?: string }) {
   };
 
   return (
-    <div className={`relative mx-auto mt-2 flex w-fit items-center gap-2 rounded-full px-4 py-1.5 text-[13px] ${ui.pill} ${className ?? ""}`}>
+    <div
+      className={`relative mx-auto mt-2 flex w-fit items-center gap-2 rounded-full px-4 py-1.5 text-[13px] ${ui.pill} ${className ?? ""}`}
+    >
       <button onClick={() => setOpen((v) => !v)} className="flex items-center gap-1 font-semibold">
         <span className="text-muted-foreground">Mode:</span>
         <span>{ui.label}</span>
@@ -79,11 +82,13 @@ export function ModeSwitcherPill({ className }: { className?: string }) {
 
       {open && (
         <div className="absolute left-0 top-full z-50 mt-2 w-52 overflow-hidden rounded-xl border border-border bg-card shadow-lg">
-          {([
-            { id: "regular", label: "Regular Tracking", check: "text-fertile" },
-            { id: "conceive", label: "Conceive Mode", check: "text-ovulation" },
-            { id: "pregnant", label: "Pregnant Mode", check: "text-pms" },
-          ] as const).map((opt) => (
+          {(
+            [
+              { id: "regular", label: "Regular Tracking", check: "text-fertile" },
+              { id: "conceive", label: "Conceive Mode", check: "text-ovulation" },
+              { id: "pregnant", label: "Pregnant Mode", check: "text-pms" },
+            ] as const
+          ).map((opt) => (
             <button
               key={opt.id}
               onClick={() => switchTo(opt.id)}
@@ -100,4 +105,3 @@ export function ModeSwitcherPill({ className }: { className?: string }) {
     </div>
   );
 }
-

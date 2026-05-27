@@ -15,7 +15,7 @@ export const Route = createFileRoute("/health")({
 });
 
 const TABS = ["All", "Hair", "Skin", "Workout", "Weight"] as const;
-type Tab = typeof TABS[number];
+type Tab = (typeof TABS)[number];
 
 // ── Phase banner ─────────────────────────────────────────────
 function getPhaseBanner() {
@@ -39,9 +39,11 @@ function getPhaseBanner() {
 // youtubeSearch → YouTube embed search playlist (no API key required)
 const VIDEOS = [
   {
-    id: "v1", category: "Workout",
+    id: "v1",
+    category: "Workout",
     title: "Follicular Phase Full Body Workout",
-    duration: "22 min", instructor: "Adriene M.",
+    duration: "22 min",
+    instructor: "Adriene M.",
     gradient: "from-ovulation to-fertile",
     icon: Dumbbell,
     tag: "High energy",
@@ -49,9 +51,11 @@ const VIDEOS = [
     youtubeSearch: "follicular phase full body workout cycle sync",
   },
   {
-    id: "v2", category: "Skin",
+    id: "v2",
+    category: "Skin",
     title: "Luteal Phase Skincare Routine",
-    duration: "8 min", instructor: "Dr. Priya K.",
+    duration: "8 min",
+    instructor: "Dr. Priya K.",
     gradient: "from-pms to-period-light",
     icon: Sparkles,
     tag: "Anti-breakout",
@@ -59,9 +63,11 @@ const VIDEOS = [
     youtubeSearch: "luteal phase skincare routine hormonal acne cycle sync",
   },
   {
-    id: "v3", category: "Hair",
+    id: "v3",
+    category: "Hair",
     title: "Period Week Hair Care — Less Shedding",
-    duration: "12 min", instructor: "Meera S.",
+    duration: "12 min",
+    instructor: "Meera S.",
     gradient: "from-period via-period-light to-pms",
     icon: Wind,
     tag: "Gentle care",
@@ -69,9 +75,11 @@ const VIDEOS = [
     youtubeSearch: "period week hair care routine hair shedding cycle",
   },
   {
-    id: "v4", category: "Weight",
+    id: "v4",
+    category: "Weight",
     title: "Ovulation Phase HIIT — Max Fat Burn",
-    duration: "30 min", instructor: "Nisha R.",
+    duration: "30 min",
+    instructor: "Nisha R.",
     gradient: "from-fertile to-ovulation",
     icon: Flame,
     tag: "Intense",
@@ -79,9 +87,11 @@ const VIDEOS = [
     youtubeSearch: "ovulation phase HIIT workout cycle syncing fat burn",
   },
   {
-    id: "v5", category: "Skin",
+    id: "v5",
+    category: "Skin",
     title: "Cycle-Synced Gua Sha Routine",
-    duration: "10 min", instructor: "Dr. Ananya V.",
+    duration: "10 min",
+    instructor: "Dr. Ananya V.",
     gradient: "from-fertile-light to-fertile",
     icon: Sparkles,
     tag: "Glow ritual",
@@ -89,9 +99,11 @@ const VIDEOS = [
     youtubeSearch: "cycle synced gua sha facial massage routine",
   },
   {
-    id: "v6", category: "Workout",
+    id: "v6",
+    category: "Workout",
     title: "Luteal Phase Yoga & Breathwork",
-    duration: "18 min", instructor: "Sunita J.",
+    duration: "18 min",
+    instructor: "Sunita J.",
     gradient: "from-pms/60 to-period-light",
     icon: Dumbbell,
     tag: "Restorative",
@@ -100,7 +112,7 @@ const VIDEOS = [
   },
 ];
 
-type Video = typeof VIDEOS[0];
+type Video = (typeof VIDEOS)[0];
 
 // ── Guides ───────────────────────────────────────────────────
 const GUIDES = [
@@ -160,12 +172,40 @@ const GUIDES = [
   },
 ];
 
-const PHASE_BANNERS: Record<string, { title: string; subtitle: string; gradient: string; focus: string[] }> = {
-  "Period":         { title: "Rest & Restore",      subtitle: "Gentle movement, iron-rich foods, hydrating skincare.", gradient: "from-period to-pms",           focus: ["Hair oil massage", "Gentle yoga", "Iron foods"] },
-  "Follicular":     { title: "Build & Energise",    subtitle: "Rising energy — best phase for habit building & HIIT.", gradient: "from-ovulation to-fertile",     focus: ["Vitamin C serum", "HIIT workouts", "Calorie deficit"] },
-  "Fertile window": { title: "Peak Performance",    subtitle: "Oestrogen peak — your skin and hair are at their best.", gradient: "from-fertile to-ovulation",    focus: ["Minimal skincare", "Strength training", "Lean protein"] },
-  "Ovulation":      { title: "Glow Season ✨",      subtitle: "Maximum collagen production — best hair & skin day.", gradient: "from-ovulation to-fertile",      focus: ["Collagen boost", "Max intensity gym", "Body confidence"] },
-  "Luteal phase":   { title: "Slow Down & Nourish", subtitle: "Progesterone rises — cleanse well, move gently.", gradient: "from-pms to-period-light",         focus: ["Double cleanse", "Yoga / walks", "Healthy snacks"] },
+const PHASE_BANNERS: Record<
+  string,
+  { title: string; subtitle: string; gradient: string; focus: string[] }
+> = {
+  Period: {
+    title: "Rest & Restore",
+    subtitle: "Gentle movement, iron-rich foods, hydrating skincare.",
+    gradient: "from-period to-pms",
+    focus: ["Hair oil massage", "Gentle yoga", "Iron foods"],
+  },
+  Follicular: {
+    title: "Build & Energise",
+    subtitle: "Rising energy — best phase for habit building & HIIT.",
+    gradient: "from-ovulation to-fertile",
+    focus: ["Vitamin C serum", "HIIT workouts", "Calorie deficit"],
+  },
+  "Fertile window": {
+    title: "Peak Performance",
+    subtitle: "Oestrogen peak — your skin and hair are at their best.",
+    gradient: "from-fertile to-ovulation",
+    focus: ["Minimal skincare", "Strength training", "Lean protein"],
+  },
+  Ovulation: {
+    title: "Glow Season ✨",
+    subtitle: "Maximum collagen production — best hair & skin day.",
+    gradient: "from-ovulation to-fertile",
+    focus: ["Collagen boost", "Max intensity gym", "Body confidence"],
+  },
+  "Luteal phase": {
+    title: "Slow Down & Nourish",
+    subtitle: "Progesterone rises — cleanse well, move gently.",
+    gradient: "from-pms to-period-light",
+    focus: ["Double cleanse", "Yoga / walks", "Healthy snacks"],
+  },
 };
 
 // ── YouTube Video Player Sheet ────────────────────────────────
@@ -186,7 +226,9 @@ function VideoPlayerSheet({ video, onClose }: { video: Video; onClose: () => voi
         </button>
         <div className="min-w-0 flex-1">
           <p className="truncate text-[14px] font-semibold text-white">{video.title}</p>
-          <p className="text-[11px] text-white/60">{video.instructor} · {video.duration}</p>
+          <p className="text-[11px] text-white/60">
+            {video.instructor} · {video.duration}
+          </p>
         </div>
       </div>
 
@@ -233,35 +275,43 @@ function HealthScreen() {
   const banner = getPhaseBanner();
   const phaseBanner = banner ? (PHASE_BANNERS[banner.phase] ?? PHASE_BANNERS["Follicular"]) : null;
 
-  const filteredVideos = activeTab === "All" ? VIDEOS : VIDEOS.filter(v => v.category === activeTab);
-  const filteredGuides = activeTab === "All" ? GUIDES : GUIDES.filter(g => g.category === activeTab);
+  const filteredVideos =
+    activeTab === "All" ? VIDEOS : VIDEOS.filter((v) => v.category === activeTab);
+  const filteredGuides =
+    activeTab === "All" ? GUIDES : GUIDES.filter((g) => g.category === activeTab);
 
   return (
     <>
       {/* Video player overlay */}
       {playingVideo && (
-        <VideoPlayerSheet
-          video={playingVideo}
-          onClose={() => setPlayingVideo(null)}
-        />
+        <VideoPlayerSheet video={playingVideo} onClose={() => setPlayingVideo(null)} />
       )}
 
       <AppShell title="Health">
         <div className="pb-6">
-
           {/* Phase sync banner */}
           {phaseBanner && (
-            <div className={cn("mx-5 mt-2 overflow-hidden rounded-3xl bg-gradient-to-br p-5", phaseBanner.gradient)}>
+            <div
+              className={cn(
+                "mx-5 mt-2 overflow-hidden rounded-3xl bg-gradient-to-br p-5",
+                phaseBanner.gradient,
+              )}
+            >
               <p className="text-[10px] font-semibold uppercase tracking-wider text-white/70">
                 Day {banner?.day} · {banner?.phase}
               </p>
               <h2 className="mt-1 font-display text-[22px] font-bold text-white leading-tight">
                 {phaseBanner.title}
               </h2>
-              <p className="mt-1 text-[12px] text-white/80 leading-relaxed">{phaseBanner.subtitle}</p>
+              <p className="mt-1 text-[12px] text-white/80 leading-relaxed">
+                {phaseBanner.subtitle}
+              </p>
               <div className="mt-3 flex flex-wrap gap-2">
                 {phaseBanner.focus.map((f) => (
-                  <span key={f} className="rounded-full bg-white/20 px-3 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">
+                  <span
+                    key={f}
+                    className="rounded-full bg-white/20 px-3 py-1 text-[11px] font-semibold text-white backdrop-blur-sm"
+                  >
                     {f}
                   </span>
                 ))}
@@ -277,7 +327,9 @@ function HealthScreen() {
                 onClick={() => setActiveTab(tab)}
                 className={cn(
                   "shrink-0 rounded-full px-4 py-1.5 text-[12px] font-semibold transition-colors",
-                  activeTab === tab ? "bg-period text-white" : "bg-muted text-muted-foreground hover:bg-accent"
+                  activeTab === tab
+                    ? "bg-period text-white"
+                    : "bg-muted text-muted-foreground hover:bg-accent",
                 )}
               >
                 {tab}
@@ -286,18 +338,27 @@ function HealthScreen() {
           </div>
 
           <div className="px-5 space-y-5">
-
             {/* Videos */}
             {filteredVideos.length > 0 && (
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-3">Videos</p>
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+                  Videos
+                </p>
                 <div className="flex gap-3 overflow-x-auto pb-1 -mx-5 px-5 scrollbar-hide">
                   {filteredVideos.map((v) => {
                     const Icon = v.icon;
                     return (
-                      <div key={v.id} className="shrink-0 w-[200px] rounded-2xl overflow-hidden border border-border bg-card">
+                      <div
+                        key={v.id}
+                        className="shrink-0 w-[200px] rounded-2xl overflow-hidden border border-border bg-card"
+                      >
                         {/* Thumbnail */}
-                        <div className={cn("relative h-[112px] bg-gradient-to-br flex items-center justify-center", v.gradient)}>
+                        <div
+                          className={cn(
+                            "relative h-[112px] bg-gradient-to-br flex items-center justify-center",
+                            v.gradient,
+                          )}
+                        >
                           <button
                             onClick={() => setPlayingVideo(v)}
                             aria-label={`Play ${v.title}`}
@@ -305,15 +366,25 @@ function HealthScreen() {
                           >
                             <Play className="size-5 text-white fill-white ml-0.5" strokeWidth={0} />
                           </button>
-                          <span className={cn("absolute bottom-2 right-2 rounded-full px-2 py-0.5 text-[10px] font-semibold", v.tagColor, "bg-white/90")}>
+                          <span
+                            className={cn(
+                              "absolute bottom-2 right-2 rounded-full px-2 py-0.5 text-[10px] font-semibold",
+                              v.tagColor,
+                              "bg-white/90",
+                            )}
+                          >
                             {v.tag}
                           </span>
                         </div>
                         {/* Info */}
                         <div className="p-3">
-                          <p className="text-[12px] font-semibold text-foreground leading-snug line-clamp-2">{v.title}</p>
+                          <p className="text-[12px] font-semibold text-foreground leading-snug line-clamp-2">
+                            {v.title}
+                          </p>
                           <div className="mt-2 flex items-center justify-between">
-                            <span className="text-[11px] text-muted-foreground">{v.instructor}</span>
+                            <span className="text-[11px] text-muted-foreground">
+                              {v.instructor}
+                            </span>
                             <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
                               <Clock className="size-3" strokeWidth={2} />
                               {v.duration}
@@ -330,19 +401,40 @@ function HealthScreen() {
             {/* Guides */}
             {filteredGuides.length > 0 && (
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-3">Guides</p>
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+                  Guides
+                </p>
                 <div className="space-y-3">
                   {filteredGuides.map((g) => {
                     const Icon = g.icon;
                     return (
-                      <button key={g.title} className="flex w-full items-center gap-4 rounded-2xl border border-border bg-card p-3 text-left transition-colors hover:bg-accent/40 active:scale-[0.99]">
-                        <span className={cn("grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br", g.gradient)}>
+                      <button
+                        key={g.title}
+                        className="flex w-full items-center gap-4 rounded-2xl border border-border bg-card p-3 text-left transition-colors hover:bg-accent/40 active:scale-[0.99]"
+                      >
+                        <span
+                          className={cn(
+                            "grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br",
+                            g.gradient,
+                          )}
+                        >
                           <Icon className="size-6 text-white" strokeWidth={2} />
                         </span>
                         <span className="flex-1 min-w-0">
-                          <span className={cn("text-[10px] font-semibold uppercase tracking-wider", g.color)}>{g.category}</span>
-                          <span className="block text-[13px] font-semibold text-foreground leading-snug mt-0.5">{g.title}</span>
-                          <span className="block text-[11px] text-muted-foreground mt-0.5 leading-snug line-clamp-2">{g.body}</span>
+                          <span
+                            className={cn(
+                              "text-[10px] font-semibold uppercase tracking-wider",
+                              g.color,
+                            )}
+                          >
+                            {g.category}
+                          </span>
+                          <span className="block text-[13px] font-semibold text-foreground leading-snug mt-0.5">
+                            {g.title}
+                          </span>
+                          <span className="block text-[11px] text-muted-foreground mt-0.5 leading-snug line-clamp-2">
+                            {g.body}
+                          </span>
                         </span>
                         <ChevronRight className="size-4 shrink-0 text-muted-foreground/40" />
                       </button>
@@ -351,7 +443,6 @@ function HealthScreen() {
                 </div>
               </div>
             )}
-
           </div>
         </div>
       </AppShell>

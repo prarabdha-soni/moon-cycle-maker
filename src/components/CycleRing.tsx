@@ -135,9 +135,7 @@ export function CycleRing({
           const a = ((ovulationDay - 1) * perDeg - 90) * (Math.PI / 180);
           const x = cx + r * Math.cos(a);
           const y = cy + r * Math.sin(a);
-          return (
-            <circle cx={x} cy={y} r={6} fill="var(--color-ovulation)" />
-          );
+          return <circle cx={x} cy={y} r={6} fill="var(--color-ovulation)" />;
         })()}
 
         {/* Decorative symptom dots */}
@@ -189,9 +187,7 @@ export function CycleRing({
 
       {/* Center text */}
       <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
-        <p className="text-[13px] font-medium text-muted-foreground">
-          Today, 16 Aug
-        </p>
+        <p className="text-[13px] font-medium text-muted-foreground">Today, 16 Aug</p>
         <p className="mt-2 max-w-[180px] font-display text-[26px] font-medium leading-tight text-foreground">
           {daysUntilNextPeriod} days until your next period
         </p>

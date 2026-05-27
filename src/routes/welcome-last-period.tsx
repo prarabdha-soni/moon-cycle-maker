@@ -15,8 +15,18 @@ export const Route = createFileRoute("/welcome-last-period")({
 
 const DAY_NAMES = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
 const MONTH_NAMES = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
 function formatDisplayDate(dateStr: string): string {
@@ -47,7 +57,8 @@ function LastPeriodScreen() {
       window.localStorage.setItem("petal:lastPeriod", periodStart);
       window.localStorage.setItem("petal:onboarded", "1");
     }
-    const mode = typeof window !== "undefined" ? window.localStorage.getItem("petal:mode") : "regular";
+    const mode =
+      typeof window !== "undefined" ? window.localStorage.getItem("petal:mode") : "regular";
     if (mode === "pregnant") {
       navigate({ to: "/pregnant", replace: true });
     } else {
@@ -93,19 +104,24 @@ function LastPeriodScreen() {
   };
 
   const prevMonth = () => {
-    if (viewMonth === 0) { setViewMonth(11); setViewYear(y => y - 1); }
-    else setViewMonth(m => m - 1);
+    if (viewMonth === 0) {
+      setViewMonth(11);
+      setViewYear((y) => y - 1);
+    } else setViewMonth((m) => m - 1);
   };
   const nextMonth = () => {
     // Don't go beyond current month
     const nowM = today.getMonth();
     const nowY = today.getFullYear();
     if (viewYear > nowY || (viewYear === nowY && viewMonth >= nowM)) return;
-    if (viewMonth === 11) { setViewMonth(0); setViewYear(y => y + 1); }
-    else setViewMonth(m => m + 1);
+    if (viewMonth === 11) {
+      setViewMonth(0);
+      setViewYear((y) => y + 1);
+    } else setViewMonth((m) => m + 1);
   };
 
-  const atMaxMonth = viewYear > today.getFullYear() ||
+  const atMaxMonth =
+    viewYear > today.getFullYear() ||
     (viewYear === today.getFullYear() && viewMonth >= today.getMonth());
 
   // Grid cells: null = empty padding, number = day
@@ -120,7 +136,6 @@ function LastPeriodScreen() {
 
   return (
     <div className="mx-auto flex min-h-screen max-w-md flex-col bg-background">
-
       {/* ── Top bar ── */}
       <div className="flex items-center justify-between px-5 pt-12 pb-2">
         <button
@@ -156,7 +171,6 @@ function LastPeriodScreen() {
 
       {/* ── Calendar ── */}
       <div className="mx-5 mt-5 rounded-3xl border border-border bg-card px-4 py-4">
-
         {/* Month nav */}
         <div className="flex items-center justify-between mb-4">
           <span className="text-[16px] font-bold text-foreground">
@@ -183,8 +197,11 @@ function LastPeriodScreen() {
 
         {/* Day headers */}
         <div className="grid grid-cols-7 mb-1">
-          {DAY_NAMES.map(d => (
-            <div key={d} className="text-center text-[12px] font-semibold text-muted-foreground py-1">
+          {DAY_NAMES.map((d) => (
+            <div
+              key={d}
+              className="text-center text-[12px] font-semibold text-muted-foreground py-1"
+            >
               {d}
             </div>
           ))}
@@ -227,7 +244,8 @@ function LastPeriodScreen() {
         <div className="mx-5 mt-4 flex items-center gap-3 rounded-2xl bg-period/8 border border-period/20 px-4 py-3">
           <CalendarDays className="size-5 shrink-0 text-period" strokeWidth={2} />
           <p className="text-[14px] text-foreground">
-            Last period: <span className="font-bold text-period">{formatDisplayDate(periodStart)}</span>
+            Last period:{" "}
+            <span className="font-bold text-period">{formatDisplayDate(periodStart)}</span>
           </p>
         </div>
       ) : (
@@ -239,7 +257,8 @@ function LastPeriodScreen() {
 
       {/* ── Flow tip ── */}
       <p className="mx-5 mt-2 text-[12px] text-muted-foreground">
-        Also tap the days your period lasted to mark flow days <span className="text-muted-foreground/70">(optional)</span>.
+        Also tap the days your period lasted to mark flow days{" "}
+        <span className="text-muted-foreground/70">(optional)</span>.
       </p>
 
       {/* ── Continue ── */}

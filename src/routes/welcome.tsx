@@ -14,7 +14,13 @@ export const Route = createFileRoute("/welcome")({
 
 type Profile = "regular" | "conceive" | "pregnant";
 
-const options: { id: Profile; title: string; desc: string; icon: typeof Flower2; iconClass: string }[] = [
+const options: {
+  id: Profile;
+  title: string;
+  desc: string;
+  icon: typeof Flower2;
+  iconClass: string;
+}[] = [
   {
     id: "regular",
     title: "Regular",
@@ -106,24 +112,18 @@ function WelcomeScreen() {
                   : "border-border bg-card hover:border-fertile/40"
               }`}
             >
-              <span
-                className={`grid size-12 shrink-0 place-items-center rounded-xl ${iconClass}`}
-              >
+              <span className={`grid size-12 shrink-0 place-items-center rounded-xl ${iconClass}`}>
                 <Icon className="size-6" strokeWidth={2} />
               </span>
               <span className="flex-1">
                 <span className="block font-display text-[17px] font-medium text-foreground">
                   {title}
                 </span>
-                <span className="mt-0.5 block text-[13px] text-muted-foreground">
-                  {desc}
-                </span>
+                <span className="mt-0.5 block text-[13px] text-muted-foreground">{desc}</span>
               </span>
               <span
                 className={`grid size-6 place-items-center rounded-full border-2 transition-all ${
-                  active
-                    ? "border-fertile bg-fertile text-primary-foreground"
-                    : "border-border"
+                  active ? "border-fertile bg-fertile text-primary-foreground" : "border-border"
                 }`}
               >
                 {active && <Check className="size-3.5" strokeWidth={3} />}

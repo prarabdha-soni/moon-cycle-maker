@@ -11,7 +11,10 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Your current cycle — Petal" },
-      { name: "description", content: "Track your menstrual cycle, period, fertile window and ovulation." },
+      {
+        name: "description",
+        content: "Track your menstrual cycle, period, fertile window and ovulation.",
+      },
       { property: "og:title", content: "Your current cycle — Petal" },
     ],
   }),
@@ -42,77 +45,330 @@ function computeCycleData(refreshKey: number) {
   else if (currentDay === ovulationDay || currentDay === ovulationDay + 1) phase = "Ovulation";
   else if (currentDay > ovulationDay + 1) phase = "Luteal phase";
 
-  return { cycleLength, periodLength, currentDay, ovulationDay, fertileStart, fertileEnd, daysUntilNextPeriod, phase };
+  return {
+    cycleLength,
+    periodLength,
+    currentDay,
+    ovulationDay,
+    fertileStart,
+    fertileEnd,
+    daysUntilNextPeriod,
+    phase,
+  };
 }
 
 // ── Phase-based health data ──────────────────────────────────
-type HealthCard = { status: string; tip: string; icon: React.ElementType; color: string; bg: string; dot: string };
+type HealthCard = {
+  status: string;
+  tip: string;
+  icon: React.ElementType;
+  color: string;
+  bg: string;
+  dot: string;
+};
 type PhaseHealth = { energy: HealthCard; skin: HealthCard; hair: HealthCard; weight: HealthCard };
 
 const PHASE_HEALTH: Record<string, PhaseHealth> = {
-  "Period": {
-    energy: { status: "Restore mode",    tip: "Rest, warmth & iron-rich foods",         icon: Moon,      color: "text-period",    bg: "bg-period/8 border-period/20",       dot: "bg-period" },
-    skin:   { status: "Sensitive skin",  tip: "Gentle cleansers, no actives",            icon: Sparkles,  color: "text-period",    bg: "bg-period/8 border-period/20",       dot: "bg-period" },
-    hair:   { status: "Brittle & dry",   tip: "Avoid heat, use nourishing oils",         icon: Wind,      color: "text-period",    bg: "bg-period/8 border-period/20",       dot: "bg-period" },
-    weight: { status: "Bloating normal", tip: "Skip deficit — focus on iron intake",     icon: Scale,     color: "text-period",    bg: "bg-period/8 border-period/20",       dot: "bg-period" },
+  Period: {
+    energy: {
+      status: "Restore mode",
+      tip: "Rest, warmth & iron-rich foods",
+      icon: Moon,
+      color: "text-period",
+      bg: "bg-period/8 border-period/20",
+      dot: "bg-period",
+    },
+    skin: {
+      status: "Sensitive skin",
+      tip: "Gentle cleansers, no actives",
+      icon: Sparkles,
+      color: "text-period",
+      bg: "bg-period/8 border-period/20",
+      dot: "bg-period",
+    },
+    hair: {
+      status: "Brittle & dry",
+      tip: "Avoid heat, use nourishing oils",
+      icon: Wind,
+      color: "text-period",
+      bg: "bg-period/8 border-period/20",
+      dot: "bg-period",
+    },
+    weight: {
+      status: "Bloating normal",
+      tip: "Skip deficit — focus on iron intake",
+      icon: Scale,
+      color: "text-period",
+      bg: "bg-period/8 border-period/20",
+      dot: "bg-period",
+    },
   },
-  "Follicular": {
-    energy: { status: "Rising energy",   tip: "Best time to build new habits",           icon: Zap,       color: "text-ovulation", bg: "bg-ovulation/8 border-ovulation/20", dot: "bg-ovulation" },
-    skin:   { status: "Clearing up",     tip: "Try Vitamin C & light exfoliation",       icon: Sparkles,  color: "text-fertile",   bg: "bg-fertile/8 border-fertile/20",     dot: "bg-fertile" },
-    hair:   { status: "Getting stronger",tip: "Great time for trims & treatments",       icon: Wind,      color: "text-ovulation", bg: "bg-ovulation/8 border-ovulation/20", dot: "bg-ovulation" },
-    weight: { status: "Metabolism rising",tip: "Best phase for a calorie deficit",       icon: Scale,     color: "text-fertile",   bg: "bg-fertile/8 border-fertile/20",     dot: "bg-fertile" },
+  Follicular: {
+    energy: {
+      status: "Rising energy",
+      tip: "Best time to build new habits",
+      icon: Zap,
+      color: "text-ovulation",
+      bg: "bg-ovulation/8 border-ovulation/20",
+      dot: "bg-ovulation",
+    },
+    skin: {
+      status: "Clearing up",
+      tip: "Try Vitamin C & light exfoliation",
+      icon: Sparkles,
+      color: "text-fertile",
+      bg: "bg-fertile/8 border-fertile/20",
+      dot: "bg-fertile",
+    },
+    hair: {
+      status: "Getting stronger",
+      tip: "Great time for trims & treatments",
+      icon: Wind,
+      color: "text-ovulation",
+      bg: "bg-ovulation/8 border-ovulation/20",
+      dot: "bg-ovulation",
+    },
+    weight: {
+      status: "Metabolism rising",
+      tip: "Best phase for a calorie deficit",
+      icon: Scale,
+      color: "text-fertile",
+      bg: "bg-fertile/8 border-fertile/20",
+      dot: "bg-fertile",
+    },
   },
   "Fertile window": {
-    energy: { status: "High energy",     tip: "Your brain & body are sharpest",          icon: Zap,       color: "text-ovulation", bg: "bg-ovulation/8 border-ovulation/20", dot: "bg-ovulation" },
-    skin:   { status: "Glowing skin",    tip: "Pores smaller, naturally luminous",       icon: Sparkles,  color: "text-ovulation", bg: "bg-ovulation/8 border-ovulation/20", dot: "bg-ovulation" },
-    hair:   { status: "Lush & full",     tip: "Estrogen keeps hair thick & shiny",       icon: Wind,      color: "text-ovulation", bg: "bg-ovulation/8 border-ovulation/20", dot: "bg-ovulation" },
-    weight: { status: "Peak metabolism", tip: "Push HIIT — body burns most now",         icon: Scale,     color: "text-ovulation", bg: "bg-ovulation/8 border-ovulation/20", dot: "bg-ovulation" },
+    energy: {
+      status: "High energy",
+      tip: "Your brain & body are sharpest",
+      icon: Zap,
+      color: "text-ovulation",
+      bg: "bg-ovulation/8 border-ovulation/20",
+      dot: "bg-ovulation",
+    },
+    skin: {
+      status: "Glowing skin",
+      tip: "Pores smaller, naturally luminous",
+      icon: Sparkles,
+      color: "text-ovulation",
+      bg: "bg-ovulation/8 border-ovulation/20",
+      dot: "bg-ovulation",
+    },
+    hair: {
+      status: "Lush & full",
+      tip: "Estrogen keeps hair thick & shiny",
+      icon: Wind,
+      color: "text-ovulation",
+      bg: "bg-ovulation/8 border-ovulation/20",
+      dot: "bg-ovulation",
+    },
+    weight: {
+      status: "Peak metabolism",
+      tip: "Push HIIT — body burns most now",
+      icon: Scale,
+      color: "text-ovulation",
+      bg: "bg-ovulation/8 border-ovulation/20",
+      dot: "bg-ovulation",
+    },
   },
-  "Ovulation": {
-    energy: { status: "Peak power ⚡",   tip: "Tackle your biggest challenges today",    icon: Zap,       color: "text-ovulation", bg: "bg-ovulation/8 border-ovulation/20", dot: "bg-ovulation" },
-    skin:   { status: "Natural glow ✨", tip: "Collagen peaks — best skin day",          icon: Sparkles,  color: "text-ovulation", bg: "bg-ovulation/8 border-ovulation/20", dot: "bg-ovulation" },
-    hair:   { status: "Thickest & shiny",tip: "Best hair day of your cycle",             icon: Wind,      color: "text-ovulation", bg: "bg-ovulation/8 border-ovulation/20", dot: "bg-ovulation" },
-    weight: { status: "Max fat burn",    tip: "Ideal for intense strength sessions",     icon: Scale,     color: "text-ovulation", bg: "bg-ovulation/8 border-ovulation/20", dot: "bg-ovulation" },
+  Ovulation: {
+    energy: {
+      status: "Peak power ⚡",
+      tip: "Tackle your biggest challenges today",
+      icon: Zap,
+      color: "text-ovulation",
+      bg: "bg-ovulation/8 border-ovulation/20",
+      dot: "bg-ovulation",
+    },
+    skin: {
+      status: "Natural glow ✨",
+      tip: "Collagen peaks — best skin day",
+      icon: Sparkles,
+      color: "text-ovulation",
+      bg: "bg-ovulation/8 border-ovulation/20",
+      dot: "bg-ovulation",
+    },
+    hair: {
+      status: "Thickest & shiny",
+      tip: "Best hair day of your cycle",
+      icon: Wind,
+      color: "text-ovulation",
+      bg: "bg-ovulation/8 border-ovulation/20",
+      dot: "bg-ovulation",
+    },
+    weight: {
+      status: "Max fat burn",
+      tip: "Ideal for intense strength sessions",
+      icon: Scale,
+      color: "text-ovulation",
+      bg: "bg-ovulation/8 border-ovulation/20",
+      dot: "bg-ovulation",
+    },
   },
   "Luteal phase": {
-    energy: { status: "Wind down",       tip: "Prioritise sleep & stress relief",        icon: Moon,      color: "text-pms",       bg: "bg-pms/8 border-pms/20",             dot: "bg-pms" },
-    skin:   { status: "Oil-prone skin",  tip: "Double cleanse, avoid heavy creams",      icon: Sparkles,  color: "text-pms",       bg: "bg-pms/8 border-pms/20",             dot: "bg-pms" },
-    hair:   { status: "Shedding more",   tip: "Gentle detangling, no harsh treatments",  icon: Wind,      color: "text-pms",       bg: "bg-pms/8 border-pms/20",             dot: "bg-pms" },
-    weight: { status: "Cravings rising", tip: "Prep healthy snacks in advance",          icon: Scale,     color: "text-pms",       bg: "bg-pms/8 border-pms/20",             dot: "bg-pms" },
+    energy: {
+      status: "Wind down",
+      tip: "Prioritise sleep & stress relief",
+      icon: Moon,
+      color: "text-pms",
+      bg: "bg-pms/8 border-pms/20",
+      dot: "bg-pms",
+    },
+    skin: {
+      status: "Oil-prone skin",
+      tip: "Double cleanse, avoid heavy creams",
+      icon: Sparkles,
+      color: "text-pms",
+      bg: "bg-pms/8 border-pms/20",
+      dot: "bg-pms",
+    },
+    hair: {
+      status: "Shedding more",
+      tip: "Gentle detangling, no harsh treatments",
+      icon: Wind,
+      color: "text-pms",
+      bg: "bg-pms/8 border-pms/20",
+      dot: "bg-pms",
+    },
+    weight: {
+      status: "Cravings rising",
+      tip: "Prep healthy snacks in advance",
+      icon: Scale,
+      color: "text-pms",
+      bg: "bg-pms/8 border-pms/20",
+      dot: "bg-pms",
+    },
   },
 };
 
 // ── Goal Tips ────────────────────────────────────────────────
-const GOAL_TIPS: Record<string, Record<string, { title: string; body: string; icon: React.ElementType; color: string; bg: string }>> = {
+const GOAL_TIPS: Record<
+  string,
+  Record<
+    string,
+    { title: string; body: string; icon: React.ElementType; color: string; bg: string }
+  >
+> = {
   health: {
-    "Period":         { title: "Rest & restore",         body: "Your body is working hard. Prioritise iron-rich foods, hydration, and gentle movement today.",       icon: HeartPulse, color: "text-fertile",   bg: "bg-fertile/8 border-fertile/15" },
-    "Follicular":     { title: "Build momentum",         body: "Energy is rising with estrogen. Best time to plan goals, start new habits and push your workouts.", icon: HeartPulse, color: "text-ovulation", bg: "bg-ovulation/8 border-ovulation/15" },
-    "Fertile window": { title: "Peak performance",       body: "Oestrogen peaks here — your brain and body are at their sharpest. Tackle your hardest tasks.",       icon: HeartPulse, color: "text-ovulation", bg: "bg-ovulation/8 border-ovulation/15" },
-    "Ovulation":      { title: "Your strongest day",     body: "Maximum energy and confidence. Social, creative, and physical performance are all at their best.",    icon: HeartPulse, color: "text-ovulation", bg: "bg-ovulation/8 border-ovulation/15" },
-    "Luteal phase":   { title: "Slow down & reflect",    body: "Progesterone is rising. Prioritise sleep, reduce stress, and swap intense workouts for yoga.",       icon: HeartPulse, color: "text-pms",       bg: "bg-pms/8 border-pms/15" },
+    Period: {
+      title: "Rest & restore",
+      body: "Your body is working hard. Prioritise iron-rich foods, hydration, and gentle movement today.",
+      icon: HeartPulse,
+      color: "text-fertile",
+      bg: "bg-fertile/8 border-fertile/15",
+    },
+    Follicular: {
+      title: "Build momentum",
+      body: "Energy is rising with estrogen. Best time to plan goals, start new habits and push your workouts.",
+      icon: HeartPulse,
+      color: "text-ovulation",
+      bg: "bg-ovulation/8 border-ovulation/15",
+    },
+    "Fertile window": {
+      title: "Peak performance",
+      body: "Oestrogen peaks here — your brain and body are at their sharpest. Tackle your hardest tasks.",
+      icon: HeartPulse,
+      color: "text-ovulation",
+      bg: "bg-ovulation/8 border-ovulation/15",
+    },
+    Ovulation: {
+      title: "Your strongest day",
+      body: "Maximum energy and confidence. Social, creative, and physical performance are all at their best.",
+      icon: HeartPulse,
+      color: "text-ovulation",
+      bg: "bg-ovulation/8 border-ovulation/15",
+    },
+    "Luteal phase": {
+      title: "Slow down & reflect",
+      body: "Progesterone is rising. Prioritise sleep, reduce stress, and swap intense workouts for yoga.",
+      icon: HeartPulse,
+      color: "text-pms",
+      bg: "bg-pms/8 border-pms/15",
+    },
   },
   weight: {
-    "Period":         { title: "Eat for iron & energy",  body: "Skip the calorie deficit today. Focus on leafy greens, lentils and dark chocolate.",                  icon: Scale,      color: "text-period",    bg: "bg-period/8 border-period/15" },
-    "Follicular":     { title: "Best time for a deficit",body: "Rising estrogen boosts metabolism. Slightly reduce calories and lean into cardio or HIIT.",            icon: Scale,      color: "text-fertile",   bg: "bg-fertile/8 border-fertile/15" },
-    "Fertile window": { title: "Go hard at the gym",     body: "Peak metabolism window. Strength training and HIIT are most effective. Push your limits this week.",  icon: Scale,      color: "text-ovulation", bg: "bg-ovulation/8 border-ovulation/15" },
-    "Ovulation":      { title: "Maximum fat burn",       body: "Your body burns the most calories today. Take advantage with a challenging workout session.",          icon: Scale,      color: "text-ovulation", bg: "bg-ovulation/8 border-ovulation/15" },
-    "Luteal phase":   { title: "Manage cravings",        body: "Progesterone spikes cravings for carbs and sugar. Prep healthy snacks in advance to stay on track.",  icon: Scale,      color: "text-pms",       bg: "bg-pms/8 border-pms/15" },
+    Period: {
+      title: "Eat for iron & energy",
+      body: "Skip the calorie deficit today. Focus on leafy greens, lentils and dark chocolate.",
+      icon: Scale,
+      color: "text-period",
+      bg: "bg-period/8 border-period/15",
+    },
+    Follicular: {
+      title: "Best time for a deficit",
+      body: "Rising estrogen boosts metabolism. Slightly reduce calories and lean into cardio or HIIT.",
+      icon: Scale,
+      color: "text-fertile",
+      bg: "bg-fertile/8 border-fertile/15",
+    },
+    "Fertile window": {
+      title: "Go hard at the gym",
+      body: "Peak metabolism window. Strength training and HIIT are most effective. Push your limits this week.",
+      icon: Scale,
+      color: "text-ovulation",
+      bg: "bg-ovulation/8 border-ovulation/15",
+    },
+    Ovulation: {
+      title: "Maximum fat burn",
+      body: "Your body burns the most calories today. Take advantage with a challenging workout session.",
+      icon: Scale,
+      color: "text-ovulation",
+      bg: "bg-ovulation/8 border-ovulation/15",
+    },
+    "Luteal phase": {
+      title: "Manage cravings",
+      body: "Progesterone spikes cravings for carbs and sugar. Prep healthy snacks in advance to stay on track.",
+      icon: Scale,
+      color: "text-pms",
+      bg: "bg-pms/8 border-pms/15",
+    },
   },
   skin: {
-    "Period":         { title: "Soothe & hydrate",       body: "Skin is sensitive and prone to breakouts. Use gentle cleansers, reduce actives, boost hydration.",    icon: Sparkles,   color: "text-period",    bg: "bg-period/8 border-period/15" },
-    "Follicular":     { title: "Introduce actives",      body: "Skin is clearing up as estrogen rises. Great time for Vitamin C serums or light exfoliation.",        icon: Sparkles,   color: "text-fertile",   bg: "bg-fertile/8 border-fertile/15" },
-    "Fertile window": { title: "Your skin is glowing",   body: "Estrogen is at its peak — pores look smaller, skin is naturally luminous. Minimal makeup needed!",    icon: Sparkles,   color: "text-ovulation", bg: "bg-ovulation/8 border-ovulation/15" },
-    "Ovulation":      { title: "Natural glow day ✨",    body: "Collagen production peaks around ovulation. Your hair and skin look their absolute best today.",       icon: Sparkles,   color: "text-ovulation", bg: "bg-ovulation/8 border-ovulation/15" },
-    "Luteal phase":   { title: "Cleanse & protect",      body: "Progesterone increases oil production — double cleanse at night and avoid heavy moisturisers.",        icon: Sparkles,   color: "text-pms",       bg: "bg-pms/8 border-pms/15" },
+    Period: {
+      title: "Soothe & hydrate",
+      body: "Skin is sensitive and prone to breakouts. Use gentle cleansers, reduce actives, boost hydration.",
+      icon: Sparkles,
+      color: "text-period",
+      bg: "bg-period/8 border-period/15",
+    },
+    Follicular: {
+      title: "Introduce actives",
+      body: "Skin is clearing up as estrogen rises. Great time for Vitamin C serums or light exfoliation.",
+      icon: Sparkles,
+      color: "text-fertile",
+      bg: "bg-fertile/8 border-fertile/15",
+    },
+    "Fertile window": {
+      title: "Your skin is glowing",
+      body: "Estrogen is at its peak — pores look smaller, skin is naturally luminous. Minimal makeup needed!",
+      icon: Sparkles,
+      color: "text-ovulation",
+      bg: "bg-ovulation/8 border-ovulation/15",
+    },
+    Ovulation: {
+      title: "Natural glow day ✨",
+      body: "Collagen production peaks around ovulation. Your hair and skin look their absolute best today.",
+      icon: Sparkles,
+      color: "text-ovulation",
+      bg: "bg-ovulation/8 border-ovulation/15",
+    },
+    "Luteal phase": {
+      title: "Cleanse & protect",
+      body: "Progesterone increases oil production — double cleanse at night and avoid heavy moisturisers.",
+      icon: Sparkles,
+      color: "text-pms",
+      bg: "bg-pms/8 border-pms/15",
+    },
   },
 };
 
 function GoalTips({ phase }: { phase: string }) {
   let goals: string[] = [];
   try {
-    goals = typeof window !== "undefined"
-      ? JSON.parse(window.localStorage.getItem("petal:goals") || "[]")
-      : [];
+    goals =
+      typeof window !== "undefined"
+        ? JSON.parse(window.localStorage.getItem("petal:goals") || "[]")
+        : [];
   } catch {
     goals = [];
   }
@@ -122,7 +378,9 @@ function GoalTips({ phase }: { phase: string }) {
 
   return (
     <section className="mt-5">
-      <h3 className="font-display text-[16px] font-semibold text-foreground mb-3">Your goals today</h3>
+      <h3 className="font-display text-[16px] font-semibold text-foreground mb-3">
+        Your goals today
+      </h3>
       <div className="space-y-3">
         {tips.map((tip, i) => {
           if (!tip) return null;
@@ -132,7 +390,9 @@ function GoalTips({ phase }: { phase: string }) {
               <Icon className={cn("mt-0.5 size-5 shrink-0", tip.color)} strokeWidth={2.25} />
               <div>
                 <p className={cn("text-[13px] font-semibold", tip.color)}>{tip.title}</p>
-                <p className="mt-0.5 text-[12px] text-muted-foreground leading-relaxed">{tip.body}</p>
+                <p className="mt-0.5 text-[12px] text-muted-foreground leading-relaxed">
+                  {tip.body}
+                </p>
               </div>
             </div>
           );
@@ -166,24 +426,31 @@ function CycleScreen() {
 
   useEffect(() => {
     if (!onboarded) return;
-    if (mode === "conceive") { navigate({ to: "/conceive", replace: true }); return; }
+    if (mode === "conceive") {
+      navigate({ to: "/conceive", replace: true });
+      return;
+    }
     if (mode === "pregnant") {
-      const lp = typeof window !== "undefined" ? window.localStorage.getItem("petal:lastPeriod") : null;
+      const lp =
+        typeof window !== "undefined" ? window.localStorage.getItem("petal:lastPeriod") : null;
       navigate({ to: lp ? "/pregnant" : "/welcome-last-period", replace: true });
     }
-  // refreshKey intentionally excluded: it tracks cycle data refresh, not mode changes.
-  // Including it caused navigate() to fire on every profile save.
-  }, [mode, onboarded, navigate]); // eslint-disable-line react-hooks/exhaustive-deps
+    // refreshKey intentionally excluded: it tracks cycle data refresh, not mode changes.
+    // Including it caused navigate() to fire on every profile save.
+  }, [mode, onboarded, navigate]);
 
   const cycle = useMemo(() => computeCycleData(refreshKey), [refreshKey]);
 
   if (!onboarded || !cycle) return null;
 
   const phaseColor =
-    cycle.phase === "Period"         ? "text-period bg-period/10 border-period/20" :
-    cycle.phase === "Ovulation"      ? "text-ovulation bg-ovulation/10 border-ovulation/20" :
-    cycle.phase.startsWith("Fertile")? "text-fertile bg-fertile/10 border-fertile/20" :
-    "text-pms bg-pms/10 border-pms/20";
+    cycle.phase === "Period"
+      ? "text-period bg-period/10 border-period/20"
+      : cycle.phase === "Ovulation"
+        ? "text-ovulation bg-ovulation/10 border-ovulation/20"
+        : cycle.phase.startsWith("Fertile")
+          ? "text-fertile bg-fertile/10 border-fertile/20"
+          : "text-pms bg-pms/10 border-pms/20";
 
   const today = new Date();
   const dateLabel = today.toLocaleDateString("en-GB", { day: "numeric", month: "long" });
@@ -197,7 +464,9 @@ function CycleScreen() {
 
         {/* Phase + date banner */}
         <div className="mt-3 flex items-center justify-between">
-          <span className={cn("rounded-full border px-3 py-1 text-[12px] font-semibold", phaseColor)}>
+          <span
+            className={cn("rounded-full border px-3 py-1 text-[12px] font-semibold", phaseColor)}
+          >
             {cycle.phase}
           </span>
           <span className="text-[13px] text-muted-foreground">{dateLabel}</span>
@@ -218,18 +487,24 @@ function CycleScreen() {
         <div className="mt-4 grid grid-cols-3 gap-2">
           <div className="rounded-2xl border border-border bg-card px-3 py-3 text-center">
             <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Next period</p>
-            <p className="mt-1 font-display text-[18px] font-bold text-period">{cycle.daysUntilNextPeriod}d</p>
+            <p className="mt-1 font-display text-[18px] font-bold text-period">
+              {cycle.daysUntilNextPeriod}d
+            </p>
             <p className="text-[10px] text-muted-foreground">away</p>
           </div>
           <div className="rounded-2xl border border-border bg-card px-3 py-3 text-center">
             <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Day</p>
-            <p className="mt-1 font-display text-[18px] font-bold text-fertile">{cycle.currentDay}</p>
+            <p className="mt-1 font-display text-[18px] font-bold text-fertile">
+              {cycle.currentDay}
+            </p>
             <p className="text-[10px] text-muted-foreground">of {cycle.cycleLength}</p>
           </div>
           <div className="rounded-2xl border border-border bg-card px-3 py-3 text-center">
             <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Ovulation</p>
             <p className="mt-1 font-display text-[18px] font-bold text-ovulation">
-              {cycle.currentDay < cycle.ovulationDay ? `${cycle.ovulationDay - cycle.currentDay}d` : "✓"}
+              {cycle.currentDay < cycle.ovulationDay
+                ? `${cycle.ovulationDay - cycle.currentDay}d`
+                : "✓"}
             </p>
             <p className="text-[10px] text-muted-foreground">
               {cycle.currentDay < cycle.ovulationDay ? "away" : "passed"}
@@ -241,35 +516,24 @@ function CycleScreen() {
         <section className="mt-5">
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-display text-[16px] font-semibold text-foreground">Health today</h3>
-            <span className={cn("text-[11px] font-medium", health.energy.color)}>{cycle.phase}</span>
+            <span className={cn("text-[11px] font-medium", health.energy.color)}>
+              {cycle.phase}
+            </span>
           </div>
 
           {/* 2×2 health card grid */}
           <div className="grid grid-cols-2 gap-3">
-
             {/* Energy / Phase */}
-            <HealthCard
-              label="Energy"
-              health={health.energy}
-            />
+            <HealthCard label="Energy" health={health.energy} />
 
             {/* Skin */}
-            <HealthCard
-              label="Skin"
-              health={health.skin}
-            />
+            <HealthCard label="Skin" health={health.skin} />
 
             {/* Hair */}
-            <HealthCard
-              label="Hair"
-              health={health.hair}
-            />
+            <HealthCard label="Hair" health={health.hair} />
 
             {/* Weight & Body */}
-            <HealthCard
-              label="Weight & Body"
-              health={health.weight}
-            />
+            <HealthCard label="Weight & Body" health={health.weight} />
           </div>
         </section>
 
@@ -313,10 +577,14 @@ function HealthCard({ label, health }: { label: string; health: HealthCard }) {
   return (
     <div className={cn("rounded-2xl border p-3.5", health.bg)}>
       <div className="flex items-center gap-2 mb-2">
-        <span className={cn("grid size-7 shrink-0 place-items-center rounded-full bg-background/60")}>
+        <span
+          className={cn("grid size-7 shrink-0 place-items-center rounded-full bg-background/60")}
+        >
           <Icon className={cn("size-3.5", health.color)} strokeWidth={2.25} />
         </span>
-        <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{label}</span>
+        <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+          {label}
+        </span>
       </div>
       <p className={cn("text-[13px] font-bold leading-snug", health.color)}>{health.status}</p>
       <p className="mt-1 text-[11px] text-muted-foreground leading-snug">{health.tip}</p>

@@ -7,7 +7,10 @@ export const Route = createFileRoute("/calendar")({
   head: () => ({
     meta: [
       { title: "Calendar — Petal" },
-      { name: "description", content: "View your full cycle calendar with period and fertile windows." },
+      {
+        name: "description",
+        content: "View your full cycle calendar with period and fertile windows.",
+      },
     ],
   }),
   component: CalendarScreen,
@@ -26,49 +29,72 @@ function getFirstDayOfMonth(year: number, month: number): number {
 
 function CalendarScreen() {
   const today = new Date();
-  const [currentDate, setCurrentDate] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
-  
+  const [currentDate, setCurrentDate] = useState(
+    new Date(today.getFullYear(), today.getMonth(), 1),
+  );
+
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
-  
+
   const offset = getFirstDayOfMonth(year, month);
   const daysInMonth = getDaysInMonth(year, month);
   const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
-  
+
   const todayDate = today.getDate();
   const isCurrentMonth = today.getMonth() === month && today.getFullYear() === year;
-  
+
   // Mock cycle data based on a 28-day cycle starting from the 1st of the month
   const periodDays = [1, 2, 3, 4, 5];
   const ovulationDay = 14;
-  const fertileDays = [ovulationDay - 2, ovulationDay - 1, ovulationDay, ovulationDay + 1, ovulationDay + 2, ovulationDay + 3];
-  
+  const fertileDays = [
+    ovulationDay - 2,
+    ovulationDay - 1,
+    ovulationDay,
+    ovulationDay + 1,
+    ovulationDay + 2,
+    ovulationDay + 3,
+  ];
+
   const goToPreviousMonth = () => {
     setCurrentDate(new Date(year, month - 1, 1));
   };
-  
+
   const goToNextMonth = () => {
     setCurrentDate(new Date(year, month + 1, 1));
   };
-  
-  const monthNames = ["January", "February", "March", "April", "May", "June", 
-                      "July", "August", "September", "October", "November", "December"];
+
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
 
   return (
     <AppShell title="Calendar" showBack>
       <div className="px-5">
         <div className="flex items-center justify-between py-2">
-          <button 
+          <button
             onClick={goToPreviousMonth}
-            aria-label="Previous month" 
+            aria-label="Previous month"
             className="p-2 text-muted-foreground hover:text-foreground transition-colors"
           >
             <ChevronLeft className="size-5" />
           </button>
-          <p className="font-display text-lg font-medium">{monthNames[month]} {year}</p>
-          <button 
+          <p className="font-display text-lg font-medium">
+            {monthNames[month]} {year}
+          </p>
+          <button
             onClick={goToNextMonth}
-            aria-label="Next month" 
+            aria-label="Next month"
             className="p-2 text-muted-foreground hover:text-foreground transition-colors"
           >
             <ChevronRight className="size-5" />
@@ -89,7 +115,7 @@ function CalendarScreen() {
             const isPeriod = periodDays.includes(d);
             const isFertile = fertileDays.includes(d);
             const isOv = d === ovulationDay;
-            const isToday = d === today;
+            const isToday = isCurrentMonth && d === todayDate;
             return (
               <div key={d} className="flex justify-center">
                 <span

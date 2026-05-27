@@ -6,7 +6,10 @@ export const Route = createFileRoute("/welcome-mode")({
   head: () => ({
     meta: [
       { title: "Welcome — Petal" },
-      { name: "description", content: "Choose your Petal experience: Regular tracking, Conceive, or Pregnant." },
+      {
+        name: "description",
+        content: "Choose your Petal experience: Regular tracking, Conceive, or Pregnant.",
+      },
     ],
   }),
   component: WelcomeMode,
@@ -127,9 +130,7 @@ function WelcomeMode() {
                       {tag}
                     </span>
                   </div>
-                  <p className="mt-1 text-[13px] leading-relaxed text-muted-foreground">
-                    {desc}
-                  </p>
+                  <p className="mt-1 text-[13px] leading-relaxed text-muted-foreground">{desc}</p>
                 </div>
                 <span
                   className={`grid size-6 shrink-0 place-items-center rounded-full border-2 transition-all ${

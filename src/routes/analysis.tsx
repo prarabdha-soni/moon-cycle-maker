@@ -44,16 +44,12 @@ function AnalysisScreen() {
               const h = ((c.length - 22) / (max - 22 + 1)) * 100;
               return (
                 <div key={c.month} className="flex flex-1 flex-col items-center gap-2">
-                  <span className="text-[11px] font-medium text-foreground">
-                    {c.length}
-                  </span>
+                  <span className="text-[11px] font-medium text-foreground">{c.length}</span>
                   <div
                     className="w-full rounded-t-lg bg-gradient-to-t from-fertile to-fertile-light"
                     style={{ height: `${Math.max(20, h)}%` }}
                   />
-                  <span className="text-[11px] text-muted-foreground">
-                    {c.month}
-                  </span>
+                  <span className="text-[11px] text-muted-foreground">{c.month}</span>
                 </div>
               );
             })}
@@ -65,12 +61,10 @@ function AnalysisScreen() {
         </div>
 
         <div className="rounded-3xl border border-border bg-accent/40 p-5">
-          <h3 className="font-display text-base font-medium">
-            Your cycle is regular ✨
-          </h3>
+          <h3 className="font-display text-base font-medium">Your cycle is regular ✨</h3>
           <p className="mt-2 text-sm text-muted-foreground">
-            Cycles between 24 and 38 days are typical. Yours has stayed within a
-            healthy 3-day range over the last six months.
+            Cycles between 24 and 38 days are typical. Yours has stayed within a healthy 3-day range
+            over the last six months.
           </p>
         </div>
       </div>
