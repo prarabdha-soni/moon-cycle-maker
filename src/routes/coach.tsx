@@ -85,13 +85,13 @@ function CoachScreen() {
     try {
       // Try real AI first
       const reply = await fetchAIReply(updatedHistory);
-      setMessages((m) => [...m, { role: "bot", text: reply }]);
+      setMessages((prev) => [...prev, { role: "bot", text: reply }]);
     } catch {
       // Fallback: canned reply → generic message
       const fallback =
         BOT_REPLIES[text] ??
         "That's a great question! Cycle health is deeply personal. Track your symptoms for a few cycles — patterns reveal a lot. Feel free to ask me anything specific! 🌸";
-      setMessages((m) => [...m, { role: "bot", text: fallback }]);
+      setMessages((prev) => [...prev, { role: "bot", text: fallback }]);
     } finally {
       setTyping(false);
     }
