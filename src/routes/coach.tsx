@@ -31,7 +31,7 @@ const SUGGESTIONS = [
   "How does stress affect my cycle?",
 ];
 
-// Offline fallback (local dev without vercel dev running)
+// Offline / fallback replies used when the API is unreachable
 const BOT_REPLIES: Record<string, string> = {
   "Why do I feel tired before my period?":
     "During the luteal phase, progesterone rises sharply which has a sedating effect on the brain. Combined with a dip in serotonin, this can leave you feeling drained 3–7 days before your period. 💤 Try iron-rich foods, gentle movement, and prioritising sleep.",
@@ -45,19 +45,28 @@ const BOT_REPLIES: Record<string, string> = {
 
 function toAPIMessages(msgs: Msg[]) {
   return msgs
-    .slice(1)
+    .slice(1) // skip welcome greeting
     .map((m) => ({ role: m.role === "bot" ? "assistant" : "user", content: m.text }));
 }
 
+/** Fetch with a 15-second hard timeout so the app never hangs */
 async function fetchAIReply(history: Msg[]): Promise<string> {
-  const res = await fetch("/api/chat", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ messages: toAPIMessages(history) }),
-  });
-  if (!res.ok) throw new Error(`API ${res.status}`);
-  const { reply } = await res.json();
-  return reply as string;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 15_000);
+
+  try {
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages: toAPIMessages(history) }),
+      signal: controller.signal,
+    });
+    if (!res.ok) throw new Error(`API ${res.status}`);
+    const { reply } = await res.json();
+    return reply as string;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 function CoachScreen() {
@@ -71,21 +80,27 @@ function CoachScreen() {
   }, [messages, typing]);
 
   const send = async (text: string) => {
-    if (!text.trim() || typing) return;
-    const userMsg: Msg = { role: "user", text };
+    const trimmed = text.trim();
+    if (!trimmed || typing) return;
+
+    const userMsg: Msg = { role: "user", text: trimmed };
     const updatedHistory = [...messages, userMsg];
     setMessages(updatedHistory);
     setInput("");
     setTyping(true);
+
     try {
       const reply = await fetchAIReply(updatedHistory);
       setMessages((m) => [...m, { role: "bot", text: reply }]);
-    } catch {
-      const fallback =
-        BOT_REPLIES[text] ??
-        "That's a great question! Cycle health is deeply personal. Track your symptoms for a few cycles — patterns reveal a lot. Feel free to ask me anything specific! 🌸";
-      setMessages((m) => [...m, { role: "bot", text: fallback }]);
+    } catch (err) {
+      // Timeout: give a clear message rather than a generic error
+      const isTimeout = err instanceof Error && err.name === "AbortError";
+      const botReply = isTimeout
+        ? "The AI is taking too long right now. Please try again in a moment. 🌸"
+        : (BOT_REPLIES[trimmed] ?? "That's a great question! Cycle health is deeply personal. Track your symptoms for a few cycles — patterns reveal a lot. 🌸");
+      setMessages((m) => [...m, { role: "bot", text: botReply }]);
     } finally {
+      // Always unblock the input — no matter what happens above
       setTyping(false);
     }
   };
@@ -93,10 +108,12 @@ function CoachScreen() {
   const showSuggestions = messages.length === 1;
 
   return (
-    /* Custom layout — chat UIs need full-height flex with a pinned input bar.
-       AppShell's pb-32 on <main> pushes the input bar behind the BottomNav,
-       so we build the layout manually here. */
-    <div className="mx-auto flex h-dvh max-w-md flex-col bg-background">
+    // Custom layout — must fill the full viewport so the input bar sits above the BottomNav.
+    // h-dvh with h-screen fallback covers iOS Safari ≤ 15 which doesn't support dvh.
+    <div
+      className="mx-auto flex max-w-md flex-col bg-background"
+      style={{ height: "100dvh" } as React.CSSProperties}
+    >
 
       {/* Header — matches AppShell style */}
       <header className="shrink-0 flex items-center justify-between px-5 pt-6 pb-2">
@@ -175,28 +192,33 @@ function CoachScreen() {
         <div ref={bottomRef} />
       </div>
 
-      {/* Input bar — sits just above the fixed BottomNav (~70 px tall) */}
+      {/* Input bar — sits just above the fixed BottomNav (~70 px) */}
       <div className="shrink-0 px-5 pt-2 pb-[76px] border-t border-border bg-background">
         <div className="flex items-center gap-2 rounded-2xl border border-border bg-muted/40 px-4 py-2">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && send(input)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                send(input);
+              }
+            }}
             placeholder="Ask anything about your cycle…"
             className="flex-1 bg-transparent text-[14px] text-foreground placeholder:text-muted-foreground outline-none"
           />
           <button
             onClick={() => send(input)}
             disabled={!input.trim() || typing}
-            className="grid size-8 place-items-center rounded-full bg-period text-white disabled:opacity-30 transition-opacity"
+            className="grid size-8 place-items-center rounded-full bg-period text-white disabled:opacity-30 transition-opacity active:scale-95"
           >
             <Send className="size-3.5" strokeWidth={2.5} />
           </button>
         </div>
       </div>
 
-      {/* BottomNav — fixed positioned, rendered here since we skip AppShell */}
+      {/* BottomNav — fixed, rendered here since we skip AppShell */}
       <BottomNav />
     </div>
   );
