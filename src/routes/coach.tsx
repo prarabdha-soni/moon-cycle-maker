@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Send, Sparkles, Bot } from "lucide-react";
 import { BottomNav } from "@/components/BottomNav";
 import { ProfileIcon } from "@/components/ProfileIcon";
@@ -31,7 +31,6 @@ const SUGGESTIONS = [
   "How does stress affect my cycle?",
 ];
 
-// Offline / fallback replies — used when the API is unreachable or in dev mode
 const BOT_REPLIES: Record<string, string> = {
   "Why do I feel tired before my period?":
     "During the luteal phase, progesterone rises sharply which has a sedating effect on the brain. Combined with a dip in serotonin, this can leave you feeling drained 3–7 days before your period. 💤 Try iron-rich foods, gentle movement, and prioritising sleep.",
@@ -43,57 +42,40 @@ const BOT_REPLIES: Record<string, string> = {
     "Chronic stress raises cortisol, which disrupts the hypothalamic-pituitary-ovarian axis — the control centre for your cycle. This can delay ovulation, shorten your luteal phase, or even cause a missed period. 🧘",
 };
 
-const FALLBACK_REPLY =
+const FALLBACK =
   "That's a great question! Cycle health is deeply personal. Track your symptoms for a few cycles — patterns reveal a lot. 🌸";
 
 function toAPIMessages(msgs: Msg[]) {
   return msgs
-    .slice(1) // skip welcome greeting
+    .slice(1)
     .map((m) => ({ role: m.role === "bot" ? "assistant" : "user", content: m.text }));
 }
 
-/**
- * Fetch the AI reply with a dual-timeout strategy:
- *  1. AbortController cancels the network request
- *  2. Promise.race() guarantees the caller unblocks regardless of browser AbortController support
- *
- * 8-second limit — shorter than before so mobile users don't perceive a freeze.
- */
-async function fetchAIReply(
-  history: Msg[],
-  signal: AbortSignal,
-): Promise<string> {
-  // Promise.race timeout — resolves/rejects independently of AbortController
-  const timeout = new Promise<never>((_, reject) =>
-    setTimeout(
-      () => reject(new DOMException("Request timed out", "AbortError")),
-      8_000,
-    ),
+/** 8-second timeout via Promise.race — works even when AbortController is ignored by the browser */
+async function callAPI(history: Msg[]): Promise<string> {
+  const controller = new AbortController();
+
+  const timer = new Promise<never>((_, reject) =>
+    setTimeout(() => {
+      controller.abort();
+      reject(new Error("timeout"));
+    }, 8000),
   );
 
-  const doFetch = async (): Promise<string> => {
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages: toAPIMessages(history) }),
-      signal, // passed in from component so unmount also aborts
-    });
-    if (!res.ok) throw new Error(`API ${res.status}`);
-    // Guard against non-JSON responses (e.g. Vite's HTML fallback in dev)
+  const req = fetch("/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ messages: toAPIMessages(history) }),
+    signal: controller.signal,
+  }).then(async (res) => {
+    if (!res.ok) throw new Error(`http_${res.status}`);
     const text = await res.text();
-    let data: { reply?: unknown };
-    try {
-      data = JSON.parse(text) as { reply?: unknown };
-    } catch {
-      throw new Error("Bad JSON response");
-    }
-    if (typeof data.reply !== "string" || !data.reply) {
-      throw new Error("Empty reply");
-    }
+    const data = JSON.parse(text) as { reply?: unknown };
+    if (typeof data.reply !== "string" || !data.reply) throw new Error("bad_reply");
     return data.reply;
-  };
+  });
 
-  return Promise.race([doFetch(), timeout]);
+  return Promise.race([req, timer]);
 }
 
 function CoachScreen() {
@@ -101,68 +83,42 @@ function CoachScreen() {
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
-  // Abort controller ref — aborted on unmount to cancel in-flight requests
-  const abortRef = useRef<AbortController | null>(null);
-
-  // Cancel any in-flight request when the component unmounts
-  useEffect(() => {
-    return () => {
-      abortRef.current?.abort();
-    };
-  }, []);
+  const typingRef = useRef(false); // mirrors typing state — prevents stale closure double-send
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, typing]);
 
-  const send = useCallback(
-    async (text: string) => {
-      const trimmed = text.trim();
-      if (!trimmed || typing) return;
+  async function send(text: string) {
+    const trimmed = text.trim();
+    if (!trimmed || typingRef.current) return;
 
-      // Cancel any previous in-flight request
-      abortRef.current?.abort();
-      const controller = new AbortController();
-      abortRef.current = controller;
+    typingRef.current = true;
+    setTyping(true);
+    setInput("");
 
-      const userMsg: Msg = { role: "user", text: trimmed };
-      setMessages((prev) => [...prev, userMsg]);
-      setInput("");
-      setTyping(true);
+    // Snapshot messages before the first await so the history is correct
+    const history = [...messages, { role: "user" as const, text: trimmed }];
+    setMessages(history);
 
-      try {
-        const reply = await fetchAIReply(
-          // Build history from current state + the new user message
-          [...messages, userMsg],
-          controller.signal,
-        );
-        if (!controller.signal.aborted) {
-          setMessages((m) => [...m, { role: "bot", text: reply }]);
-        }
-      } catch (err) {
-        if (controller.signal.aborted) return; // navigated away — ignore
-        const isTimeout =
-          err instanceof Error &&
-          (err.name === "AbortError" || err.name === "TimeoutError");
-        const botReply = isTimeout
-          ? "The AI is taking too long right now. Please try again in a moment. 🌸"
-          : (BOT_REPLIES[trimmed] ?? FALLBACK_REPLY);
-        setMessages((m) => [...m, { role: "bot", text: botReply }]);
-      } finally {
-        if (!controller.signal.aborted) {
-          setTyping(false);
-        }
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [typing, messages],
-  );
+    try {
+      const reply = await callAPI(history);
+      setMessages((prev) => [...prev, { role: "bot", text: reply }]);
+    } catch (err) {
+      const isTimeout = err instanceof Error && err.message === "timeout";
+      const fallback = isTimeout
+        ? "The AI is taking too long right now. Please try again in a moment. 🌸"
+        : (BOT_REPLIES[trimmed] ?? FALLBACK);
+      setMessages((prev) => [...prev, { role: "bot", text: fallback }]);
+    } finally {
+      typingRef.current = false;
+      setTyping(false);
+    }
+  }
 
-  const showSuggestions = messages.length === 1;
+  const showSuggestions = messages.length === 1 && !typing;
 
   return (
-    // Custom layout — must fill the full viewport so the input bar sits above the BottomNav.
-    // h-dvh with h-screen fallback covers iOS Safari ≤ 15 which doesn't support dvh.
     <div
       className="mx-auto flex max-w-md flex-col bg-background"
       style={{ height: "100dvh" } as React.CSSProperties}
@@ -183,14 +139,12 @@ function CoachScreen() {
         </div>
         <div>
           <p className="text-[13px] font-semibold text-foreground">Petal AI Coach</p>
-          <p className="text-[11px] text-muted-foreground">
-            Powered by DeepSeek · Always private
-          </p>
+          <p className="text-[11px] text-muted-foreground">Powered by DeepSeek · Always private</p>
         </div>
       </div>
 
-      {/* Messages — scrollable, fills all remaining space */}
-      <div className="flex-1 overflow-y-auto px-5 space-y-3 py-2">
+      {/* Message list */}
+      <div className="flex-1 overflow-y-auto px-5 py-2 space-y-3">
         {messages.map((m, i) => (
           <div
             key={i}
@@ -209,7 +163,7 @@ function CoachScreen() {
                   : "bg-period text-white rounded-tr-sm",
               )}
             >
-              {m.text}
+              {String(m.text)}
             </div>
           </div>
         ))}
@@ -227,7 +181,7 @@ function CoachScreen() {
           </div>
         )}
 
-        {showSuggestions && !typing && (
+        {showSuggestions && (
           <div className="pt-2 space-y-2">
             <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide">
               Suggested questions
@@ -236,7 +190,7 @@ function CoachScreen() {
               {SUGGESTIONS.map((s) => (
                 <button
                   key={s}
-                  onClick={() => send(s)}
+                  onClick={() => void send(s)}
                   className="rounded-full border border-period/30 bg-period/6 px-3 py-1.5 text-[12px] font-medium text-period transition-colors hover:bg-period/12"
                 >
                   {s}
@@ -249,7 +203,7 @@ function CoachScreen() {
         <div ref={bottomRef} />
       </div>
 
-      {/* Input bar — sits just above the fixed BottomNav */}
+      {/* Input bar */}
       <div className="shrink-0 px-5 pt-2 pb-[76px] border-t border-border bg-background">
         <div className="flex items-center gap-2 rounded-2xl border border-border bg-muted/40 px-4 py-2">
           <input
@@ -275,7 +229,6 @@ function CoachScreen() {
         </div>
       </div>
 
-      {/* BottomNav — fixed, rendered here since we skip AppShell */}
       <BottomNav />
     </div>
   );
