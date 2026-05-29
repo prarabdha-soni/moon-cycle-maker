@@ -53,35 +53,28 @@ function toAPIMessages(msgs: Msg[]) {
 
 async function callAPI(history: Msg[]): Promise<string> {
   const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 8000);
 
-  return new Promise<string>((resolve, reject) => {
-    const timerId = setTimeout(() => {
-      controller.abort();
-      reject(new Error("timeout"));
-    }, 8000);
-
-    fetch("/api/chat", {
+  try {
+    const res = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ messages: toAPIMessages(history) }),
       signal: controller.signal,
-    })
-      .then(async (res) => {
-        clearTimeout(timerId);
-        if (!res.ok) throw new Error(`http_${res.status}`);
-        const text = await res.text();
-        const data = JSON.parse(text) as { reply?: unknown };
-        if (typeof data.reply !== "string" || !data.reply) throw new Error("bad_reply");
-        return data.reply;
-      })
-      .then(resolve)
-      .catch((err: unknown) => {
-        clearTimeout(timerId);
-        // AbortError fires when the timer aborted the fetch — let the "timeout" rejection win
-        if (err instanceof Error && err.name === "AbortError") return;
-        reject(err);
-      });
-  });
+    });
+    clearTimeout(timeoutId);
+
+    if (!res.ok) throw new Error(`http_${res.status}`);
+
+    const data = (await res.json()) as { reply?: unknown };
+    if (typeof data.reply !== "string" || !data.reply) throw new Error("bad_reply");
+    return data.reply;
+  } catch (err) {
+    clearTimeout(timeoutId);
+    // Translate abort → "timeout" so the caller can detect it
+    if (err instanceof Error && err.name === "AbortError") throw new Error("timeout");
+    throw err;
+  }
 }
 
 function CoachScreen() {

@@ -22,93 +22,82 @@ function devApiPlugin(apiKey: string): Plugin {
   return {
     name: "dev-api-chat",
     configureServer(server) {
-      server.middlewares.use(
-        "/api/chat",
-        (req: IncomingMessage, res: ServerResponse) => {
-          res.setHeader("Content-Type", "application/json");
-          res.setHeader("Access-Control-Allow-Origin", "*");
+      server.middlewares.use("/api/chat", (req: IncomingMessage, res: ServerResponse) => {
+        res.setHeader("Content-Type", "application/json");
+        res.setHeader("Access-Control-Allow-Origin", "*");
 
-          if (req.method === "OPTIONS") {
-            res.statusCode = 204;
-            res.end();
-            return;
-          }
+        if (req.method === "OPTIONS") {
+          res.statusCode = 204;
+          res.end();
+          return;
+        }
 
-          if (req.method !== "POST") {
-            res.statusCode = 405;
-            res.end(JSON.stringify({ error: "Method not allowed" }));
-            return;
-          }
+        if (req.method !== "POST") {
+          res.statusCode = 405;
+          res.end(JSON.stringify({ error: "Method not allowed" }));
+          return;
+        }
 
-          if (!apiKey || apiKey === "your_deepseek_api_key_here") {
-            res.statusCode = 500;
-            res.end(
-              JSON.stringify({
-                error:
-                  "Add your DeepSeek API key to .env as DEEPSEEK_API_KEY and restart the dev server.",
-              }),
-            );
-            return;
-          }
+        if (!apiKey || apiKey === "your_deepseek_api_key_here") {
+          res.statusCode = 500;
+          res.end(
+            JSON.stringify({
+              error:
+                "Add your DeepSeek API key to .env as DEEPSEEK_API_KEY and restart the dev server.",
+            }),
+          );
+          return;
+        }
 
-          // Collect the POST body chunks
-          const chunks: Buffer[] = [];
-          req.on("data", (chunk: Buffer) => chunks.push(chunk));
-          req.on("end", () => {
-            void (async () => {
-              try {
-                const body = JSON.parse(
-                  Buffer.concat(chunks).toString(),
-                ) as {
-                  messages: { role: string; content: string }[];
-                };
+        // Collect the POST body chunks
+        const chunks: Buffer[] = [];
+        req.on("data", (chunk: Buffer) => chunks.push(chunk));
+        req.on("end", () => {
+          void (async () => {
+            try {
+              const body = JSON.parse(Buffer.concat(chunks).toString()) as {
+                messages: { role: string; content: string }[];
+              };
 
-                const upstream = await fetch(
-                  "https://api.deepseek.com/v1/chat/completions",
-                  {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                      Authorization: `Bearer ${apiKey}`,
-                    },
-                    body: JSON.stringify({
-                      model: "deepseek-chat",
-                      messages: [
-                        { role: "system", content: SYSTEM_PROMPT },
-                        ...body.messages,
-                      ],
-                      max_tokens: 350,
-                      temperature: 0.7,
-                    }),
-                  },
-                );
+              const upstream = await fetch("https://api.deepseek.com/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${apiKey}`,
+                },
+                body: JSON.stringify({
+                  model: "deepseek-chat",
+                  messages: [{ role: "system", content: SYSTEM_PROMPT }, ...body.messages],
+                  max_tokens: 350,
+                  temperature: 0.7,
+                }),
+              });
 
-                if (!upstream.ok) {
-                  const errText = await upstream.text();
-                  console.error("[dev-api] DeepSeek error:", errText);
-                  res.statusCode = 502;
-                  res.end(JSON.stringify({ error: "Upstream API error" }));
-                  return;
-                }
-
-                const data = (await upstream.json()) as {
-                  choices: { message: { content: string } }[];
-                };
-                const reply =
-                  data.choices?.[0]?.message?.content ??
-                  "I'm not sure — could you rephrase your question? 🌸";
-
-                res.statusCode = 200;
-                res.end(JSON.stringify({ reply }));
-              } catch (err) {
-                console.error("[dev-api] handler error:", err);
-                res.statusCode = 500;
-                res.end(JSON.stringify({ error: "Internal error" }));
+              if (!upstream.ok) {
+                const errText = await upstream.text();
+                console.error("[dev-api] DeepSeek error:", errText);
+                res.statusCode = 502;
+                res.end(JSON.stringify({ error: "Upstream API error" }));
+                return;
               }
-            })();
-          });
-        },
-      );
+
+              const data = (await upstream.json()) as {
+                choices: { message: { content: string } }[];
+              };
+              const reply =
+                data.choices?.[0]?.message?.content ??
+                "I'm not sure — could you rephrase your question? 🌸";
+
+              res.statusCode = 200;
+              res.end(JSON.stringify({ reply }));
+            } catch (err) {
+              console.error("[dev-api] handler error:", err);
+              res.statusCode = 500;
+              res.end(JSON.stringify({ error: "Internal error" }));
+            }
+          })();
+        });
+      });
     },
   };
 }
