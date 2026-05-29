@@ -1,14 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
-  Outlet,
-  Link,
-  createRootRouteWithContext,
-  useRouter,
-  HeadContent,
-  Scripts,
-} from "@tanstack/react-router";
-
-import appCss from "../styles.css?url";
+import { Outlet, Link, createRootRouteWithContext, useRouter } from "@tanstack/react-router";
 
 function NotFoundComponent() {
   return (
@@ -68,69 +59,10 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  head: () => ({
-    meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      {
-        name: "description",
-        content:
-          "A mobile app that clones Clue's period tracker, adding supplement and water intake tracking.",
-      },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      {
-        property: "og:description",
-        content:
-          "A mobile app that clones Clue's period tracker, adding supplement and water intake tracking.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
-      { name: "twitter:title", content: "Lovable App" },
-      {
-        name: "twitter:description",
-        content:
-          "A mobile app that clones Clue's period tracker, adding supplement and water intake tracking.",
-      },
-      {
-        property: "og:image",
-        content:
-          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/c7b85aed-0c38-46b3-a787-d52ffbb4276d/id-preview-5fd76b13--7cca68e6-f0aa-4505-a9e3-b2747492bea3.lovable.app-1778345495199.png",
-      },
-      {
-        name: "twitter:image",
-        content:
-          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/c7b85aed-0c38-46b3-a787-d52ffbb4276d/id-preview-5fd76b13--7cca68e6-f0aa-4505-a9e3-b2747492bea3.lovable.app-1778345495199.png",
-      },
-    ],
-    links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
-    ],
-  }),
-  shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
   errorComponent: ErrorComponent,
 });
-
-function RootShell({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        {children}
-        <Scripts />
-      </body>
-    </html>
-  );
-}
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
