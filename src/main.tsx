@@ -4,6 +4,7 @@ import ReactDOM from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
 import { QueryClient } from "@tanstack/react-query";
+import "./styles.css";
 
 /** Catches unhandled render errors so a broken page doesn't crash the whole app */
 class AppErrorBoundary extends React.Component<{ children: ReactNode }, { error: Error | null }> {
