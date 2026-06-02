@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import {
   Flame,
@@ -15,9 +15,12 @@ import {
   Check,
   AlertCircle,
   CalendarDays,
+  CheckCircle2,
+  ChevronRight,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { ModeSwitcherPill } from "@/components/ModeSwitcherPill";
+import { YOGA_POSES, PoseSVG } from "@/lib/yoga-poses";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/pcos")({
@@ -125,6 +128,115 @@ function loadTodaySymptoms(): Set<SymptomId> {
 
 function saveTodaySymptoms(ids: Set<SymptomId>) {
   window.localStorage.setItem(todayKey(), JSON.stringify([...ids]));
+}
+
+function yogaDoneKey() {
+  return `petal:yogaDone:${new Date().toISOString().slice(0, 10)}`;
+}
+
+function hoursUntilMidnight() {
+  const now = new Date();
+  const midnight = new Date(now);
+  midnight.setHours(24, 0, 0, 0);
+  return Math.ceil((midnight.getTime() - now.getTime()) / 3600000);
+}
+
+function YogaSection() {
+  const [doneToday, setDoneToday] = useState(false);
+  const [streak, setStreak] = useState(0);
+
+  const refresh = () => {
+    setDoneToday(!!window.localStorage.getItem(yogaDoneKey()));
+    setStreak(parseInt(window.localStorage.getItem("petal:yogaStreak") ?? "0", 10));
+  };
+
+  useEffect(() => {
+    refresh();
+    // Re-check when user returns from the yoga flow screen
+    const onVisible = () => { if (document.visibilityState === "visible") refresh(); };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  }, []);
+
+  return (
+    <section>
+      {/* Section header */}
+      <div className="flex items-baseline justify-between mb-3">
+        <div>
+          <h3 className="font-display text-[16px] font-semibold text-foreground">Today's yoga</h3>
+          <p className="text-[11px] text-muted-foreground mt-0.5">3×/week · 20 min · restorative only</p>
+        </div>
+        {streak > 0 && (
+          <span className="flex items-center gap-1 rounded-full bg-pcos/10 px-2.5 py-1 text-[11px] font-semibold text-pcos">
+            🔥 {streak} day{streak === 1 ? "" : "s"}
+          </span>
+        )}
+      </div>
+
+      {doneToday ? (
+        /* Completed state */
+        <div className="flex items-center gap-3 rounded-2xl bg-ovulation/8 border border-ovulation/20 p-4">
+          <CheckCircle2 className="size-6 shrink-0 text-ovulation" strokeWidth={2} />
+          <div className="flex-1">
+            <p className="text-[13px] font-semibold text-foreground">Done today</p>
+            <p className="text-[12px] text-muted-foreground">Next session in {hoursUntilMidnight()}h</p>
+          </div>
+          <Link
+            to="/yoga-flow"
+            className="text-[12px] font-medium text-muted-foreground flex items-center gap-0.5"
+          >
+            Repeat <ChevronRight className="size-3.5" />
+          </Link>
+        </div>
+      ) : (
+        <>
+          {/* Horizontally scrollable pose cards */}
+          <div className="-mx-5">
+            <div className="flex gap-3 overflow-x-auto px-5 pb-3 scrollbar-none">
+              {YOGA_POSES.map((pose) => (
+                <div
+                  key={pose.id}
+                  className="flex-shrink-0 w-[138px] rounded-2xl border border-border bg-card p-3 flex flex-col"
+                >
+                  {/* Illustration */}
+                  <div className="flex items-center justify-center h-[72px] mb-2.5 text-pcos">
+                    <PoseSVG id={pose.id} className="h-[68px] w-auto" />
+                  </div>
+
+                  {/* Name */}
+                  <p className="text-[12px] font-semibold text-foreground leading-snug">
+                    {pose.name}
+                  </p>
+                  {/* Sanskrit */}
+                  <p className="text-[10px] italic text-muted-foreground mt-0.5 mb-2">
+                    {pose.sanskrit}
+                  </p>
+
+                  {/* Hold badge */}
+                  <span className="self-start rounded-full bg-pcos/12 px-2 py-0.5 text-[10px] font-semibold text-pcos mb-1.5">
+                    {pose.holdLabel}
+                  </span>
+
+                  {/* Benefit tag */}
+                  <span className={cn("self-start rounded-full px-2 py-0.5 text-[10px] font-medium", pose.benefitClass)}>
+                    {pose.benefit}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Start button */}
+          <Link
+            to="/yoga-flow"
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-pcos py-3.5 text-[14px] font-semibold text-white shadow-lg shadow-pcos/25 active:scale-[0.98] transition-transform"
+          >
+            Start sequence →
+          </Link>
+        </>
+      )}
+    </section>
+  );
 }
 
 function PcosScreen() {
@@ -302,6 +414,9 @@ function PcosScreen() {
             1 in 5 Indian women have PCOS. Irregular cycles ranging 25–90 days are common. Tracking your symptoms helps identify your unique hormonal pattern.
           </p>
         </div>
+
+        {/* Today's yoga section */}
+        <YogaSection />
 
         {/* Save button */}
         {totalLogged > 0 && (

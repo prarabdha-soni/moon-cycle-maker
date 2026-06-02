@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PcosRouteImport } from './routes/pcos'
+import { Route as YogaFlowRouteImport } from './routes/yoga-flow'
 import { Route as WelcomeSupplementsRouteImport } from './routes/welcome-supplements'
 import { Route as WelcomeModeRouteImport } from './routes/welcome-mode'
 import { Route as WelcomeRouteImport } from './routes/welcome'
@@ -32,6 +33,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const PcosRoute = PcosRouteImport.update({
   id: '/pcos',
   path: '/pcos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const YogaFlowRoute = YogaFlowRouteImport.update({
+  id: '/yoga-flow',
+  path: '/yoga-flow',
   getParentRoute: () => rootRouteImport,
 } as any)
 const WelcomeSupplementsRoute = WelcomeSupplementsRouteImport.update({
@@ -145,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/welcome-last-period': typeof WelcomeLastPeriodRoute
   '/welcome-mode': typeof WelcomeModeRoute
   '/welcome-supplements': typeof WelcomeSupplementsRoute
+  '/yoga-flow': typeof YogaFlowRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -166,6 +173,7 @@ export interface FileRoutesByTo {
   '/welcome-last-period': typeof WelcomeLastPeriodRoute
   '/welcome-mode': typeof WelcomeModeRoute
   '/welcome-supplements': typeof WelcomeSupplementsRoute
+  '/yoga-flow': typeof YogaFlowRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -188,6 +196,7 @@ export interface FileRoutesById {
   '/welcome-last-period': typeof WelcomeLastPeriodRoute
   '/welcome-mode': typeof WelcomeModeRoute
   '/welcome-supplements': typeof WelcomeSupplementsRoute
+  '/yoga-flow': typeof YogaFlowRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -211,6 +220,7 @@ export interface FileRouteTypes {
     | '/welcome-last-period'
     | '/welcome-mode'
     | '/welcome-supplements'
+    | '/yoga-flow'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -232,6 +242,7 @@ export interface FileRouteTypes {
     | '/welcome-last-period'
     | '/welcome-mode'
     | '/welcome-supplements'
+    | '/yoga-flow'
   id:
     | '__root__'
     | '/'
@@ -253,6 +264,7 @@ export interface FileRouteTypes {
     | '/welcome-last-period'
     | '/welcome-mode'
     | '/welcome-supplements'
+    | '/yoga-flow'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -275,6 +287,7 @@ export interface RootRouteChildren {
   WelcomeLastPeriodRoute: typeof WelcomeLastPeriodRoute
   WelcomeModeRoute: typeof WelcomeModeRoute
   WelcomeSupplementsRoute: typeof WelcomeSupplementsRoute
+  YogaFlowRoute: typeof YogaFlowRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -284,6 +297,13 @@ declare module '@tanstack/react-router' {
       path: '/pcos'
       fullPath: '/pcos'
       preLoaderRoute: typeof PcosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/yoga-flow': {
+      id: '/yoga-flow'
+      path: '/yoga-flow'
+      fullPath: '/yoga-flow'
+      preLoaderRoute: typeof YogaFlowRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/welcome-supplements': {
@@ -435,6 +455,7 @@ const rootRouteChildren: RootRouteChildren = {
   WelcomeLastPeriodRoute: WelcomeLastPeriodRoute,
   WelcomeModeRoute: WelcomeModeRoute,
   WelcomeSupplementsRoute: WelcomeSupplementsRoute,
+  YogaFlowRoute: YogaFlowRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
