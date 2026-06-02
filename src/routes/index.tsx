@@ -434,11 +434,6 @@ function CycleScreen() {
       navigate({ to: "/pcos", replace: true });
       return;
     }
-    if (mode === "pregnant") {
-      const lp =
-        typeof window !== "undefined" ? window.localStorage.getItem("petal:lastPeriod") : null;
-      navigate({ to: lp ? "/pregnant" : "/welcome-last-period", replace: true });
-    }
     // refreshKey intentionally excluded: it tracks cycle data refresh, not mode changes.
     // Including it caused navigate() to fire on every profile save.
   }, [mode, onboarded, navigate]);

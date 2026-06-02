@@ -2,12 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Check, ChevronDown } from "lucide-react";
 
-type Mode = "regular" | "conceive" | "pregnant" | "pcos";
+type Mode = "regular" | "conceive" | "pcos";
 
 function safeGetMode(): Mode {
   if (typeof window === "undefined") return "regular";
   const raw = window.localStorage.getItem("petal:mode");
-  if (raw === "conceive" || raw === "pregnant" || raw === "regular" || raw === "pcos") return raw;
+  if (raw === "conceive" || raw === "regular" || raw === "pcos") return raw;
   return "regular";
 }
 
@@ -29,13 +29,6 @@ export function ModeSwitcherPill({ className }: { className?: string }) {
         pill: "bg-ovulation/20 text-ovulation",
         check: "text-ovulation",
         label: "Conceive",
-      };
-    }
-    if (mode === "pregnant") {
-      return {
-        pill: "bg-pms/20 text-pms",
-        check: "text-pms",
-        label: "Pregnant",
       };
     }
     if (mode === "pcos") {
@@ -71,14 +64,6 @@ export function ModeSwitcherPill({ className }: { className?: string }) {
       navigate({ to: "/pcos", replace: true });
       return;
     }
-
-    const lastPeriod =
-      typeof window !== "undefined" ? window.localStorage.getItem("petal:lastPeriod") : null;
-    if (!lastPeriod) {
-      navigate({ to: "/welcome-last-period", replace: true });
-      return;
-    }
-    navigate({ to: "/pregnant", replace: true });
   };
 
   return (
@@ -98,7 +83,6 @@ export function ModeSwitcherPill({ className }: { className?: string }) {
               { id: "regular", label: "Regular Tracking", check: "text-fertile" },
               { id: "pcos", label: "PCOS Mode", check: "text-pcos" },
               { id: "conceive", label: "Conceive Mode", check: "text-ovulation" },
-              { id: "pregnant", label: "Pregnant Mode", check: "text-pms" },
             ] as const
           ).map((opt) => (
             <button

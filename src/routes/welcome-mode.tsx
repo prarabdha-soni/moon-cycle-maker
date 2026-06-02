@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Flower2, Sparkles, Baby, Check, ArrowRight, Zap } from "lucide-react";
+import { Flower2, Sparkles, Check, ArrowRight, Zap } from "lucide-react";
 
 export const Route = createFileRoute("/welcome-mode")({
   head: () => ({
@@ -15,7 +15,7 @@ export const Route = createFileRoute("/welcome-mode")({
   component: WelcomeMode,
 });
 
-type Mode = "regular" | "conceive" | "pregnant" | "pcos";
+type Mode = "regular" | "conceive" | "pcos";
 
 const modes: {
   id: Mode;
@@ -53,15 +53,6 @@ const modes: {
     iconClass: "bg-ovulation/15 text-ovulation",
     ringClass: "border-ovulation",
   },
-  {
-    id: "pregnant",
-    title: "Pregnant",
-    tag: "Expecting a baby",
-    desc: "Track your pregnancy journey with day-by-day baby development insights.",
-    icon: Baby,
-    iconClass: "bg-pms/15 text-pms",
-    ringClass: "border-pms",
-  },
 ];
 
 function WelcomeMode() {
@@ -83,8 +74,6 @@ function WelcomeMode() {
         window.localStorage.setItem("petal:onboarded", "1");
       }
       navigate({ to: "/pcos", replace: true });
-    } else if (selected === "pregnant") {
-      navigate({ to: "/welcome-last-period", replace: true });
     } else {
       navigate({ to: "/welcome-supplements", replace: true });
     }
