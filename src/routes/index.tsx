@@ -430,6 +430,10 @@ function CycleScreen() {
       navigate({ to: "/conceive", replace: true });
       return;
     }
+    if (mode === "pcos") {
+      navigate({ to: "/pcos", replace: true });
+      return;
+    }
     if (mode === "pregnant") {
       const lp =
         typeof window !== "undefined" ? window.localStorage.getItem("petal:lastPeriod") : null;

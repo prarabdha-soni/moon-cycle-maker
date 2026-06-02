@@ -2,12 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Check, ChevronDown } from "lucide-react";
 
-type Mode = "regular" | "conceive" | "pregnant";
+type Mode = "regular" | "conceive" | "pregnant" | "pcos";
 
 function safeGetMode(): Mode {
   if (typeof window === "undefined") return "regular";
   const raw = window.localStorage.getItem("petal:mode");
-  if (raw === "conceive" || raw === "pregnant" || raw === "regular") return raw;
+  if (raw === "conceive" || raw === "pregnant" || raw === "regular" || raw === "pcos") return raw;
   return "regular";
 }
 
@@ -38,6 +38,13 @@ export function ModeSwitcherPill({ className }: { className?: string }) {
         label: "Pregnant",
       };
     }
+    if (mode === "pcos") {
+      return {
+        pill: "bg-pcos/20 text-pcos",
+        check: "text-pcos",
+        label: "PCOS",
+      };
+    }
     return {
       pill: "bg-fertile-light/30 text-fertile",
       check: "text-fertile",
@@ -58,6 +65,10 @@ export function ModeSwitcherPill({ className }: { className?: string }) {
     }
     if (next === "conceive") {
       navigate({ to: "/conceive", replace: true });
+      return;
+    }
+    if (next === "pcos") {
+      navigate({ to: "/pcos", replace: true });
       return;
     }
 
@@ -85,6 +96,7 @@ export function ModeSwitcherPill({ className }: { className?: string }) {
           {(
             [
               { id: "regular", label: "Regular Tracking", check: "text-fertile" },
+              { id: "pcos", label: "PCOS Mode", check: "text-pcos" },
               { id: "conceive", label: "Conceive Mode", check: "text-ovulation" },
               { id: "pregnant", label: "Pregnant Mode", check: "text-pms" },
             ] as const

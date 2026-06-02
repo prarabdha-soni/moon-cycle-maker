@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PcosRouteImport } from './routes/pcos'
 import { Route as WelcomeSupplementsRouteImport } from './routes/welcome-supplements'
 import { Route as WelcomeModeRouteImport } from './routes/welcome-mode'
 import { Route as WelcomeRouteImport } from './routes/welcome'
@@ -28,6 +29,11 @@ import { Route as WelcomeGoalsRouteImport } from './routes/welcome-goals'
 import { Route as WelcomeLastPeriodRouteImport } from './routes/welcome-last-period'
 import { Route as IndexRouteImport } from './routes/index'
 
+const PcosRoute = PcosRouteImport.update({
+  id: '/pcos',
+  path: '/pcos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WelcomeSupplementsRoute = WelcomeSupplementsRouteImport.update({
   id: '/welcome-supplements',
   path: '/welcome-supplements',
@@ -129,6 +135,7 @@ export interface FileRoutesByFullPath {
   '/health': typeof HealthRoute
   '/learn': typeof LearnRoute
   '/med': typeof MedRoute
+  '/pcos': typeof PcosRoute
   '/pregnant': typeof PregnantRoute
   '/profile': typeof ProfileRoute
   '/shop': typeof ShopRoute
@@ -149,6 +156,7 @@ export interface FileRoutesByTo {
   '/health': typeof HealthRoute
   '/learn': typeof LearnRoute
   '/med': typeof MedRoute
+  '/pcos': typeof PcosRoute
   '/pregnant': typeof PregnantRoute
   '/profile': typeof ProfileRoute
   '/shop': typeof ShopRoute
@@ -170,6 +178,7 @@ export interface FileRoutesById {
   '/health': typeof HealthRoute
   '/learn': typeof LearnRoute
   '/med': typeof MedRoute
+  '/pcos': typeof PcosRoute
   '/pregnant': typeof PregnantRoute
   '/profile': typeof ProfileRoute
   '/shop': typeof ShopRoute
@@ -192,6 +201,7 @@ export interface FileRouteTypes {
     | '/health'
     | '/learn'
     | '/med'
+    | '/pcos'
     | '/pregnant'
     | '/profile'
     | '/shop'
@@ -212,6 +222,7 @@ export interface FileRouteTypes {
     | '/health'
     | '/learn'
     | '/med'
+    | '/pcos'
     | '/pregnant'
     | '/profile'
     | '/shop'
@@ -232,6 +243,7 @@ export interface FileRouteTypes {
     | '/health'
     | '/learn'
     | '/med'
+    | '/pcos'
     | '/pregnant'
     | '/profile'
     | '/shop'
@@ -253,6 +265,7 @@ export interface RootRouteChildren {
   HealthRoute: typeof HealthRoute
   LearnRoute: typeof LearnRoute
   MedRoute: typeof MedRoute
+  PcosRoute: typeof PcosRoute
   PregnantRoute: typeof PregnantRoute
   ProfileRoute: typeof ProfileRoute
   ShopRoute: typeof ShopRoute
@@ -266,6 +279,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/pcos': {
+      id: '/pcos'
+      path: '/pcos'
+      fullPath: '/pcos'
+      preLoaderRoute: typeof PcosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/welcome-supplements': {
       id: '/welcome-supplements'
       path: '/welcome-supplements'
@@ -405,6 +425,7 @@ const rootRouteChildren: RootRouteChildren = {
   HealthRoute: HealthRoute,
   LearnRoute: LearnRoute,
   MedRoute: MedRoute,
+  PcosRoute: PcosRoute,
   PregnantRoute: PregnantRoute,
   ProfileRoute: ProfileRoute,
   ShopRoute: ShopRoute,

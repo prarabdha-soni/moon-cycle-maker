@@ -128,8 +128,20 @@ const categories = [
   },
 ];
 
+function todayKey() {
+  return `petal:log:${new Date().toISOString().slice(0, 10)}`;
+}
+
 function TrackScreen() {
-  const [selected, setSelected] = useState<Record<string, boolean>>({});
+  const [selected, setSelected] = useState<Record<string, boolean>>(() => {
+    if (typeof window === "undefined") return {};
+    try {
+      const raw = window.localStorage.getItem(todayKey());
+      return raw ? (JSON.parse(raw) as Record<string, boolean>) : {};
+    } catch {
+      return {};
+    }
+  });
   const [saved, setSaved] = useState(false);
 
   const toggle = (id: string) => setSelected((s) => ({ ...s, [id]: !s[id] }));
@@ -143,6 +155,7 @@ function TrackScreen() {
   });
 
   const handleSave = () => {
+    window.localStorage.setItem(todayKey(), JSON.stringify(selected));
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };

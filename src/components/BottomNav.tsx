@@ -1,19 +1,20 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import { House, Bot, HeartPulse, ShoppingBag } from "lucide-react";
 
-type Mode = "regular" | "conceive" | "pregnant";
+type Mode = "regular" | "conceive" | "pregnant" | "pcos";
 
 function safeGetMode(): Mode {
   if (typeof window === "undefined") return "regular";
   const raw = window.localStorage.getItem("petal:mode");
-  if (raw === "conceive" || raw === "pregnant" || raw === "regular") return raw;
+  if (raw === "conceive" || raw === "pregnant" || raw === "regular" || raw === "pcos") return raw;
   return "regular";
 }
 
 export function BottomNav() {
   const { pathname } = useLocation();
   const mode = safeGetMode();
-  const cycleTo = mode === "conceive" ? "/conceive" : mode === "pregnant" ? "/pregnant" : "/";
+  const cycleTo =
+    mode === "conceive" ? "/conceive" : mode === "pregnant" ? "/pregnant" : mode === "pcos" ? "/pcos" : "/";
 
   const items = [
     { to: cycleTo, label: "Home", icon: House },

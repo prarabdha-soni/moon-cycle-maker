@@ -17,18 +17,48 @@ export const Route = createFileRoute("/coach")({
 
 type Msg = { role: "bot" | "user"; text: string };
 
+function getContext(): string {
+  if (typeof window === "undefined") return "";
+  const mode = window.localStorage.getItem("petal:mode") ?? "regular";
+  const lastPeriod = window.localStorage.getItem("petal:lastPeriod");
+  const cycleLength = window.localStorage.getItem("petal:cycleLength") ?? "28";
+  const name = window.localStorage.getItem("petal:name");
+
+  let daysSince = "";
+  if (lastPeriod) {
+    const d = Math.floor((Date.now() - new Date(lastPeriod).getTime()) / 86400000);
+    daysSince = `Day ${d + 1} of cycle`;
+  }
+
+  const parts = [
+    `User mode: ${mode}`,
+    name ? `User name: ${name}` : "",
+    daysSince,
+    mode !== "pcos" ? `Cycle length: ${cycleLength} days` : "Irregular PCOS cycle",
+  ].filter(Boolean);
+
+  return parts.join(", ");
+}
+
+const PCOS_SUGGESTIONS = [
+  "Why is my PCOS cycle so irregular?",
+  "What Indian foods help PCOS?",
+  "How does stress worsen PCOS?",
+  "Can I get pregnant with PCOS?",
+];
+
+const REGULAR_SUGGESTIONS = [
+  "Why do I feel tired before my period?",
+  "What foods help with cramps?",
+  "When is my fertile window?",
+  "How does stress affect my cycle?",
+];
+
 const INITIAL_MESSAGES: Msg[] = [
   {
     role: "bot",
     text: "Hi! 👋 I'm Petal AI, your personal cycle coach. Ask me anything about your period, hormones, fertility, or how to feel your best every day.",
   },
-];
-
-const SUGGESTIONS = [
-  "Why do I feel tired before my period?",
-  "What foods help with cramps?",
-  "When is my fertile window?",
-  "How does stress affect my cycle?",
 ];
 
 const BOT_REPLIES: Record<string, string> = {
@@ -40,18 +70,28 @@ const BOT_REPLIES: Record<string, string> = {
     "Your fertile window is roughly 5 days before ovulation plus ovulation day itself. For a 28-day cycle that's usually days 10–15. 🌿 Sperm can live up to 5 days, so timing in this range gives you the best chance.",
   "How does stress affect my cycle?":
     "Chronic stress raises cortisol, which disrupts the hypothalamic-pituitary-ovarian axis — the control centre for your cycle. This can delay ovulation, shorten your luteal phase, or even cause a missed period. 🧘",
+  "Why is my PCOS cycle so irregular?":
+    "With PCOS, the ovaries produce excess androgens (male hormones) which disrupt the normal follicle maturation process. This delays or prevents ovulation, causing cycles that can range from 25 to 90+ days. 🌿 Tracking symptoms over time helps you find your personal pattern — many women with PCOS do have a rhythm, just longer than average.",
+  "What Indian foods help PCOS?":
+    "Several traditional Indian ingredients are clinically shown to help PCOS: 🌿 **Methi (fenugreek)** seeds improve insulin sensitivity — soak 1 tsp overnight and eat on an empty stomach. **Jeera (cumin)** water reduces testosterone. **Haldi (turmeric)** reduces inflammation. **Karela (bitter gourd)** helps blood sugar regulation. Avoid maida, white rice in excess, and refined sugar.",
+  "How does stress worsen PCOS?":
+    "Stress triggers cortisol release, which directly raises insulin levels and androgens — the two key drivers of PCOS. High cortisol also suppresses progesterone, making cycles more irregular. 🧘 Yoga, pranayama, and 7–8 hours of sleep are among the most effective interventions for PCOS management.",
+  "Can I get pregnant with PCOS?":
+    "Yes — absolutely. 🌸 PCOS affects ovulation timing but most women with PCOS can conceive naturally or with minimal support. Tracking your cycle, maintaining a healthy weight, and reducing insulin resistance (through diet and exercise) significantly improve chances. Switch to Conceive mode in Petal for fertility-focused tracking tools.",
 };
 
 const FALLBACK =
   "That's a great question! Cycle health is deeply personal. Track your symptoms for a few cycles — patterns reveal a lot. 🌸";
 
-function toAPIMessages(msgs: Msg[]) {
-  return msgs
-    .slice(1)
-    .map((m) => ({ role: m.role === "bot" ? "assistant" : "user", content: m.text }));
+function toAPIMessages(msgs: Msg[], context: string) {
+  const systemContent = `You are Petal AI, a compassionate women's health coach specialising in menstrual cycles, PCOS, fertility, and hormonal health. Current user context: ${context}. Give warm, evidence-based, concise answers. When relevant, mention Indian dietary and Ayurvedic options. Always note that your responses are educational, not medical advice.`;
+  return [
+    { role: "system", content: systemContent },
+    ...msgs.slice(1).map((m) => ({ role: m.role === "bot" ? "assistant" : "user", content: m.text })),
+  ];
 }
 
-async function callAPI(history: Msg[]): Promise<string> {
+async function callAPI(history: Msg[], context: string): Promise<string> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 8000);
 
@@ -59,7 +99,7 @@ async function callAPI(history: Msg[]): Promise<string> {
     const res = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages: toAPIMessages(history) }),
+      body: JSON.stringify({ messages: toAPIMessages(history, context) }),
       signal: controller.signal,
     });
     clearTimeout(timeoutId);
@@ -81,8 +121,13 @@ function CoachScreen() {
   const [messages, setMessages] = useState<Msg[]>(INITIAL_MESSAGES);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
+  const [context] = useState(() => getContext());
+  const [isPcos] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.localStorage.getItem("petal:mode") === "pcos";
+  });
   const bottomRef = useRef<HTMLDivElement>(null);
-  const typingRef = useRef(false); // mirrors typing state — prevents stale closure double-send
+  const typingRef = useRef(false);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -96,12 +141,11 @@ function CoachScreen() {
     setTyping(true);
     setInput("");
 
-    // Snapshot messages before the first await so the history is correct
     const history = [...messages, { role: "user" as const, text: trimmed }];
     setMessages(history);
 
     try {
-      const reply = await callAPI(history);
+      const reply = await callAPI(history, context);
       setMessages((prev) => [...prev, { role: "bot", text: reply }]);
     } catch (err) {
       const isTimeout = err instanceof Error && err.message === "timeout";
@@ -115,6 +159,7 @@ function CoachScreen() {
     }
   }
 
+  const suggestions = isPcos ? PCOS_SUGGESTIONS : REGULAR_SUGGESTIONS;
   const showSuggestions = messages.length === 1 && !typing;
 
   return (
@@ -186,11 +231,15 @@ function CoachScreen() {
               Suggested questions
             </p>
             <div className="flex flex-wrap gap-2">
-              {SUGGESTIONS.map((s) => (
+              {suggestions.map((s) => (
                 <button
                   key={s}
                   onClick={() => void send(s)}
-                  className="rounded-full border border-period/30 bg-period/6 px-3 py-1.5 text-[12px] font-medium text-period transition-colors hover:bg-period/12"
+                  className={`rounded-full border px-3 py-1.5 text-[12px] font-medium transition-colors ${
+                    isPcos
+                      ? "border-pcos/30 bg-pcos/6 text-pcos hover:bg-pcos/12"
+                      : "border-period/30 bg-period/6 text-period hover:bg-period/12"
+                  }`}
                 >
                   {s}
                 </button>

@@ -36,6 +36,8 @@
   --color-fertile-light: var(--fertile-light);
   --color-ovulation: var(--ovulation);
   --color-pms: var(--pms);
+  --color-pcos: var(--pcos);
+  --color-pcos-light: var(--pcos-light);
   --color-track: var(--track);
   --font-display: "Fraunces", Georgia, serif;
   --font-sans: "Inter", system-ui, sans-serif;
@@ -70,6 +72,8 @@
   --fertile-light: oklch(0.75 0.08 220);
   --ovulation: oklch(0.55 0.16 165); /* green */
   --pms: oklch(0.7 0.14 60); /* amber */
+  --pcos: oklch(0.52 0.22 290); /* violet-purple for PCOS mode */
+  --pcos-light: oklch(0.78 0.12 290);
   --track: oklch(0.92 0.005 80); /* ring track */
   --chart-1: var(--period);
   --chart-2: var(--fertile);

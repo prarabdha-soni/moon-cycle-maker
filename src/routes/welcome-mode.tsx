@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Flower2, Sparkles, Baby, Check, ArrowRight } from "lucide-react";
+import { Flower2, Sparkles, Baby, Check, ArrowRight, Zap } from "lucide-react";
 
 export const Route = createFileRoute("/welcome-mode")({
   head: () => ({
@@ -8,14 +8,14 @@ export const Route = createFileRoute("/welcome-mode")({
       { title: "Welcome — Petal" },
       {
         name: "description",
-        content: "Choose your Petal experience: Regular tracking, Conceive, or Pregnant.",
+        content: "Choose your Petal experience: Regular tracking, PCOS, Conceive, or Pregnant.",
       },
     ],
   }),
   component: WelcomeMode,
 });
 
-type Mode = "regular" | "conceive" | "pregnant";
+type Mode = "regular" | "conceive" | "pregnant" | "pcos";
 
 const modes: {
   id: Mode;
@@ -34,6 +34,15 @@ const modes: {
     icon: Flower2,
     iconClass: "bg-fertile/15 text-fertile",
     ringClass: "border-fertile",
+  },
+  {
+    id: "pcos",
+    title: "PCOS",
+    tag: "Irregular cycles",
+    desc: "Designed for irregular cycles — track hormonal symptoms, metabolic signs, and get Ayurvedic tips.",
+    icon: Zap,
+    iconClass: "bg-pcos/15 text-pcos",
+    ringClass: "border-pcos",
   },
   {
     id: "conceive",
@@ -65,13 +74,16 @@ function WelcomeMode() {
       window.localStorage.setItem("petal:mode", selected);
     }
     if (selected === "conceive") {
-      // Conceive users skip the cycle-type/supplement onboarding
       if (typeof window !== "undefined") {
         window.localStorage.setItem("petal:onboarded", "1");
       }
       navigate({ to: "/conceive", replace: true });
+    } else if (selected === "pcos") {
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("petal:onboarded", "1");
+      }
+      navigate({ to: "/pcos", replace: true });
     } else if (selected === "pregnant") {
-      // Pregnant users go to last period screen
       navigate({ to: "/welcome-last-period", replace: true });
     } else {
       navigate({ to: "/welcome-supplements", replace: true });
@@ -157,7 +169,9 @@ function WelcomeMode() {
           className={`flex w-full items-center justify-center gap-2 rounded-full py-4 text-[15px] font-semibold text-primary-foreground shadow-lg transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none ${
             selected === "conceive"
               ? "bg-ovulation shadow-ovulation/30"
-              : "bg-fertile shadow-fertile/30"
+              : selected === "pcos"
+                ? "bg-pcos shadow-pcos/30"
+                : "bg-fertile shadow-fertile/30"
           }`}
         >
           Continue
