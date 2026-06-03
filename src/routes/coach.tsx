@@ -1,283 +1,175 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
-import { Send, Sparkles, Bot } from "lucide-react";
-import { BottomNav } from "@/components/BottomNav";
-import { ProfileIcon } from "@/components/ProfileIcon";
-import { cn } from "@/lib/utils";
+import { AppShell } from "@/components/AppShell";
 
 export const Route = createFileRoute("/coach")({
   head: () => ({
     meta: [
-      { title: "AI Coach — Petal" },
+      { title: "AI Coach — SheThrives" },
       { name: "description", content: "Your personal AI cycle coach." },
     ],
   }),
   component: CoachScreen,
 });
 
+const ACCENT = "#E26D8A";
+const ACCENT_DEEP = "#C9577A";
+const GOLD = "#D99B57";
+type Mode = "regular" | "pcos" | "conceive";
 type Msg = { role: "bot" | "user"; text: string };
 
-function getContext(): string {
-  if (typeof window === "undefined") return "";
-  const mode = window.localStorage.getItem("petal:mode") ?? "regular";
-  const lastPeriod = window.localStorage.getItem("petal:lastPeriod");
-  const cycleLength = window.localStorage.getItem("petal:cycleLength") ?? "28";
-  const name = window.localStorage.getItem("petal:name");
-
-  let daysSince = "";
-  if (lastPeriod) {
-    const d = Math.floor((Date.now() - new Date(lastPeriod).getTime()) / 86400000);
-    daysSince = `Day ${d + 1} of cycle`;
-  }
-
-  const parts = [
-    `User mode: ${mode}`,
-    name ? `User name: ${name}` : "",
-    daysSince,
-    mode !== "pcos" ? `Cycle length: ${cycleLength} days` : "Irregular PCOS cycle",
-  ].filter(Boolean);
-
-  return parts.join(", ");
+function getContext(): { mode: Mode; name: string } {
+  if (typeof window === "undefined") return { mode: "regular", name: "" };
+  return {
+    mode: (window.localStorage.getItem("petal:mode") as Mode) || "regular",
+    name: window.localStorage.getItem("petal:name") || "",
+  };
 }
 
-const PCOS_SUGGESTIONS = [
-  "Why is my PCOS cycle so irregular?",
-  "What Indian foods help PCOS?",
-  "How does stress worsen PCOS?",
-  "Can I get pregnant with PCOS?",
-];
-
-const REGULAR_SUGGESTIONS = [
-  "Why do I feel tired before my period?",
-  "What foods help with cramps?",
-  "When is my fertile window?",
-  "How does stress affect my cycle?",
-];
-
-const INITIAL_MESSAGES: Msg[] = [
-  {
-    role: "bot",
-    text: "Hi! 👋 I'm Petal AI, your personal cycle coach. Ask me anything about your period, hormones, fertility, or how to feel your best every day.",
-  },
-];
-
-const BOT_REPLIES: Record<string, string> = {
-  "Why do I feel tired before my period?":
-    "During the luteal phase, progesterone rises sharply which has a sedating effect on the brain. Combined with a dip in serotonin, this can leave you feeling drained 3–7 days before your period. 💤 Try iron-rich foods, gentle movement, and prioritising sleep.",
-  "What foods help with cramps?":
-    "Anti-inflammatory foods are your best friend! 🥦 Omega-3s (salmon, flaxseed), magnesium (dark chocolate, leafy greens), and ginger tea can all reduce prostaglandins — the compounds that cause cramping.",
-  "When is my fertile window?":
-    "Your fertile window is roughly 5 days before ovulation plus ovulation day itself. For a 28-day cycle that's usually days 10–15. 🌿 Sperm can live up to 5 days, so timing in this range gives you the best chance.",
-  "How does stress affect my cycle?":
-    "Chronic stress raises cortisol, which disrupts the hypothalamic-pituitary-ovarian axis — the control centre for your cycle. This can delay ovulation, shorten your luteal phase, or even cause a missed period. 🧘",
-  "Why is my PCOS cycle so irregular?":
-    "With PCOS, the ovaries produce excess androgens (male hormones) which disrupt the normal follicle maturation process. This delays or prevents ovulation, causing cycles that can range from 25 to 90+ days. 🌿 Tracking symptoms over time helps you find your personal pattern — many women with PCOS do have a rhythm, just longer than average.",
-  "What Indian foods help PCOS?":
-    "Several traditional Indian ingredients are clinically shown to help PCOS: 🌿 **Methi (fenugreek)** seeds improve insulin sensitivity — soak 1 tsp overnight and eat on an empty stomach. **Jeera (cumin)** water reduces testosterone. **Haldi (turmeric)** reduces inflammation. **Karela (bitter gourd)** helps blood sugar regulation. Avoid maida, white rice in excess, and refined sugar.",
-  "How does stress worsen PCOS?":
-    "Stress triggers cortisol release, which directly raises insulin levels and androgens — the two key drivers of PCOS. High cortisol also suppresses progesterone, making cycles more irregular. 🧘 Yoga, pranayama, and 7–8 hours of sleep are among the most effective interventions for PCOS management.",
-  "Can I get pregnant with PCOS?":
-    "Yes — absolutely. 🌸 PCOS affects ovulation timing but most women with PCOS can conceive naturally or with minimal support. Tracking your cycle, maintaining a healthy weight, and reducing insulin resistance (through diet and exercise) significantly improve chances. Switch to Conceive mode in Petal for fertility-focused tracking tools.",
+const CHIPS: Record<Mode, string[]> = {
+  conceive: ["When am I most fertile?", "Foods that boost fertility", "Is my BBT shift normal?"],
+  pcos: ["Why is my cycle so long?", "Best supplements for PCOS", "How to ease a flare-up"],
+  regular: ["Why do I feel low energy?", "What does my phase mean?", "Tips for less cramping"],
 };
 
-const FALLBACK =
-  "That's a great question! Cycle health is deeply personal. Track your symptoms for a few cycles — patterns reveal a lot. 🌸";
+const INTROS: Record<Mode, string> = {
+  conceive: "You're in your fertile window — the next two days are your best chance. Your temperature shift this morning lines up beautifully. Want a few gentle things that can help?",
+  pcos: "Your cycle running long is very common with PCOS and usually nothing to worry about. Logging symptoms helps us spot your patterns. What's on your mind today?",
+  regular: "You're in your follicular phase, so it's normal to feel more energetic and social right now. Anything you'd like to understand about how you're feeling?",
+};
 
-function toAPIMessages(msgs: Msg[], context: string) {
-  const systemContent = `You are Petal AI, a compassionate women's health coach specialising in menstrual cycles, PCOS, fertility, and hormonal health. Current user context: ${context}. Give warm, evidence-based, concise answers. When relevant, mention Indian dietary and Ayurvedic options. Always note that your responses are educational, not medical advice.`;
-  return [
-    { role: "system", content: systemContent },
-    ...msgs.slice(1).map((m) => ({ role: m.role === "bot" ? "assistant" : "user", content: m.text })),
-  ];
-}
+const REPLIES: Record<Mode, string> = {
+  conceive: "Aim for intimacy today and tomorrow, stay hydrated, and keep stress low — short walks and good sleep matter more than people expect.",
+  pcos: "Focus on balanced meals with protein and fibre, gentle movement, and consistent sleep. These steady your insulin, which steadies your cycle over time.",
+  regular: "Your energy peaks now thanks to rising estrogen. Use it for the things that need focus — and lean into rest later when progesterone rises.",
+};
 
-async function callAPI(history: Msg[], context: string): Promise<string> {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 8000);
-
-  try {
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages: toAPIMessages(history, context) }),
-      signal: controller.signal,
-    });
-    clearTimeout(timeoutId);
-
-    if (!res.ok) throw new Error(`http_${res.status}`);
-
-    const data = (await res.json()) as { reply?: unknown };
-    if (typeof data.reply !== "string" || !data.reply) throw new Error("bad_reply");
-    return data.reply;
-  } catch (err) {
-    clearTimeout(timeoutId);
-    // Translate abort → "timeout" so the caller can detect it
-    if (err instanceof Error && err.name === "AbortError") throw new Error("timeout");
-    throw err;
+function Bubble({ me, text, accent }: { me: boolean; text: string; accent: string }) {
+  if (me) {
+    return (
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
+        <div style={{ maxWidth: "78%", padding: "12px 15px", fontSize: 14.5, lineHeight: 1.5, borderRadius: "20px 20px 6px 20px", background: accent, color: "#fff", boxShadow: `0 6px 16px rgba(226,109,138,.28)` }}>
+          {text}
+        </div>
+      </div>
+    );
   }
+  return (
+    <div style={{ display: "flex", justifyContent: "flex-start", marginBottom: 12 }}>
+      <div style={{ width: 30, height: 30, borderRadius: "50%", background: `linear-gradient(135deg,${accent},${GOLD})`, display: "flex", alignItems: "center", justifyContent: "center", marginRight: 9, flexShrink: 0, alignSelf: "flex-end", fontSize: 14 }}>
+        ✨
+      </div>
+      <div style={{ maxWidth: "78%", padding: "12px 15px", fontSize: 14.5, lineHeight: 1.5, borderRadius: "20px 20px 20px 6px", background: "#fff", color: "#2E2329", border: "1px solid #F6ECE8", boxShadow: "0 1px 2px rgba(70,35,48,.04), 0 10px 30px rgba(170,90,115,.07)" }}>
+        {text}
+      </div>
+    </div>
+  );
 }
 
 function CoachScreen() {
-  const [messages, setMessages] = useState<Msg[]>(INITIAL_MESSAGES);
+  const ctx = getContext();
+  const [mode] = useState<Mode>(ctx.mode);
+  const [msgs, setMsgs] = useState<Msg[]>([
+    { role: "bot", text: INTROS[ctx.mode] },
+    { role: "user", text: CHIPS[ctx.mode][0] },
+    { role: "bot", text: `Great question. ${REPLIES[ctx.mode]}` },
+  ]);
   const [input, setInput] = useState("");
-  const [typing, setTyping] = useState(false);
-  const [context] = useState(() => getContext());
-  const [isPcos] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return window.localStorage.getItem("petal:mode") === "pcos";
-  });
-  const bottomRef = useRef<HTMLDivElement>(null);
-  const typingRef = useRef(false);
+  const [loading, setLoading] = useState(false);
+  const msgsRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const modeLabel = mode === "pcos" ? "PCOS" : mode === "conceive" ? "Conceive" : "Regular";
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, typing]);
+    if (msgsRef.current) msgsRef.current.scrollTop = msgsRef.current.scrollHeight;
+  }, [msgs]);
 
   async function send(text: string) {
-    const trimmed = text.trim();
-    if (!trimmed || typingRef.current) return;
-
-    typingRef.current = true;
-    setTyping(true);
+    if (!text.trim() || loading) return;
     setInput("");
-
-    const history = [...messages, { role: "user" as const, text: trimmed }];
-    setMessages(history);
-
+    setMsgs(p => [...p, { role: "user", text }]);
+    setLoading(true);
     try {
-      const reply = await callAPI(history, context);
-      setMessages((prev) => [...prev, { role: "bot", text: reply }]);
-    } catch (err) {
-      const isTimeout = err instanceof Error && err.message === "timeout";
-      const fallback = isTimeout
-        ? "The AI is taking too long right now. Please try again in a moment. 🌸"
-        : (BOT_REPLIES[trimmed] ?? FALLBACK);
-      setMessages((prev) => [...prev, { role: "bot", text: fallback }]);
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: [
+            ...msgs.map(m => ({ role: m.role === "user" ? "user" : "assistant", content: m.text })),
+            { role: "user", content: text },
+          ],
+        }),
+      });
+      const data = await res.json();
+      const reply = data.reply || data.content || data.message || "I'm here to help — could you tell me a bit more?";
+      setMsgs(p => [...p, { role: "bot", text: reply }]);
+    } catch {
+      setMsgs(p => [...p, { role: "bot", text: "I'm having trouble connecting right now. Please try again in a moment." }]);
     } finally {
-      typingRef.current = false;
-      setTyping(false);
+      setLoading(false);
     }
   }
 
-  const suggestions = isPcos ? PCOS_SUGGESTIONS : REGULAR_SUGGESTIONS;
-  const showSuggestions = messages.length === 1 && !typing;
-
   return (
-    <div
-      className="mx-auto flex max-w-md flex-col bg-background h-screen"
-      style={{ height: "100dvh" } as React.CSSProperties}
-    >
-      {/* Header */}
-      <header className="shrink-0 flex items-center justify-between px-5 pt-6 pb-2">
-        <ProfileIcon />
-        <h1 className="font-display text-[17px] font-medium tracking-tight text-foreground">
-          AI Coach
-        </h1>
-        <span className="size-9" aria-hidden />
-      </header>
-
-      {/* Hero banner */}
-      <div className="shrink-0 mx-5 mt-1 mb-2 flex items-center gap-3 rounded-2xl bg-gradient-to-r from-period/10 via-fertile/10 to-ovulation/10 border border-period/15 px-4 py-3">
-        <div className="grid size-9 shrink-0 place-items-center rounded-full bg-period/15">
-          <Sparkles className="size-4 text-period" strokeWidth={2} />
+    <AppShell>
+      <div style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: "calc(100vh - 88px)", overflow: "hidden", background: "linear-gradient(180deg,#FCF5F2,#FBF3F0)" }}>
+        {/* Header */}
+        <div style={{ padding: "58px 20px 14px", display: "flex", alignItems: "center", gap: 12, borderBottom: "1px solid #F6ECE8", background: "rgba(255,255,255,.6)", backdropFilter: "blur(8px)", flexShrink: 0 }}>
+          <div style={{ width: 44, height: 44, borderRadius: "50%", background: `linear-gradient(135deg,${ACCENT},${GOLD})`, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 8px 26px rgba(180,100,120,.10)", fontSize: 24 }}>
+            ✨
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 17, fontWeight: 800, color: "#2E2329" }}>Your Coach</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, color: "#578A70", fontWeight: 600 }}>
+              <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#7FB59A" }} />
+              Knows your {modeLabel.toLowerCase()} context
+            </div>
+          </div>
         </div>
-        <div>
-          <p className="text-[13px] font-semibold text-foreground">Petal AI Coach</p>
-          <p className="text-[11px] text-muted-foreground">Powered by DeepSeek · Always private</p>
-        </div>
-      </div>
 
-      {/* Message list */}
-      <div className="flex-1 overflow-y-auto px-5 py-2 space-y-3">
-        {messages.map((m, i) => (
-          <div
-            key={i}
-            className={cn("flex gap-2", m.role === "user" ? "justify-end" : "justify-start")}
-          >
-            {m.role === "bot" && (
-              <div className="grid size-7 shrink-0 place-items-center rounded-full bg-period/15 mt-1">
-                <Bot className="size-3.5 text-period" strokeWidth={2} />
+        {/* Messages */}
+        <div ref={msgsRef} style={{ flex: 1, overflowY: "auto", padding: "20px 18px 8px" }}>
+          <div style={{ textAlign: "center", fontSize: 12, fontWeight: 600, color: "#A89AA0", marginBottom: 18 }}>Today</div>
+          {msgs.map((m, i) => <Bubble key={i} me={m.role === "user"} text={m.text} accent={ACCENT} />)}
+          {loading && (
+            <div style={{ display: "flex", justifyContent: "flex-start", marginBottom: 12 }}>
+              <div style={{ width: 30, height: 30, borderRadius: "50%", background: `linear-gradient(135deg,${ACCENT},${GOLD})`, display: "flex", alignItems: "center", justifyContent: "center", marginRight: 9, flexShrink: 0, alignSelf: "flex-end", fontSize: 14 }}>✨</div>
+              <div style={{ padding: "12px 18px", background: "#fff", borderRadius: "20px 20px 20px 6px", border: "1px solid #F6ECE8", boxShadow: "0 1px 2px rgba(70,35,48,.04)" }}>
+                <div style={{ display: "flex", gap: 4 }}>
+                  {[0,1,2].map(i => <span key={i} style={{ width: 8, height: 8, borderRadius: "50%", background: "#F0E2DE", animation: `breathe 1.3s ease-in-out ${i*0.22}s infinite` }}/>)}
+                </div>
               </div>
-            )}
-            <div
-              className={cn(
-                "max-w-[78%] rounded-2xl px-4 py-2.5 text-[14px] leading-relaxed",
-                m.role === "bot"
-                  ? "bg-card border border-border text-foreground rounded-tl-sm"
-                  : "bg-period text-white rounded-tr-sm",
-              )}
-            >
-              {String(m.text)}
             </div>
+          )}
+        </div>
+
+        {/* Composer */}
+        <div style={{ padding: "10px 16px 14px", borderTop: "1px solid #F6ECE8", background: "rgba(255,255,255,.7)", backdropFilter: "blur(8px)", flexShrink: 0 }}>
+          <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 10, marginBottom: 2 }}>
+            {CHIPS[mode].map(c => (
+              <button key={c} onClick={() => send(c)}
+                style={{ flexShrink: 0, background: "#fff", color: "#705F66", border: "1px solid #F0E2DE", fontWeight: 600, fontSize: 13.5, padding: "9px 15px", borderRadius: 999, whiteSpace: "nowrap", cursor: "pointer", fontFamily: "inherit" }}>
+                {c}
+              </button>
+            ))}
           </div>
-        ))}
-
-        {typing && (
-          <div className="flex gap-2 justify-start">
-            <div className="grid size-7 shrink-0 place-items-center rounded-full bg-period/15 mt-1">
-              <Bot className="size-3.5 text-period" strokeWidth={2} />
-            </div>
-            <div className="bg-card border border-border rounded-2xl rounded-tl-sm px-4 py-3 flex gap-1.5 items-center">
-              <span className="size-1.5 rounded-full bg-muted-foreground animate-bounce [animation-delay:0ms]" />
-              <span className="size-1.5 rounded-full bg-muted-foreground animate-bounce [animation-delay:150ms]" />
-              <span className="size-1.5 rounded-full bg-muted-foreground animate-bounce [animation-delay:300ms]" />
-            </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, background: "#fff", border: "1px solid #F0E2DE", borderRadius: 999, padding: "7px 7px 7px 18px", boxShadow: "0 1px 2px rgba(70,35,48,.04), 0 10px 30px rgba(170,90,115,.07)" }}>
+            <input
+              ref={inputRef}
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={e => e.key === "Enter" && send(input)}
+              placeholder="Ask anything…"
+              style={{ flex: 1, fontSize: 14.5, color: "#2E2329", background: "none", border: "none", outline: "none", fontFamily: "inherit" }}
+            />
+            <button onClick={() => send(input)} disabled={!input.trim() || loading}
+              style={{ width: 40, height: 40, borderRadius: "50%", border: "none", background: ACCENT, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 4px 12px rgba(226,109,138,.28)`, cursor: "pointer", opacity: input.trim() ? 1 : 0.5 }}>
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round"><path d="M5 12l14-7-5 14-2.5-5.5L5 12Z"/></svg>
+            </button>
           </div>
-        )}
-
-        {showSuggestions && (
-          <div className="pt-2 space-y-2">
-            <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide">
-              Suggested questions
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {suggestions.map((s) => (
-                <button
-                  key={s}
-                  onClick={() => void send(s)}
-                  className={`rounded-full border px-3 py-1.5 text-[12px] font-medium transition-colors ${
-                    isPcos
-                      ? "border-pcos/30 bg-pcos/6 text-pcos hover:bg-pcos/12"
-                      : "border-period/30 bg-period/6 text-period hover:bg-period/12"
-                  }`}
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div ref={bottomRef} />
-      </div>
-
-      {/* Input bar */}
-      <div className="shrink-0 px-5 pt-2 pb-[76px] border-t border-border bg-background">
-        <div className="flex items-center gap-2 rounded-2xl border border-border bg-muted/40 px-4 py-2">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                void send(input);
-              }
-            }}
-            placeholder="Ask anything about your cycle…"
-            className="flex-1 bg-transparent text-[14px] text-foreground placeholder:text-muted-foreground outline-none"
-          />
-          <button
-            onClick={() => void send(input)}
-            disabled={!input.trim() || typing}
-            className="grid size-8 place-items-center rounded-full bg-period text-white disabled:opacity-30 transition-opacity active:scale-95"
-          >
-            <Send className="size-3.5" strokeWidth={2.5} />
-          </button>
         </div>
       </div>
-
-      <BottomNav />
-    </div>
+    </AppShell>
   );
 }

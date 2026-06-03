@@ -1,355 +1,95 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Search, ShoppingBag, Star, Check, Heart } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
-import { cn } from "@/lib/utils";
-import shetrivesCup from "@/assets/shetrives-cup.png";
 
 export const Route = createFileRoute("/shop")({
   head: () => ({
-    meta: [
-      { title: "Shop — Petal" },
-      { name: "description", content: "Curated period care products for your cycle." },
-    ],
+    meta: [{ title: "Shop — SheThrives" }],
   }),
   component: ShopScreen,
 });
 
-const CATEGORIES = ["All", "Period Care", "Supplements", "Skincare", "Wellness"];
+const ACCENT = "#E26D8A";
+const ACCENT_DEEP = "#C9577A";
+const ACCENT_SOFT = "#FBE7EC";
+const CARD_SHADOW = "0 1px 2px rgba(70,35,48,.04), 0 10px 30px rgba(170,90,115,.07)";
+
+const CATS = ["Curated for you", "Supplements", "Teas", "Comfort", "Books"];
 
 const PRODUCTS = [
-  {
-    id: "shetrives-cup",
-    name: "SheTrives Soft Menstrual Cup",
-    subtitle: "Size Regular · Desert Blush",
-    price: 499,
-    mrp: 799,
-    rating: 4.8,
-    reviews: 1240,
-    tag: "Period Care",
-    badge: "Best Seller",
-    badgeColor: "bg-period/10 text-period",
-    features: ["Medical-grade soft silicone", "Reusable for up to 5 years", "Made in India"],
-    image: shetrivesCup,
-    hasImage: true,
-  },
-  {
-    id: "iron-gummies",
-    name: "Iron + Vitamin C Gummies",
-    subtitle: "Strawberry flavour · 60 gummies",
-    price: 349,
-    mrp: 499,
-    rating: 4.6,
-    reviews: 843,
-    tag: "Supplements",
-    badge: "New",
-    badgeColor: "bg-fertile/10 text-fertile",
-    features: ["Supports energy during period", "High-absorption formula", "Vegan & gluten-free"],
-    hasImage: false,
-    gradient: "from-period-light to-ovulation",
-  },
-  {
-    id: "magnesium",
-    name: "Magnesium Glycinate 400mg",
-    subtitle: "60 capsules · 2-month supply",
-    price: 599,
-    mrp: 799,
-    rating: 4.9,
-    reviews: 2105,
-    tag: "Supplements",
-    badge: "Top Rated",
-    badgeColor: "bg-ovulation/10 text-ovulation",
-    features: ["Reduces cramps & PMS", "Improves sleep quality", "Clinically studied dosage"],
-    hasImage: false,
-    gradient: "from-ovulation to-fertile",
-  },
-  {
-    id: "heating-patch",
-    name: "Period Relief Heating Patch",
-    subtitle: "Pack of 5 · 8-hour heat",
-    price: 249,
-    mrp: 349,
-    rating: 4.7,
-    reviews: 576,
-    tag: "Wellness",
-    badge: null,
-    badgeColor: "",
-    features: ["Air-activated warmth", "Ultra-thin & discreet", "Drug-free relief"],
-    hasImage: false,
-    gradient: "from-pms to-period-light",
-  },
+  { c1:"#9C7CC1", c2:"#E26D8A", ic:"🌿", name:"Myo-Inositol blend", sub:"Hormone & cycle support", price:"₹2,349" },
+  { c1:"#E26D8A", c2:"#D99B57", ic:"🍵", name:"Cramp-ease tea", sub:"Ginger & raspberry leaf", price:"₹1,349" },
+  { c1:"#6FA98B", c2:"#9C7CC1", ic:"🔥", name:"Warming heat patch", sub:"8-hour gentle relief · 5pk", price:"₹1,149" },
+  { c1:"#D99B57", c2:"#6FA98B", ic:"💧", name:"Iron + B12 gummies", sub:"Restore mode essentials", price:"₹1,849" },
+  { c1:"#E26D8A", c2:"#9C7CC1", ic:"❤️", name:"Prenatal complete", sub:"Folate-rich, gentle on tummy", price:"₹2,699" },
+  { c1:"#9C7CC1", c2:"#D99B57", ic:"🌙", name:"Magnesium calm", sub:"For sleep & PMS ease", price:"₹1,599" },
 ];
 
+function ThumbGradient({ c1, c2, ic, h }: { c1: string; c2: string; ic: string; h: number }) {
+  return (
+    <div style={{ position: "relative", width: "100%", height: h, borderRadius: 16, overflow: "hidden", background: `linear-gradient(135deg,${c1},${c2})`, flexShrink: 0 }}>
+      <div style={{ position: "absolute", right: -14, bottom: -14, opacity: .32, fontSize: h * 0.5 }}>{ic}</div>
+      <div style={{ position: "absolute", left: -20, top: -20, width: 80, height: 80, borderRadius: "50%", background: "rgba(255,255,255,.14)" }} />
+    </div>
+  );
+}
+
 function ShopScreen() {
-  const [activeCategory, setActiveCategory] = useState("All");
-  const [wishlist, setWishlist] = useState<Set<string>>(new Set());
-  const [cart, setCart] = useState<Set<string>>(new Set());
-
-  const toggleWishlist = (id: string) => {
-    setWishlist((w) => {
-      const next = new Set(w);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-  };
-
-  const filtered =
-    activeCategory === "All" ? PRODUCTS : PRODUCTS.filter((p) => p.tag === activeCategory);
-
-  const [featured, ...rest] = filtered;
+  const [activeCat, setActiveCat] = useState("Curated for you");
+  const [cartCount] = useState(2);
 
   return (
-    <AppShell title="Shop">
-      <div className="pb-6">
-        {/* Search */}
-        <div className="px-5 pt-2 pb-3">
-          <div className="flex items-center gap-3 rounded-2xl border border-border bg-muted/40 px-4 py-2.5">
-            <Search className="size-4 text-muted-foreground shrink-0" strokeWidth={2} />
-            <span className="text-[14px] text-muted-foreground">Search products…</span>
+    <AppShell>
+      <div className="fade-in" style={{ minHeight: "100%", background: "linear-gradient(180deg,#FCF5F2,#FBF3F0)" }}>
+        <div style={{ padding: "60px 20px 0" }}>
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+            <div>
+              <h1 style={{ fontSize: 30, fontWeight: 800, color: "#2E2329", marginBottom: 4, letterSpacing: -0.6 }}>Shop</h1>
+              <p style={{ fontSize: 14.5, color: "#705F66", margin: 0 }}>Wellness picks for your phase.</p>
+            </div>
+            <button style={{ position: "relative", width: 44, height: 44, borderRadius: "50%", background: "#fff", border: "1px solid #F0E2DE", boxShadow: CARD_SHADOW, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 21 }}>
+              🛒
+              <span style={{ position: "absolute", top: -2, right: -2, minWidth: 18, height: 18, borderRadius: 999, background: ACCENT, color: "#fff", fontSize: 10.5, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 4px" }}>{cartCount}</span>
+            </button>
+          </div>
+          <div style={{ display: "flex", gap: 8, overflowX: "auto", marginTop: 16, paddingBottom: 4 }} className="scrollbar-hide">
+            {CATS.map(c => (
+              <button key={c} onClick={() => setActiveCat(c)}
+                style={{ flexShrink: 0, padding: "9px 15px", fontSize: 13.5, fontWeight: 600, borderRadius: 999, border: `1px solid ${activeCat === c ? ACCENT : "#F0E2DE"}`, background: activeCat === c ? ACCENT : "#fff", color: activeCat === c ? "#fff" : "#705F66", cursor: "pointer", fontFamily: "inherit", transition: "all .15s ease", whiteSpace: "nowrap" }}>
+                {c}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Category pills */}
-        <div className="flex gap-2 overflow-x-auto px-5 pb-3 scrollbar-hide">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={cn(
-                "shrink-0 rounded-full px-4 py-1.5 text-[12px] font-semibold transition-colors",
-                activeCategory === cat
-                  ? "bg-period text-white"
-                  : "bg-muted text-muted-foreground hover:bg-accent",
-              )}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
+        <div style={{ padding: "18px 20px 20px" }}>
+          {/* Banner */}
+          <div style={{ display: "flex", alignItems: "center", gap: 16, borderRadius: 24, padding: "18px 20px", marginBottom: 18, background: `linear-gradient(120deg,${ACCENT_DEEP},${ACCENT})`, boxShadow: `0 12px 30px rgba(226,109,138,.28)` }}>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".8px", textTransform: "uppercase", color: "rgba(255,255,255,.85)" }}>Phase bundle</div>
+              <div style={{ fontSize: 18, fontWeight: 800, color: "#fff", lineHeight: 1.2, margin: "4px 0 8px" }}>Your follicular essentials, 20% off</div>
+              <span style={{ display: "inline-block", background: "#fff", color: ACCENT_DEEP, fontSize: 12.5, fontWeight: 700, padding: "7px 14px", borderRadius: 999 }}>Shop the edit</span>
+            </div>
+            <span style={{ fontSize: 56, opacity: .5 }}>🌿</span>
+          </div>
 
-        <div className="px-5 space-y-4">
-          {/* Featured product */}
-          {featured && (
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">
-                Featured
-              </p>
-              <div className="overflow-hidden rounded-3xl border border-border bg-card">
-                {/* Product image / gradient */}
-                <div className="relative">
-                  {featured.hasImage ? (
-                    <div className="relative grid place-items-center bg-gradient-to-br from-fertile-light/40 via-period-light/30 to-pms/30 px-4 pt-5 pb-2">
-                      {featured.badge && (
-                        <span
-                          className={cn(
-                            "absolute left-4 top-4 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider",
-                            featured.badgeColor,
-                          )}
-                        >
-                          {featured.badge}
-                        </span>
-                      )}
-                      <button
-                        onClick={() => toggleWishlist(featured.id)}
-                        className="absolute right-4 top-4 grid size-8 place-items-center rounded-full bg-background/70 backdrop-blur-sm"
-                      >
-                        <Heart
-                          className={cn(
-                            "size-4",
-                            wishlist.has(featured.id)
-                              ? "fill-period text-period"
-                              : "text-muted-foreground",
-                          )}
-                          strokeWidth={2}
-                        />
-                      </button>
-                      <img
-                        src={featured.image}
-                        alt={featured.name}
-                        className="h-44 w-auto object-contain drop-shadow-md"
-                      />
-                    </div>
-                  ) : (
-                    <div
-                      className={cn("h-36 bg-gradient-to-br flex items-end p-4", featured.gradient)}
-                    >
-                      {featured.badge && (
-                        <span
-                          className={cn(
-                            "rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider bg-white/20 text-white",
-                          )}
-                        >
-                          {featured.badge}
-                        </span>
-                      )}
-                    </div>
-                  )}
+          {/* Product grid */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            {PRODUCTS.map(p => (
+              <div key={p.name} style={{ background: "#fff", borderRadius: 22, padding: 9, border: "1px solid #F6ECE8", boxShadow: CARD_SHADOW }}>
+                <div style={{ position: "relative" }}>
+                  <ThumbGradient c1={p.c1} c2={p.c2} ic={p.ic} h={118} />
+                  <button style={{ position: "absolute", right: 8, bottom: 8, width: 34, height: 34, borderRadius: "50%", border: "none", background: "#fff", boxShadow: "0 8px 26px rgba(180,100,120,.10)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 19, color: ACCENT }}>+</button>
                 </div>
-                {/* Details */}
-                <div className="p-4">
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                        {featured.tag}
-                      </p>
-                      <h3 className="mt-0.5 font-display text-[18px] font-semibold leading-snug text-foreground">
-                        {featured.name}
-                      </h3>
-                      <p className="text-[12px] text-muted-foreground">{featured.subtitle}</p>
-                    </div>
-                    {!featured.hasImage && (
-                      <button
-                        onClick={() => toggleWishlist(featured.id)}
-                        className="grid size-8 place-items-center rounded-full bg-muted"
-                      >
-                        <Heart
-                          className={cn(
-                            "size-4",
-                            wishlist.has(featured.id)
-                              ? "fill-period text-period"
-                              : "text-muted-foreground",
-                          )}
-                          strokeWidth={2}
-                        />
-                      </button>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-1 mt-2">
-                    <Star className="size-3.5 fill-pms text-pms" strokeWidth={0} />
-                    <span className="text-[12px] font-semibold text-foreground">
-                      {featured.rating}
-                    </span>
-                    <span className="text-[12px] text-muted-foreground">
-                      ({featured.reviews.toLocaleString()})
-                    </span>
-                  </div>
-                  <ul className="mt-3 space-y-1.5">
-                    {featured.features.map((f) => (
-                      <li key={f} className="flex items-center gap-2 text-[13px] text-foreground">
-                        <Check className="size-3.5 shrink-0 text-fertile" strokeWidth={2.5} />
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="mt-4 flex items-center justify-between">
-                    <div>
-                      <p className="font-display text-[22px] font-bold text-foreground">
-                        ₹{featured.price}
-                      </p>
-                      <p className="text-[11px] text-muted-foreground line-through">
-                        ₹{featured.mrp}
-                      </p>
-                    </div>
-                    <button
-                      onClick={() =>
-                        setCart((c) => {
-                          const n = new Set(c);
-                          n.add(featured.id);
-                          return n;
-                        })
-                      }
-                      className={cn(
-                        "inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-[13px] font-semibold transition-all",
-                        cart.has(featured.id)
-                          ? "bg-fertile/15 text-fertile"
-                          : "bg-period text-white shadow-md shadow-period/30",
-                      )}
-                    >
-                      <ShoppingBag className="size-4" />
-                      {cart.has(featured.id) ? "Added" : "Add to bag"}
-                    </button>
-                  </div>
+                <div style={{ padding: "11px 7px 6px" }}>
+                  <div style={{ fontSize: 14.5, fontWeight: 700, color: "#2E2329", lineHeight: 1.25 }}>{p.name}</div>
+                  <div style={{ fontSize: 12, color: "#705F66", marginTop: 2, lineHeight: 1.3 }}>{p.sub}</div>
+                  <div style={{ fontSize: 15.5, fontWeight: 800, color: "#2E2329", marginTop: 8, letterSpacing: -0.2 }}>{p.price}</div>
                 </div>
               </div>
-            </div>
-          )}
-
-          {/* Rest of products */}
-          {rest.length > 0 && (
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">
-                More products
-              </p>
-              <div className="space-y-3">
-                {rest.map((p) => (
-                  <div
-                    key={p.id}
-                    className="flex gap-3 rounded-2xl border border-border bg-card p-3"
-                  >
-                    {/* Thumb */}
-                    <div
-                      className={cn(
-                        "size-16 shrink-0 rounded-xl bg-gradient-to-br",
-                        p.gradient ?? "from-muted to-muted",
-                      )}
-                    />
-                    {/* Info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-1">
-                        <div>
-                          <p className="text-[12px] font-semibold text-foreground leading-snug">
-                            {p.name}
-                          </p>
-                          <p className="text-[11px] text-muted-foreground">{p.subtitle}</p>
-                        </div>
-                        <button onClick={() => toggleWishlist(p.id)} className="shrink-0 mt-0.5">
-                          <Heart
-                            className={cn(
-                              "size-4",
-                              wishlist.has(p.id)
-                                ? "fill-period text-period"
-                                : "text-muted-foreground",
-                            )}
-                            strokeWidth={2}
-                          />
-                        </button>
-                      </div>
-                      <div className="flex items-center gap-1 mt-1">
-                        <Star className="size-3 fill-pms text-pms" strokeWidth={0} />
-                        <span className="text-[11px] font-semibold text-foreground">
-                          {p.rating}
-                        </span>
-                        <span className="text-[11px] text-muted-foreground">
-                          ({p.reviews.toLocaleString()})
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between mt-2">
-                        <div className="flex items-baseline gap-1.5">
-                          <span className="font-display text-[15px] font-bold text-foreground">
-                            ₹{p.price}
-                          </span>
-                          <span className="text-[11px] text-muted-foreground line-through">
-                            ₹{p.mrp}
-                          </span>
-                        </div>
-                        <button
-                          onClick={() =>
-                            setCart((c) => {
-                              const n = new Set(c);
-                              n.add(p.id);
-                              return n;
-                            })
-                          }
-                          className={cn(
-                            "rounded-full px-3 py-1 text-[11px] font-semibold transition-all",
-                            cart.has(p.id)
-                              ? "bg-fertile/15 text-fertile"
-                              : "bg-period/10 text-period",
-                          )}
-                        >
-                          {cart.has(p.id) ? "Added ✓" : "Add"}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+            ))}
+          </div>
+          <div style={{ height: 8 }} />
         </div>
       </div>
     </AppShell>

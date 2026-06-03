@@ -30,107 +30,92 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-period: var(--period);
-  --color-period-light: var(--period-light);
-  --color-fertile: var(--fertile);
-  --color-fertile-light: var(--fertile-light);
-  --color-ovulation: var(--ovulation);
-  --color-pms: var(--pms);
-  --color-pcos: var(--pcos);
-  --color-pcos-light: var(--pcos-light);
-  --color-track: var(--track);
-  --font-display: "Fraunces", Georgia, serif;
-  --font-sans: "Inter", system-ui, sans-serif;
+
+  /* SheThrives palette tokens */
+  --color-rose: var(--rose);
+  --color-rose-deep: var(--rose-deep);
+  --color-rose-soft: var(--rose-soft);
+  --color-gold: var(--gold);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-she-bg: var(--she-bg);
+  --color-she-line: var(--she-line);
+  --color-she-line-soft: var(--she-line-soft);
+  --color-ph-menstrual: var(--ph-menstrual);
+  --color-ph-follicular: var(--ph-follicular);
+  --color-ph-ovulation: var(--ph-ovulation);
+  --color-ph-luteal: var(--ph-luteal);
+
+  /* Legacy token aliases for compat with existing components */
+  --color-period: var(--rose);
+  --color-period-light: var(--rose-soft);
+  --color-fertile: #7FB59A;
+  --color-fertile-light: #A8D0BF;
+  --color-ovulation: #7FB59A;
+  --color-pms: #C7B4DF;
+  --color-pcos: var(--rose);
+  --color-pcos-light: var(--rose-soft);
+  --color-track: var(--she-line-soft);
+
+  --font-sans: "Hanken Grotesk", -apple-system, system-ui, sans-serif;
+  --font-display: "Hanken Grotesk", -apple-system, system-ui, sans-serif;
 }
 
 :root {
   --radius: 1rem;
-  --background: oklch(0.98 0.005 80);
-  --foreground: oklch(0.22 0.02 250);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.22 0.02 250);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.22 0.02 250);
-  --primary: oklch(0.45 0.12 220);
-  --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.95 0.01 80);
-  --secondary-foreground: oklch(0.22 0.02 250);
-  --muted: oklch(0.95 0.01 80);
-  --muted-foreground: oklch(0.5 0.02 250);
-  --accent: oklch(0.92 0.04 50);
-  --accent-foreground: oklch(0.22 0.02 250);
-  --destructive: oklch(0.55 0.22 25);
-  --destructive-foreground: oklch(0.99 0 0);
-  --border: oklch(0.9 0.01 80);
-  --input: oklch(0.9 0.01 80);
-  --ring: oklch(0.45 0.12 220);
 
-  /* Clue-inspired palette */
-  --period: oklch(0.55 0.22 22); /* deep red */
-  --period-light: oklch(0.72 0.18 25); /* soft coral */
-  --fertile: oklch(0.55 0.12 220); /* teal blue */
-  --fertile-light: oklch(0.75 0.08 220);
-  --ovulation: oklch(0.55 0.16 165); /* green */
-  --pms: oklch(0.7 0.14 60); /* amber */
-  --pcos: oklch(0.52 0.22 290); /* violet-purple for PCOS mode */
-  --pcos-light: oklch(0.78 0.12 290);
-  --track: oklch(0.92 0.005 80); /* ring track */
-  --chart-1: var(--period);
-  --chart-2: var(--fertile);
-  --chart-3: var(--ovulation);
-  --chart-4: var(--pms);
-  --chart-5: oklch(0.6 0.15 290);
-  --sidebar: oklch(0.99 0 0);
-  --sidebar-foreground: oklch(0.22 0.02 250);
-  --sidebar-primary: var(--primary);
-  --sidebar-primary-foreground: oklch(0.99 0 0);
-  --sidebar-accent: oklch(0.95 0.01 80);
-  --sidebar-accent-foreground: oklch(0.22 0.02 250);
-  --sidebar-border: oklch(0.9 0.01 80);
-  --sidebar-ring: var(--primary);
-}
+  /* SheThrives core tokens */
+  --rose: #E26D8A;
+  --rose-deep: #C9577A;
+  --rose-soft: #FBE7EC;
+  --gold: #D99B57;
+  --ink: #2E2329;
+  --ink-soft: #705F66;
+  --ink-faint: #A89AA0;
+  --she-bg: #FBF3F0;
+  --she-bg-top: #FCF5F2;
+  --she-line: #F0E2DE;
+  --she-line-soft: #F6ECE8;
 
-.dark {
-  --background: oklch(0.18 0.02 250);
-  --foreground: oklch(0.96 0.005 80);
-  --card: oklch(0.22 0.02 250);
-  --card-foreground: oklch(0.96 0.005 80);
-  --popover: oklch(0.22 0.02 250);
-  --popover-foreground: oklch(0.96 0.005 80);
-  --primary: oklch(0.7 0.12 220);
-  --primary-foreground: oklch(0.18 0.02 250);
-  --secondary: oklch(0.28 0.02 250);
-  --secondary-foreground: oklch(0.96 0.005 80);
-  --muted: oklch(0.28 0.02 250);
-  --muted-foreground: oklch(0.7 0.02 250);
-  --accent: oklch(0.32 0.04 50);
-  --accent-foreground: oklch(0.96 0.005 80);
-  --destructive: oklch(0.65 0.2 25);
-  --destructive-foreground: oklch(0.99 0 0);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.7 0.12 220);
-  --track: oklch(0.3 0.01 250);
+  /* Phase colors */
+  --ph-menstrual: #E26D8A;
+  --ph-follicular: #F2B6C4;
+  --ph-ovulation: #7FB59A;
+  --ph-luteal: #C7B4DF;
+
+  /* Tailwind semantic tokens */
+  --background: #FBF3F0;
+  --foreground: #2E2329;
+  --card: #ffffff;
+  --card-foreground: #2E2329;
+  --popover: #ffffff;
+  --popover-foreground: #2E2329;
+  --primary: #E26D8A;
+  --primary-foreground: #ffffff;
+  --secondary: #FCF8F6;
+  --secondary-foreground: #2E2329;
+  --muted: #FCF8F6;
+  --muted-foreground: #705F66;
+  --accent: #FBE7EC;
+  --accent-foreground: #2E2329;
+  --destructive: #E26D8A;
+  --destructive-foreground: #ffffff;
+  --border: #F0E2DE;
+  --input: #F0E2DE;
+  --ring: #E26D8A;
+
+  --sidebar: #ffffff;
+  --sidebar-foreground: #2E2329;
+  --sidebar-primary: #E26D8A;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #FBE7EC;
+  --sidebar-accent-foreground: #2E2329;
+  --sidebar-border: #F0E2DE;
+  --sidebar-ring: #E26D8A;
 }
 
 @layer base {
-  @font-face {
-    font-family: "Inter";
-    font-style: normal;
-    font-weight: 100 900;
-    font-display: swap;
-    src: url("https://fonts.gstatic.com/s/inter/v18/UcCo3FwrK3iLTcvneQg7Ca725JhhKnNqk4j1ebLhAm8SrXTczg.woff2")
-      format("woff2");
-  }
-  @font-face {
-    font-family: "Fraunces";
-    font-style: normal;
-    font-weight: 100 900;
-    font-display: swap;
-    src: url("https://fonts.gstatic.com/s/fraunces/v37/6NUh8FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk.woff2")
-      format("woff2");
-  }
-
   * {
     border-color: var(--color-border);
   }
@@ -141,4 +126,49 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
   }
+}
+
+/* Utility: hide scrollbars */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Sheet animation */
+@keyframes sheetUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.sheet-up {
+  animation: sheetUp 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Fade in */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+.fade-in {
+  animation: fadeIn 0.3s ease;
+}
+
+/* Player animations */
+@keyframes breathe {
+  0%, 100% { transform: scale(1) translateY(0); }
+  50% { transform: scale(1.09) translateY(-7px); }
+}
+@keyframes rep {
+  0%, 100% { transform: translateY(-8px); }
+  50% { transform: translateY(12px) scale(0.96); }
+}
+@keyframes bob {
+  0%, 100% { transform: translateY(-9px); }
+  50% { transform: translateY(9px); }
+}
+@keyframes floaty {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-22px); }
 }
