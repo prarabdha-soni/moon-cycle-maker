@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/yoga-flow")({
   head: () => ({
-    meta: [{ title: "Yoga sequence — Petal" }],
+    meta: [{ title: "Yoga sequence — SheThrives" }],
   }),
   component: YogaFlowScreen,
 });

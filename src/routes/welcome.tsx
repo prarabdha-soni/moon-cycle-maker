@@ -5,8 +5,8 @@ import { Flower2, HeartPulse, Baby, Check, ArrowRight } from "lucide-react";
 export const Route = createFileRoute("/welcome")({
   head: () => ({
     meta: [
-      { title: "Welcome — Petal" },
-      { name: "description", content: "Tell us about your cycle to personalize Petal." },
+      { title: "Welcome — SheThrives" },
+      { name: "description", content: "Tell us about your cycle to personalize SheThrives." },
     ],
   }),
   component: WelcomeScreen,

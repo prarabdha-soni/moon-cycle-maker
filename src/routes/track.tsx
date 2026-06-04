@@ -21,7 +21,7 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/track")({
   head: () => ({
     meta: [
-      { title: "Track today — Petal" },
+      { title: "Track today — SheThrives" },
       { name: "description", content: "Log your period flow, symptoms, mood and more." },
     ],
   }),

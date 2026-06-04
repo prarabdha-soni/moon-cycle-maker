@@ -5,7 +5,7 @@ import { AppShell } from "@/components/AppShell";
 export const Route = createFileRoute("/analysis")({
   head: () => ({
     meta: [
-      { title: "Analysis — Petal" },
+      { title: "Analysis — SheThrives" },
       { name: "description", content: "Cycle insights and trends across your last six months." },
     ],
   }),
@@ -39,16 +39,18 @@ function AnalysisScreen() {
             <h2 className="font-display text-lg font-medium">Cycle history</h2>
             <span className="text-xs text-muted-foreground">last 6 months</span>
           </div>
-          <div className="flex items-end justify-between gap-2 h-40">
+          <div className="flex items-end justify-between gap-2">
             {cycleHistory.map((c) => {
               const h = ((c.length - 22) / (max - 22 + 1)) * 100;
               return (
                 <div key={c.month} className="flex flex-1 flex-col items-center gap-2">
                   <span className="text-[11px] font-medium text-foreground">{c.length}</span>
-                  <div
-                    className="w-full rounded-t-lg bg-gradient-to-t from-fertile to-fertile-light"
-                    style={{ height: `${Math.max(20, h)}%` }}
-                  />
+                  <div className="flex h-32 w-full items-end">
+                    <div
+                      className="w-full rounded-t-lg bg-gradient-to-t from-fertile to-fertile-light"
+                      style={{ height: `${Math.max(20, h)}%` }}
+                    />
+                  </div>
                   <span className="text-[11px] text-muted-foreground">{c.month}</span>
                 </div>
               );

@@ -8,7 +8,7 @@ import { PROFILE_UPDATE_EVENT } from "@/components/ProfileIcon";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/profile")({
-  head: () => ({ meta: [{ title: "Profile — Petal" }] }),
+  head: () => ({ meta: [{ title: "Profile — SheThrives" }] }),
   component: ProfileScreen,
 });
 

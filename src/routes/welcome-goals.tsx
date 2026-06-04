@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/welcome-goals")({
   head: () => ({
     meta: [
-      { title: "Your Goals — Petal" },
+      { title: "Your Goals — SheThrives" },
       {
         name: "description",
         content: "Tell us your health goals so we can personalise your experience.",

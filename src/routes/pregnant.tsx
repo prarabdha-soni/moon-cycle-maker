@@ -9,7 +9,7 @@ import { ProfileIcon } from "@/components/ProfileIcon";
 export const Route = createFileRoute("/pregnant")({
   head: () => ({
     meta: [
-      { title: "Pregnancy — Petal" },
+      { title: "Pregnancy — SheThrives" },
       { name: "description", content: "Track your pregnancy journey week by week." },
     ],
   }),
@@ -1943,7 +1943,7 @@ function InsightCards({
     },
     {
       id: "baby",
-      title: `Your baby\nat ${week} weeks`,
+      title: `Your baby\nat ${week} ${week === 1 ? "week" : "weeks"}`,
       bg: "bg-stone-100",
       content: (
         <div className="mt-auto flex items-center gap-1">
@@ -1955,7 +1955,7 @@ function InsightCards({
     },
     {
       id: "body",
-      title: `Your body\nat ${week} weeks`,
+      title: `Your body\nat ${week} ${week === 1 ? "week" : "weeks"}`,
       bg: "bg-sky-100",
       content: <div className="mt-auto text-4xl">🫁</div>,
       onClick: onOpenDetails,

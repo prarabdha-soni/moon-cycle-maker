@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/welcome-last-period")({
   head: () => ({
     meta: [
-      { title: "Last Period — Petal" },
+      { title: "Last Period — SheThrives" },
       { name: "description", content: "Tell us when your last period started." },
     ],
   }),
@@ -145,7 +145,7 @@ function LastPeriodScreen() {
         >
           <ArrowLeft className="size-5" strokeWidth={2.25} />
         </button>
-        <span className="font-display text-[17px] font-semibold text-period">Petal</span>
+        <span className="font-display text-[17px] font-semibold text-period">SheThrives</span>
         <span className="size-9" aria-hidden />
       </div>
 

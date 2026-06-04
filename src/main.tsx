@@ -13,7 +13,7 @@ class AppErrorBoundary extends React.Component<{ children: ReactNode }, { error:
     return { error };
   }
   componentDidCatch(error: Error, info: ErrorInfo) {
-    console.error("Petal error boundary caught:", error, info);
+    console.error("SheThrives error boundary caught:", error, info);
   }
   render() {
     if (this.state.error) {
@@ -24,7 +24,7 @@ class AppErrorBoundary extends React.Component<{ children: ReactNode }, { error:
             Something went wrong
           </h1>
           <p className="text-[14px] text-muted-foreground">
-            Petal hit an unexpected error. Tap below to reload.
+            SheThrives hit an unexpected error. Tap below to reload.
           </p>
           <button
             onClick={() => window.location.reload()}

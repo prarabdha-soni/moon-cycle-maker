@@ -19,7 +19,7 @@ import { AppShell } from "@/components/AppShell";
 export const Route = createFileRoute("/med")({
   head: () => ({
     meta: [
-      { title: "Med & supplements — Petal" },
+      { title: "Med & supplements — SheThrives" },
       {
         name: "description",
         content:

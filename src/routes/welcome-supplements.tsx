@@ -5,7 +5,7 @@ import { Pill, Leaf, Sun, Droplets, Sparkles, FlaskConical, Check } from "lucide
 export const Route = createFileRoute("/welcome-supplements")({
   head: () => ({
     meta: [
-      { title: "Your supplements — Petal" },
+      { title: "Your supplements — SheThrives" },
       { name: "description", content: "Pick the supplements you take so we can remind you daily." },
     ],
   }),

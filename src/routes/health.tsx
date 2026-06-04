@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/health")({
   head: () => ({
     meta: [
-      { title: "Health — Petal" },
+      { title: "Health — SheThrives" },
       { name: "description", content: "Health guides and videos tailored to your mode." },
     ],
   }),

@@ -6,7 +6,7 @@ import shetrivesCup from "@/assets/shetrives-cup.png";
 export const Route = createFileRoute("/content")({
   head: () => ({
     meta: [
-      { title: "Product — Petal" },
+      { title: "Product — SheThrives" },
       {
         name: "description",
         content: "Shop curated period care products handpicked for your cycle.",
@@ -66,7 +66,9 @@ function ContentScreen() {
         <section>
           <div className="mb-3 flex items-end justify-between">
             <h2 className="font-display text-lg font-medium">Shop</h2>
-            <span className="text-[11px] uppercase tracking-wider text-fertile">Petal picks</span>
+            <span className="text-[11px] uppercase tracking-wider text-fertile">
+              SheThrives picks
+            </span>
           </div>
           <article className="overflow-hidden rounded-3xl border border-border bg-card">
             <div className="relative grid place-items-center bg-gradient-to-br from-fertile-light/40 via-period-light/30 to-pms/30 px-4 pt-5">
